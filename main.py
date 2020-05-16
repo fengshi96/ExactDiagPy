@@ -26,14 +26,6 @@ def main(total, cmdargs):
 
 
 
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
 	sys.argv ## get the input argument
 	total = len(sys.argv)
