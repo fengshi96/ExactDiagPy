@@ -1,1 +1,1 @@
-# Honeycomb-ExactDiag: Python Realization
+# Honeycomb-ExactDiag using PRIMME: Python Realization
