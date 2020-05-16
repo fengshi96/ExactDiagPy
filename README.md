@@ -1,1 +1,1 @@
-# Honeycomb-ExactDiagPy
+# Honeycomb-ExactDiag: Python Realization
