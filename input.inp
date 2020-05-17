@@ -15,6 +15,7 @@ Bxx=-0.0
 Byy=-0.0
 Bzz=-0.0
 
+# Number of states to keep
 Nstates=2
 
 
