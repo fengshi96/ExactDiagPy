@@ -205,7 +205,7 @@ class Lattice:
                     self.nn_[i, 1] = j
 
             if self.IsPeriodicY:
-                # +y - 1neighbor 1
+                # +y - 1neighbor 2
                 if iy == self.LLY - 1:  # right edge
                     jx = ix
                     jy = 0
@@ -213,7 +213,7 @@ class Lattice:
                     self.nn_[i, 2] = j
 
             if self.IsPeriodicY:
-                # -y - 1neighbor 1
+                # -y - 1neighbor 3
                 if iy == 0:  # left edge
                     jx = ix
                     jy = self.LLY - 1
