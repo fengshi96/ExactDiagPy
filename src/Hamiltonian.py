@@ -44,9 +44,7 @@ class Hamiltonian:
 
 		elif self.Model == "Hubbard":
 			self.Nsite = para.LLX * para.LLY
-			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.tGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.Ham = self.BuildHubbard(para)
 
 		else:
