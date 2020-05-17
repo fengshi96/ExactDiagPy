@@ -3,7 +3,6 @@ import numpy as np
 import scipy.sparse as sp
 import primme
 from src.Parameter import Parameter
-from src.Lattice import Lattice
 from src.Hamiltonian import Hamiltonian
 
 

@@ -3,6 +3,7 @@ import scipy.sparse as sp
 from src.Parameter import Parameter
 from src.Lattice import Lattice
 from src.Dofs import Dofs
+from src.Helper import matprint
 
 class Hamiltonian:
 
@@ -55,9 +56,10 @@ class Hamiltonian:
 				self.KzzGraph_[i,j] = self.Kzz
 				self.KzzGraph_[j,i] = self.Kzz
 				
-		print("\nKxxGraph_:", *self.KxxGraph_,sep="\n")
-		print("\nKyyGraph_:", *self.KyyGraph_,sep="\n")
-		print("\nKzzGraph_:", *self.KzzGraph_,sep="\n")
+		#print("\nKxxGraph_:", *self.KxxGraph_,sep="\n")
+		#print("\nKyyGraph_:", *self.KyyGraph_,sep="\n")
+		#print("\nKzzGraph_:", *self.KzzGraph_,sep="\n")
+		matprint(self.KxxGraph_); matprint(self.KyyGraph_); matprint(self.KzzGraph_)
 		
 		# only need the upper half of KnnGraph_
 		xbonds = int( np.count_nonzero(self.KxxGraph_)/2 )

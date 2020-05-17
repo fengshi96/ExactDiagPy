@@ -1,130 +1,228 @@
 import numpy as np
 import math as m
 from src.Parameter import Parameter
+from src.Helper import matprint
+
 
 class Lattice:
-	
-	def __init__(self, para):
-		
-		self.LLX = para.LLX
-		self.LLY = para.LLY
-		self.IsPeriodicX = para.IsPeriodicX
-		self.IsPeriodicY = para.IsPeriodicY
-		self.Model = para.Model
-		self.Nsite = self.LLX * self.LLY * 2
-		
-		if para.Model=="Kitaev":
-			self.Number1neigh = 3 
-		elif para.Model=="2dHeisenberg":
-			self.Number1neigh = 4
-		else:
-			pass
-		
-		self.indx_ = np.zeros(self.Nsite,dtype=int)	
-		self.indy_ = np.zeros(self.Nsite,dtype=int)
-		self.mesh_ = -np.ones((self.LLX*2+self.LLY, self.LLY*2),dtype=int)	
-		self.nn_ = np.zeros((self.Nsite,self.Number1neigh),dtype=int)
-		
-		self.Build()
-		
-		
-	def Build(self):
-		"Construct Lattice mesh and nearest neighbor matrix"
-		
-		print("[Lattice.py] building Honeycomb lattice...")
-		scalex = 2; 
-		scaley = 4.0/m.sqrt(3)
-		t1 = [1.0 * scalex, 0]
-		t2 = [0.5 * scalex, m.sqrt(3)/2.0 * scaley]		
-		
-		xv = 0
-		counter = 0
-	
-		for i in range(0,self.LLX):
-			if i != 0:
-				xv += t1[0]
-			
-			xa = xv; xb = xv + 1
-			ya = 0; yb = 1
-		
-			for j in range(0,self.LLY):
-				xa = xv + j*t2[0]; xb = (xv + 1) + j*t2[0]
-				ya = j*t2[1]; yb = 1 + j*t2[1]
-				
-				xa = int(xa); xb = int(xb)
-				ya = int(ya); yb = int(yb)			
-			
-				self.indx_[counter] = xa
-				self.indy_[counter] = ya
-				self.mesh_[xa,ya] = counter
-				counter += 1
-				
-				self.indx_[counter] = xb
-				self.indy_[counter] = yb
-				self.mesh_[xb,yb] = counter
-				counter += 1	
-		print(*self.mesh_,sep = "\n")
 
-		
-		print("\n[Lattice.py] Looking for nearest neighbors...")
-		xmax = max(self.indx_)
-		ymax = max(self.indy_)	
-				
-		for i in range(0,self.Nsite):
-			ix = self.indx_[i]  # coordinate of n-th site in matrix
-			iy = self.indy_[i]
-			
-			#----------------------------OBC-----------------------------------
-			
-			# n.n in x-bond
-			jx = ix + 1; jy = iy + 1  # move 1 step in x = (1,1) direction
-			if jx <= xmax and jy <= ymax and self.mesh_[jx,jy] != -1:
-				j = self.mesh_[jx,jy]  # site index of n.n. in x direction
-				self.nn_[i,0] = j
-				self.nn_[j,0] = i 
-				
-			# n.n in y-bond
-			jx = ix + 1; jy = iy - 1  # move 1 step in x = (1,1) direction
-			if jx <= xmax and jy <= ymax and jy >= 0 and self.mesh_[jx,jy] != -1:
-				j = self.mesh_[jx,jy]  # site index of n.n. in x direction
-				self.nn_[i,1] = j
-				self.nn_[j,1] = i 
-				
-			# n.n in z-bond
-			jx = ix; jy = iy + 1  # move 1 step in x = (1,1) direction
-			if jx <= xmax and jy <= ymax and self.mesh_[jx,jy] != -1:
-				j = self.mesh_[jx,jy]  # site index of n.n. in x direction
-				self.nn_[i,2] = j
-				self.nn_[j,2] = i 		
-						
-			#----------------------------OBC-----------------------------------	
-			
-			
-			#--------------------------Apply PBC-------------------------------
-			
-			if self.IsPeriodicY == True:
-				# z-bond
-				jx = ix - self.LLY 
-				jy = 0
-				if jx >= 0 and iy == ymax and self.mesh_[jx,jy]!=-1:
-					j = self.mesh_[jx,jy]
-					self.nn_[i,2] = j
-					self.nn_[j,2] = i
-			
-			if self.IsPeriodicX == True:
-				# y-bond
-				jx = ix + 2 * self.LLX - 1 
-				jy = iy + 1
-				if jx <= xmax and iy <= ymax and iy%2 ==0 and self.mesh_[jx,jy]!=-1:
-					j = self.mesh_[jx,jy]
-					self.nn_[i,1] = j
-					self.nn_[j,1] = i			
-				
-		print(*self.nn_,sep = "\n")
+    def __init__(self, para):
 
+        self.LLX = para.LLX
+        self.LLY = para.LLY
+        self.IsPeriodicX = para.IsPeriodicX
+        self.IsPeriodicY = para.IsPeriodicY
+        self.Model = para.Model
+
+
+        if para.Model == "Kitaev":
+            self.Nsite = self.LLX * self.LLY * 2
+            self.indx_ = np.zeros(self.Nsite, dtype=int)
+            self.indy_ = np.zeros(self.Nsite, dtype=int)
+            self.Number1neigh = 3
+            self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)
+            self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)
+            self.BuildHoneycomb()
+        elif para.Model == "Square":
+            self.Nsite = self.LLX * self.LLY
+            self.indx_ = np.zeros(self.Nsite, dtype=int)
+            self.indy_ = np.zeros(self.Nsite, dtype=int)
+            self.Number1neigh = 4
+            self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)
+            self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
+            self.BuildSquare()
+        else:
+            pass
+
+    def BuildHoneycomb(self):
+        """Construct Honeycomb Lattice mesh and nearest neighbor matrix"""
+
+        print("[Lattice.py] building Honeycomb lattice...")
+        scalex = 2
+        scaley = 4.0 / m.sqrt(3)
+        t1 = [1.0 * scalex, 0]
+        t2 = [0.5 * scalex, m.sqrt(3) / 2.0 * scaley]
+
+        xv = 0
+        counter = 0
+
+        for i in range(0, self.LLX):
+            if i != 0:
+                xv += t1[0]
+
+            for j in range(0, self.LLY):
+                xa = xv + j * t2[0]
+                xb = (xv + 1) + j * t2[0]
+                ya = j * t2[1]
+                yb = 1 + j * t2[1]
+
+                xa = int(xa)
+                xb = int(xb)
+                ya = int(ya)
+                yb = int(yb)
+
+                self.indx_[counter] = xa
+                self.indy_[counter] = ya
+                self.mesh_[xa, ya] = counter
+                counter += 1
+
+                self.indx_[counter] = xb
+                self.indy_[counter] = yb
+                self.mesh_[xb, yb] = counter
+                counter += 1
+        matprint(self.mesh_)
+
+        print("\n[Lattice.py] Looking for nearest neighbors...")
+        xmax = max(self.indx_)
+        ymax = max(self.indy_)
+
+        for i in range(0, self.Nsite):
+            ix = self.indx_[i]  # coordinate of n-th site in matrix
+            iy = self.indy_[i]
+
+            # ----------------------------OBC-----------------------------------
+
+            # n.n in x-bond
+            jx = ix + 1
+            jy = iy + 1  # move 1 step in x = (1,1) direction
+            if jx <= xmax and jy <= ymax and self.mesh_[jx, jy] != -1:
+                j = self.mesh_[jx, jy]  # site index of n.n. in x direction
+                self.nn_[i, 0] = j
+                self.nn_[j, 0] = i
+
+            # n.n in y-bond
+            jx = ix + 1
+            jy = iy - 1  # move 1 step in x = (1,1) direction
+            if jx <= xmax and jy <= ymax and jy >= 0 and self.mesh_[jx, jy] != -1:
+                j = self.mesh_[jx, jy]  # site index of n.n. in x direction
+                self.nn_[i, 1] = j
+                self.nn_[j, 1] = i
+
+            # n.n in z-bond
+            jx = ix
+            jy = iy + 1  # move 1 step in x = (1,1) direction
+            if jx <= xmax and jy <= ymax and self.mesh_[jx, jy] != -1:
+                j = self.mesh_[jx, jy]  # site index of n.n. in x direction
+                self.nn_[i, 2] = j
+                self.nn_[j, 2] = i
+
+            # ----------------------------OBC-----------------------------------
+
+            # --------------------------Apply PBC-------------------------------
+
+            if self.IsPeriodicY:
+                # z-bond
+                jx = ix - self.LLY
+                jy = 0
+                if jx >= 0 and iy == ymax and self.mesh_[jx, jy] != -1:
+                    j = self.mesh_[jx, jy]
+                    self.nn_[i, 2] = j
+                    self.nn_[j, 2] = i
+
+            if self.IsPeriodicX:
+                # y-bond
+                jx = ix + 2 * self.LLX - 1
+                jy = iy + 1
+                if jx <= xmax and iy <= ymax and iy % 2 == 0 and self.mesh_[jx, jy] != -1:
+                    j = self.mesh_[jx, jy]
+                    self.nn_[i, 1] = j
+                    self.nn_[j, 1] = i
+
+        matprint(self.nn_)
+
+    def BuildSquare(self):
+        """
+        Construct Square Lattice mesh and nearest neighbor matrix
+        ----------------------------------------------------------
+                                 |
+                                (1)
+                                 |
+                      —— (3) ——  i  ——  (2) ——
+                                 |
+                                (0)
+                                 |
+        ----------------------------------------------------------
+        """
+
+        print("[Lattice.py] building Square lattice...")
+        # ----------------------------OBC-----------------------------------
+        counter = 0
+        for ix in range(0, self.LLX):
+            for iy in range(0, self.LLY):
+                self.mesh_[ix, iy] = counter
+                self.indx_[counter] = ix
+                self.indy_[counter] = iy
+                counter += 1
+        matprint(self.mesh_)
+
+        print("\n[Lattice.py] Looking for nearest neighbors...")
+        for i in range(0, self.Nsite):
+            ix = self.indx_[i]
+            iy = self.indy_[i]
+
+            # +x - 1neighbor 0
+            if ix + 1 < self.LLX:  # if not at the bottom edge
+                jy = iy
+                jx = ix + 1
+                j = self.mesh_[jx, jy]  # (+x)-neighbor index
+                self.nn_[i, 0] = j
+
+            # -x - 1neighbor 1
+            if ix > 0:  # if not at the top edge
+                jy = iy
+                jx = ix - 1
+                j = self.mesh_[jx, jy]  # (-x)-neighbor index
+                self.nn_[i, 1] = j
+
+            # +y - 1neighbor 2
+            if iy + 1 < self.LLY:  # if not at the right edge
+                jy = iy + 1
+                jx = ix
+                j = self.mesh_[jx, jy]  # (+y)-neighbor index
+                self.nn_[i, 2] = j
+
+            # -y - 1neighbor 3
+            if iy > 0:  # if not at the left edge
+                jy = iy - 1
+                jx = ix
+                j = self.mesh_[jx, jy]  # (-y)-neighbor index
+                self.nn_[i, 3] = j
+            # ----------------------------OBC-----------------------------------
+
+            # --------------------------Apply PBC-------------------------------
+            if self.IsPeriodicX:
+                # +x - 1neighbor 0
+                if ix == self.LLX - 1:  # bottom edge
+                    jx = 0
+                    jy = iy
+                    j = self.mesh_[jx, jy]
+                    self.nn_[i, 0] = j
+
+                # -x - 1neighbor 1
+                if ix == 0:  # top edge
+                    jx = self.LLX - 1
+                    jy = iy
+                    j = self.mesh_[jx, jy]
+                    self.nn_[i, 1] = j
+
+            if self.IsPeriodicY:
+                # +y - 1neighbor 1
+                if iy == self.LLY - 1:  # right edge
+                    jx = ix
+                    jy = 0
+                    j = self.mesh_[jx, jy]
+                    self.nn_[i, 2] = j
+
+            if self.IsPeriodicY:
+                # -y - 1neighbor 1
+                if iy == 0:  # left edge
+                    jx = ix
+                    jy = self.LLY - 1
+                    j = self.mesh_[jx, jy]
+                    self.nn_[i, 3] = j
+        matprint(self.nn_)
 
 #param = Parameter("../input.inp")
 #lat = Lattice(param)
-
 
 
