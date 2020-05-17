@@ -11,16 +11,14 @@ class Hamiltonian:
 	def __init__(self, para):
 
 		self.Model = para.Model
-		self.Nsite = para.LLX * para.LLY * 2
-		self.Kxx = para.Kxx
-		self.Kyy = para.Kyy
-		self.Kzz = para.Kzz
-		self.Hx = para.Hx
+
+		self.Hx = para.Hx  # uniform field in x
 		self.Hy = para.Hy
 		self.Hz = para.Hz
-		self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-		self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-		self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+
+		self.Kxx = para.Kxx  # coupling strength of x-bond
+		self.Kyy = para.Kyy
+		self.Kzz = para.Kzz
 
 		self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
 		self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
@@ -31,13 +29,31 @@ class Hamiltonian:
 		self.Kzzcoef_ = np.zeros(())
 
 		if self.Model == "Kitaev":
+			self.Nsite = para.LLX * para.LLY * 2
+			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.Ham = self.BuildKitaev(para)
+
 		elif self.Model == "Heisenberg":
+			self.Nsite = para.LLX * para.LLY
+			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.Ham = self.BuildHeisenberg(para)
+
 		elif self.Model == "Hubbard":
+			self.Nsite = para.LLX * para.LLY
+			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.Ham = self.BuildHubbard(para)
+
 		else:
 			pass
+
+
+
 
 	def BuildKitaev(self, para):
 
@@ -182,7 +198,8 @@ class Hamiltonian:
 		return Ham
 
 	def BuildHeisenberg(self, para):
-		pass
+		lat = Lattice(para)
+		nn_ = lat.nn_
 
 	def BuildHubbard(self, para):
 		pass
