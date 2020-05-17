@@ -1,4 +1,4 @@
-# Honeycomb-ExactDiag using PRIMME: Python Realization
+# ExactDiag by PRIMME: Python Realization
 
 The main.py takes one argument in terminal: 
 
