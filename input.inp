@@ -2,6 +2,8 @@ LLX=2
 LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
+
+# Kitaev or Square
 Model=Kitaev
 
 

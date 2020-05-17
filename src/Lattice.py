@@ -23,7 +23,7 @@ class Lattice:
             self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)
             self.BuildHoneycomb()
-        elif para.Model == "Square":
+        elif para.Model == "Heisenberg" or para.Model == "Hubbard":
             self.Nsite = self.LLX * self.LLY
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
