@@ -14,7 +14,6 @@ class Lattice:
         self.IsPeriodicY = para.IsPeriodicY
         self.Model = para.Model
 
-
         if para.Model == "Kitaev":
             self.Nsite = self.LLX * self.LLY * 2
             self.indx_ = np.zeros(self.Nsite, dtype=int)
@@ -222,7 +221,5 @@ class Lattice:
                     self.nn_[i, 3] = j
         matprint(self.nn_)
 
-#param = Parameter("../input.inp")
-#lat = Lattice(param)
-
-
+# param = Parameter("../input.inp")
+# lat = Lattice(param)
