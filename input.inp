@@ -1,4 +1,4 @@
-LLX=2
+LLX=1
 LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
@@ -15,6 +15,6 @@ Bxx=-0.0
 Byy=-0.0
 Bzz=-0.0
 
-Nstates=3
+Nstates=2
 
 

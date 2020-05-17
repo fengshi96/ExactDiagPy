@@ -80,10 +80,9 @@ class Hamiltonian:
 		print("\nKzzGraph_:")
 		matprint(self.KzzGraph_)
 
-		self.KxxPair_, self.Kxxcoef_, Nxbonds = PairConstructor(self.KxxGraph_, self.Nsite)
-		self.KyyPair_, self.Kyycoef_, Nybonds = PairConstructor(self.KyyGraph_, self.Nsite)
-		self.KzzPair_, self.Kzzcoef_, Nzbonds = PairConstructor(self.KzzGraph_, self.Nsite)
-
+		self.KxxPair_, self.Kxxcoef_ = PairConstructor(self.KxxGraph_, self.Nsite)
+		self.KyyPair_, self.Kyycoef_ = PairConstructor(self.KyyGraph_, self.Nsite)
+		self.KzzPair_, self.Kzzcoef_ = PairConstructor(self.KzzGraph_, self.Nsite)
 
 		# ---------------------Build Hamiltonian as Sparse Matrix-------------------
 
@@ -94,52 +93,9 @@ class Hamiltonian:
 		Sz = Spins.Sz
 		I = Spins.I
 
-		Ham = sp.eye(2 ** self.Nsite, dtype=complex) * 0
-		Hamx = sp.eye(2 ** self.Nsite, dtype=complex) * 0
-		Hamy = sp.eye(2 ** self.Nsite, dtype=complex) * 0
-		Hamz = sp.eye(2 ** self.Nsite, dtype=complex) * 0
-
-		for i in range(0, Nxbonds):
-			ia = self.KxxPair_[i, 0]
-			ib = self.KxxPair_[i, 1]
-			coef = self.Kxxcoef_[i]
-
-			ida = sp.eye(2 ** ia)
-			idm = sp.eye(2 ** (ib - ia - 1))
-			idb = sp.eye(2 ** (self.Nsite - ib - 1))
-			tmp1 = sp.kron(ida, Sx)
-			tmp2 = sp.kron(tmp1, idm)
-			tmp3 = sp.kron(tmp2, Sx)
-			tmp4 = sp.kron(tmp3, idb)
-			Hamx += tmp4 * coef
-
-		for i in range(0, Nybonds):
-			ia = self.KyyPair_[i, 0]
-			ib = self.KyyPair_[i, 1]
-			coef = self.Kyycoef_[i]
-
-			ida = sp.eye(2 ** ia)
-			idm = sp.eye(2 ** (ib - ia - 1))
-			idb = sp.eye(2 ** (self.Nsite - ib - 1))
-			tmp1 = sp.kron(ida, Sy)
-			tmp2 = sp.kron(tmp1, idm)
-			tmp3 = sp.kron(tmp2, Sy)
-			tmp4 = sp.kron(tmp3, idb)
-			Hamy += tmp4 * coef
-
-		for i in range(0, Nzbonds):
-			ia = self.KzzPair_[i, 0]
-			ib = self.KzzPair_[i, 1]
-			coef = self.Kzzcoef_[i]
-
-			ida = sp.eye(2 ** ia)
-			idm = sp.eye(2 ** (ib - ia - 1))
-			idb = sp.eye(2 ** (self.Nsite - ib - 1))
-			tmp1 = sp.kron(ida, Sz)
-			tmp2 = sp.kron(tmp1, idm)
-			tmp3 = sp.kron(tmp2, Sz)
-			tmp4 = sp.kron(tmp3, idb)
-			Hamz += tmp4 * coef
+		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, Sx, self.Nsite)
+		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, Sy, self.Nsite)
+		Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, Sz, self.Nsite)
 
 		Ham = Hamx + Hamy + Hamz
 
@@ -180,9 +136,35 @@ class Hamiltonian:
 		print("\nKzzGraph_:")
 		matprint(self.KzzGraph_)
 
-		self.KxxPair_, self.Kxxcoef_, Nxbonds = PairConstructor(self.KxxGraph_, self.Nsite)
-		self.KyyPair_, self.Kyycoef_, Nybonds = PairConstructor(self.KyyGraph_, self.Nsite)
-		self.KzzPair_, self.Kzzcoef_, Nzbonds = PairConstructor(self.KzzGraph_, self.Nsite)
+		self.KxxPair_, self.Kxxcoef_ = PairConstructor(self.KxxGraph_, self.Nsite)
+		self.KyyPair_, self.Kyycoef_ = PairConstructor(self.KyyGraph_, self.Nsite)
+		self.KzzPair_, self.Kzzcoef_ = PairConstructor(self.KzzGraph_, self.Nsite)
+
+		# ---------------------Build Hamiltonian as Sparse Matrix-------------------
+
+		print("[Hamiltonian.py] Building Hamiltonian as Sparse Matrix...")
+		Spins = Dofs("SpinHalf")
+		Sx = Spins.Sx
+		Sy = Spins.Sy
+		Sz = Spins.Sz
+		I = Spins.I
+
+		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, Sx, self.Nsite)
+		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, Sy, self.Nsite)
+		Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, Sz, self.Nsite)
+
+		Ham = Hamx + Hamy + Hamz
+
+		# --------------------------- Add external field -------------------------
+
+		for i in range(0, self.Nsite):
+			ida = sp.eye(2 ** i)
+			idb = sp.eye(2 ** (self.Nsite - i - 1))
+			Ham += sp.kron(ida, sp.kron(Sx, idb)) * self.Hx
+			Ham += sp.kron(ida, sp.kron(Sy, idb)) * self.Hy
+			Ham += sp.kron(ida, sp.kron(Sz, idb)) * self.Hz
+
+		return Ham
 
 	def BuildHubbard(self, para):
 		pass
@@ -192,12 +174,11 @@ class Hamiltonian:
 # --------------------------- Functions -------------------------
 # --------------------------- Functions -------------------------
 def PairConstructor(Graph_, Nsite):
-
 	bonds = int(np.count_nonzero(Graph_) / 2)  # Number of non-zero bonds. Only half of matrix elements is needed
 	PairInd_ = np.zeros((bonds, 2))  # Indices of pairs of sites that have non-zero coupling
 	PairCoef_ = np.zeros(bonds)  # coupling constant of pairs
 
-	# extract non-zero coupling pairs and their magnitude
+	# extract non-zero coupling pairs and their value
 	counter = 0
 	for i in range(0, Nsite):
 		for j in range(i, Nsite):
@@ -207,8 +188,26 @@ def PairConstructor(Graph_, Nsite):
 				PairCoef_[counter] = Graph_[i, j]
 				counter += 1
 
-	return PairInd_, PairCoef_, bonds
+	return PairInd_, PairCoef_
 
 
-para = Parameter("../input.inp")
-Ham = Hamiltonian(para)
+def TwoSpinOps(PairInd_, PairCoef_, Dof, Nsite):
+	Nbonds = len(PairCoef_)  # Number of non-zero bonds
+	Hamtmp_ = sp.eye(2 ** Nsite, dtype=complex) * 0
+	for i in range(0, Nbonds):
+		ia = PairInd_[i, 0]
+		ib = PairInd_[i, 1]
+		coef = PairCoef_[i]
+
+		ida = sp.eye(2 ** ia)
+		idm = sp.eye(2 ** (ib - ia - 1))
+		idb = sp.eye(2 ** (Nsite - ib - 1))
+
+		tmp = sp.kron(sp.kron(sp.kron(sp.kron(ida, Dof), idm), Dof), idb)
+		Hamtmp_ += tmp * coef
+
+	return Hamtmp_
+
+
+#para = Parameter("../input.inp")
+#Ham = Hamiltonian(para)
