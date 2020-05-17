@@ -3,8 +3,8 @@ LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
 
-# Kitaev or Square
-Model=Kitaev
+# Kitaev, Heisenberg or Hubbard
+Model=Heisenberg
 
 
 Kxx=1.0

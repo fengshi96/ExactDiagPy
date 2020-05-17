@@ -50,81 +50,40 @@ class Hamiltonian:
 		else:
 			pass
 
-
-
-
 	def BuildKitaev(self, para):
 
 		lat = Lattice(para)
-		nn_ = lat.nn_
 
 		for i in range(0, self.Nsite):
 			# Kxx_Conn
-			j = nn_[i, 0]
+			j = lat.nn_[i, 0]
 			if i < j and j >= 0:
 				self.KxxGraph_[i, j] = self.Kxx
 				self.KxxGraph_[j, i] = self.Kxx
 
 			# Kyy_Conn
-			j = nn_[i, 1]
+			j = lat.nn_[i, 1]
 			if i < j and j >= 0:
 				self.KyyGraph_[i, j] = self.Kyy
 				self.KyyGraph_[j, i] = self.Kyy
 
 			# Kzz_Conn
-			j = nn_[i, 2]
+			j = lat.nn_[i, 2]
 			if i < j and j >= 0:
 				self.KzzGraph_[i, j] = self.Kzz
 				self.KzzGraph_[j, i] = self.Kzz
 
-		# print("\nKxxGraph_:", *self.KxxGraph_,sep="\n")
-		# print("\nKyyGraph_:", *self.KyyGraph_,sep="\n")
-		# print("\nKzzGraph_:", *self.KzzGraph_,sep="\n")
+		print("\nKxxGraph_:")
 		matprint(self.KxxGraph_)
+		print("\nKyyGraph_:")
 		matprint(self.KyyGraph_)
+		print("\nKzzGraph_:")
 		matprint(self.KzzGraph_)
 
-		# only need the upper half of KnnGraph_
-		xbonds = int(np.count_nonzero(self.KxxGraph_) / 2)
-		ybonds = int(np.count_nonzero(self.KyyGraph_) / 2)
-		zbonds = int(np.count_nonzero(self.KzzGraph_) / 2)
+		self.KxxPair_, self.Kxxcoef_, Nxbonds = PairConstructor(self.KxxGraph_, self.Nsite)
+		self.KyyPair_, self.Kyycoef_, Nybonds = PairConstructor(self.KyyGraph_, self.Nsite)
+		self.KzzPair_, self.Kzzcoef_, Nzbonds = PairConstructor(self.KzzGraph_, self.Nsite)
 
-		self.KxxPair_ = np.resize(self.KxxPair_, (xbonds, 2))
-		self.KyyPair_ = np.resize(self.KyyPair_, (ybonds, 2))
-		self.KzzPair_ = np.resize(self.KzzPair_, (zbonds, 2))
-		self.Kxxcoef_ = np.resize(self.Kxxcoef_, xbonds)
-		self.Kyycoef_ = np.resize(self.Kyycoef_, ybonds)
-		self.Kzzcoef_ = np.resize(self.Kzzcoef_, zbonds)
-
-		# extract non-zero x-coupling pairs
-		counter = 0
-		for i in range(0, self.Nsite):
-			for j in range(i, self.Nsite):
-				if self.KxxGraph_[i, j] != 0:
-					self.KxxPair_[counter, 0] = i
-					self.KxxPair_[counter, 1] = j
-					self.Kxxcoef_[counter] = self.KxxGraph_[i, j]
-					counter += 1
-
-		# extract non-zero y-coupling pairs
-		counter = 0
-		for i in range(0, self.Nsite):
-			for j in range(i, self.Nsite):
-				if self.KyyGraph_[i, j] != 0:
-					self.KyyPair_[counter, 0] = i
-					self.KyyPair_[counter, 1] = j
-					self.Kyycoef_[counter] = self.KyyGraph_[i, j]
-					counter += 1
-
-		# extract non-zero z-coupling pairs
-		counter = 0
-		for i in range(0, self.Nsite):
-			for j in range(i, self.Nsite):
-				if self.KzzGraph_[i, j] != 0:
-					self.KzzPair_[counter, 0] = i
-					self.KzzPair_[counter, 1] = j
-					self.Kzzcoef_[counter] = self.KzzGraph_[i, j]
-					counter += 1
 
 		# ---------------------Build Hamiltonian as Sparse Matrix-------------------
 
@@ -135,17 +94,17 @@ class Hamiltonian:
 		Sz = Spins.Sz
 		I = Spins.I
 
-		Ham = sp.eye(2 ** (self.Nsite), dtype=complex) * 0
-		Hamx = sp.eye(2 ** (self.Nsite), dtype=complex) * 0
-		Hamy = sp.eye(2 ** (self.Nsite), dtype=complex) * 0
-		Hamz = sp.eye(2 ** (self.Nsite), dtype=complex) * 0
+		Ham = sp.eye(2 ** self.Nsite, dtype=complex) * 0
+		Hamx = sp.eye(2 ** self.Nsite, dtype=complex) * 0
+		Hamy = sp.eye(2 ** self.Nsite, dtype=complex) * 0
+		Hamz = sp.eye(2 ** self.Nsite, dtype=complex) * 0
 
-		for i in range(0, xbonds):
+		for i in range(0, Nxbonds):
 			ia = self.KxxPair_[i, 0]
 			ib = self.KxxPair_[i, 1]
 			coef = self.Kxxcoef_[i]
 
-			ida = sp.eye(2 ** (ia))
+			ida = sp.eye(2 ** ia)
 			idm = sp.eye(2 ** (ib - ia - 1))
 			idb = sp.eye(2 ** (self.Nsite - ib - 1))
 			tmp1 = sp.kron(ida, Sx)
@@ -154,12 +113,12 @@ class Hamiltonian:
 			tmp4 = sp.kron(tmp3, idb)
 			Hamx += tmp4 * coef
 
-		for i in range(0, ybonds):
+		for i in range(0, Nybonds):
 			ia = self.KyyPair_[i, 0]
 			ib = self.KyyPair_[i, 1]
 			coef = self.Kyycoef_[i]
 
-			ida = sp.eye(2 ** (ia))
+			ida = sp.eye(2 ** ia)
 			idm = sp.eye(2 ** (ib - ia - 1))
 			idb = sp.eye(2 ** (self.Nsite - ib - 1))
 			tmp1 = sp.kron(ida, Sy)
@@ -168,12 +127,12 @@ class Hamiltonian:
 			tmp4 = sp.kron(tmp3, idb)
 			Hamy += tmp4 * coef
 
-		for i in range(0, zbonds):
+		for i in range(0, Nzbonds):
 			ia = self.KzzPair_[i, 0]
 			ib = self.KzzPair_[i, 1]
 			coef = self.Kzzcoef_[i]
 
-			ida = sp.eye(2 ** (ia))
+			ida = sp.eye(2 ** ia)
 			idm = sp.eye(2 ** (ib - ia - 1))
 			idb = sp.eye(2 ** (self.Nsite - ib - 1))
 			tmp1 = sp.kron(ida, Sz)
@@ -187,7 +146,7 @@ class Hamiltonian:
 		# --------------------------- Add external field -------------------------
 
 		for i in range(0, self.Nsite):
-			ida = sp.eye(2 ** (i))
+			ida = sp.eye(2 ** i)
 			idb = sp.eye(2 ** (self.Nsite - i - 1))
 			Ham += sp.kron(ida, sp.kron(Sx, idb)) * self.Hx
 			Ham += sp.kron(ida, sp.kron(Sy, idb)) * self.Hy
@@ -197,7 +156,59 @@ class Hamiltonian:
 
 	def BuildHeisenberg(self, para):
 		lat = Lattice(para)
-		nn_ = lat.nn_
+
+		for bond in range(0, lat.Number1neigh):
+			for i in range(0, self.Nsite):
+				j = lat.nn_[i, bond]
+				if i < j:
+					# Kxx_ij * S_i^x S_j^x
+					self.KxxGraph_[i, j] = self.Kxx
+					self.KxxGraph_[j, i] = self.Kxx
+
+					# Kyy_ij * S_i^y S_j^y
+					self.KyyGraph_[i, j] = self.Kyy
+					self.KyyGraph_[j, i] = self.Kyy
+
+					# Kzz_ij * S_i^z S_j^z
+					self.KzzGraph_[i, j] = self.Kzz
+					self.KzzGraph_[j, i] = self.Kzz
+
+		print("\nKxxGraph_:")
+		matprint(self.KxxGraph_)
+		print("\nKyyGraph_:")
+		matprint(self.KyyGraph_)
+		print("\nKzzGraph_:")
+		matprint(self.KzzGraph_)
+
+		self.KxxPair_, self.Kxxcoef_, Nxbonds = PairConstructor(self.KxxGraph_, self.Nsite)
+		self.KyyPair_, self.Kyycoef_, Nybonds = PairConstructor(self.KyyGraph_, self.Nsite)
+		self.KzzPair_, self.Kzzcoef_, Nzbonds = PairConstructor(self.KzzGraph_, self.Nsite)
 
 	def BuildHubbard(self, para):
 		pass
+
+
+# --------------------------- Functions -------------------------
+# --------------------------- Functions -------------------------
+# --------------------------- Functions -------------------------
+def PairConstructor(Graph_, Nsite):
+
+	bonds = int(np.count_nonzero(Graph_) / 2)  # Number of non-zero bonds. Only half of matrix elements is needed
+	PairInd_ = np.zeros((bonds, 2))  # Indices of pairs of sites that have non-zero coupling
+	PairCoef_ = np.zeros(bonds)  # coupling constant of pairs
+
+	# extract non-zero coupling pairs and their magnitude
+	counter = 0
+	for i in range(0, Nsite):
+		for j in range(i, Nsite):
+			if Graph_[i, j] != 0:
+				PairInd_[counter, 0] = i
+				PairInd_[counter, 1] = j
+				PairCoef_[counter] = Graph_[i, j]
+				counter += 1
+
+	return PairInd_, PairCoef_, bonds
+
+
+para = Parameter("../input.inp")
+Ham = Hamiltonian(para)
