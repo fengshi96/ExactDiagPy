@@ -48,7 +48,7 @@ class Hamiltonian:
 			self.Ham = self.BuildHubbard(para)
 
 		else:
-			pass
+			raise ValueError("Model not supported")
 
 	def BuildKitaev(self, para):
 
