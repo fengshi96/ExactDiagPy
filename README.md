@@ -2,6 +2,12 @@
 
 The program is designed to exact diagonalize several common quantum many-body models. It uses iterative methods developed in the project PRIMME (Python wrapper of Fortran). 
 
+Another realization with Julia for Kitaev's honeycomb can be found in the repo:
+ 
+https://github.com/fengshi96/Honeycomb-ExactDiag
+
+which uses ARPACK instead of PRIMME. It's a bit more accurate but significantly slower.  
+
 The program supports the following models: 
 (1) Kitaev's honeycomb model + external field
 (2) 2D Heisenberg model + external field
