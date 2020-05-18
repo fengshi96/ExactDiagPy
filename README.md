@@ -18,7 +18,7 @@ The file input.inp includes all parameters that are needed to construct the Latt
 LLX, LLY       # Number of unit cells in X and Y direction
 Model          # Name of the model: Kitaev, Heisenberg or Hubbard
 IsPeriodicX    # PBC (1) or OBC (0) in X direction
-IsPeriodicY    # PBC (1) or OBC (0) in X direction
+IsPeriodicY    # PBC (1) or OBC (0) in Y direction
 Kxx, Kyy, Kzz  # The coupling constant of spins
 Bxx, Byy, Bzz  # Magnetic field in x, y, z directions
 t, U, mu       # Standard Constants in Hubbard Model <comming soon...>
