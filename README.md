@@ -1,6 +1,6 @@
 # ExactDiag by PRIMME: Python Realization
 
-The program is designed to exactly diagonalize several common quantum many-body models. It uses iterative methods developed in the project PRIMME (Python wrapper of Fortran). 
+The program is designed to exactly diagonalize several common quantum many-body models. It uses iterative methods developed in the project PRIMME (Python wrapper of Fortran: PyPrimme). 
 
 
 
@@ -16,7 +16,7 @@ The program supports the following models:
 (2) 2D Heisenberg model + external field
 (3) 2D Hubbard model < Comming soon... >
 
-The program is dependent on Primme(https://pypi.org/project/primme/). 
+The program is dependent on PyPrimme(https://pypi.org/project/primme/). 
 To install Primme by pip:
 ```
 pip install numpy   # if numpy is not installed yet
