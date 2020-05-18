@@ -7,6 +7,16 @@ The program supports the following models:
 (2) 2D Heisenberg model + external field
 (3) 2D Hubbard model < Comming soon... >
 
+The program is dependent on Primme(https://pypi.org/project/primme/). 
+To install Primme by pip:
+```
+pip install numpy   # if numpy is not installed yet
+pip install scipy   # if scipy is not installed yet
+pip install future  # if using python 2
+conda install mkl-devel # if using Anaconda Python distribution
+pip install primme
+```
+
 The main.py takes one argument in terminal: 
 
 ```
