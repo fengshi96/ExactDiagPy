@@ -4,11 +4,11 @@ The program is designed to exact diagonalize several common quantum many-body mo
 
 
 
-*Another realization with Julia for Kitaev's honeycomb can be found in the repo:
+*Another realization with Julia for Kitaev's honeycomb can be found in the repo:*
  
-*https://github.com/fengshi96/Honeycomb-ExactDiag
+*https://github.com/fengshi96/Honeycomb-ExactDiag*
 
-*which uses ARPACK instead of PRIMME. It's a bit more accurate but significantly slower.  
+*which uses ARPACK instead of PRIMME. It's a bit more accurate but significantly slower.  *
 
 
 
