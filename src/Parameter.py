@@ -54,11 +54,11 @@ class Parameter:
 				pass
 				
 		print("Parameters:")
-		print("LLX=",self.LLX,"\nLLY=",self.LLY)
-		print("IsPeriodicX=",self.IsPeriodicX,"\nIsPeriodicY=",self.IsPeriodicY)
-		print("Model=",self.Model)
-		print("Kx=",self.Kxx,"\nKy=",self.Kyy,"\nKz=",self.Kzz)
-		print("Hx=",self.Hx,"\nHy=",self.Hy,"\nHz=",self.Hz)
+		print("LLX=", self.LLX, "\nLLY=",self.LLY)
+		print("IsPeriodicX=", self.IsPeriodicX,"\nIsPeriodicY=", self.IsPeriodicY)
+		print("Model=", self.Model)
+		print("Kx=", self.Kxx, "\nKy=", self.Kyy, "\nKz=", self.Kzz)
+		print("Hx=", self.Hx, "\nHy=", self.Hy, "\nHz=", self.Hz)
 		print("#States2Keep:", self.Nstates)
 		
 		print("\n-----------------")
