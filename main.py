@@ -4,6 +4,8 @@ import scipy.sparse as sp
 import primme
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
+from src.Observ import Observ
+from src.Lattice import Lattice
 
 
 
@@ -13,14 +15,19 @@ def main(total, cmdargs):
 			raise ValueError('Missing arguments')
 	inputname = cmdargs[1]
 	#---------------------------------------------------------------
+
+	para = Parameter(inputname)  # import parameters from input.inp
+	Lat = Lattice(para)  # Build lattice
+	Hamil = Hamiltonian(Lat)  # Build Hamiltonian
+	ham = Hamil.Ham  # Hamiltonian as sparse matrix
 	
-	para = Parameter(inputname)
-	Hamil = Hamiltonian(para)
-	ham = Hamil.Ham
-	
-	Nstates = para.Nstates
+	Nstates = para.Nstates  # Number of eigenstates to keep
 	evals, evecs = primme.eigsh(ham, Nstates, tol=1e-6, which='SA')
 	print("\nEigen Values:\n", *evals, sep='\n')
+
+	ob = Observ(Lat)  # creat Observable object
+	Tscurrx, Tscurry, Tscurrz = ob.TscurrBuild()  # Build total spin current operators in 3 directions
+	print("\n\nTotal spin current in x,y,z:", *ob.Tscurr_str, sep="\n")   # print string
 
 
 

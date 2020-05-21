@@ -1,6 +1,5 @@
 import numpy as np
 import math as m
-from src.Parameter import Parameter
 from src.Helper import matprint
 
 
@@ -16,6 +15,9 @@ class Lattice:
 
         if para.Model == "Kitaev":
             self.Nsite = self.LLX * self.LLY * 2
+            self.Hx = para.Hx; self.Kxx = para.Kxx
+            self.Hy = para.Hy; self.Kyy = para.Kyy
+            self.Hz = para.Hz; self.Kzz = para.Kzz
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 3
@@ -24,6 +26,9 @@ class Lattice:
             self.BuildHoneycomb()
         elif para.Model == "Heisenberg" or para.Model == "Hubbard":
             self.Nsite = self.LLX * self.LLY
+            self.Hx = para.Hx; self.Kxx = para.Kxx
+            self.Hy = para.Hy; self.Kyy = para.Kyy
+            self.Hz = para.Hz; self.Kzz = para.Kzz
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 4

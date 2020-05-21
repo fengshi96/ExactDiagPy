@@ -1,24 +1,23 @@
 import numpy as np
 import scipy.sparse as sp
-from src.Parameter import Parameter
-from src.Lattice import Lattice
 from src.Dofs import Dofs
 from src.Helper import matprint
 
 
 class Hamiltonian:
 
-	def __init__(self, para):
+	def __init__(self, Lat):
 
-		self.Model = para.Model
+		self.Lat = Lat
+		self.Model = Lat.Model
 
-		self.Hx = para.Hx  # uniform field in x
-		self.Hy = para.Hy
-		self.Hz = para.Hz
+		self.Hx = Lat.Hx  # uniform field in x
+		self.Hy = Lat.Hy
+		self.Hz = Lat.Hz
 
-		self.Kxx = para.Kxx  # coupling strength of x-bond
-		self.Kyy = para.Kyy
-		self.Kzz = para.Kzz
+		self.Kxx = Lat.Kxx  # coupling strength of x-bond
+		self.Kyy = Lat.Kyy
+		self.Kzz = Lat.Kzz
 
 		self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
 		self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
@@ -29,31 +28,30 @@ class Hamiltonian:
 		self.Kzzcoef_ = np.zeros(())
 
 		if self.Model == "Kitaev":
-			self.Nsite = para.LLX * para.LLY * 2
+			self.Nsite = Lat.LLX * Lat.LLY * 2
 			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.Ham = self.BuildKitaev(para)
+			self.Ham = self.BuildKitaev()
 
 		elif self.Model == "Heisenberg":
-			self.Nsite = para.LLX * para.LLY
+			self.Nsite = Lat.LLX * Lat.LLY
 			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
 			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.Ham = self.BuildHeisenberg(para)
+			self.Ham = self.BuildHeisenberg()
 
 		elif self.Model == "Hubbard":
-			self.Nsite = para.LLX * para.LLY
+			self.Nsite = Lat.LLX * Lat.LLY
 			self.tGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.Ham = self.BuildHubbard(para)
+			self.Ham = self.BuildHubbard()
 
 		else:
 			raise ValueError("Model not supported")
 
-	def BuildKitaev(self, para):
+	def BuildKitaev(self):
 
-		lat = Lattice(para)
-
+		lat = self.Lat
 		for i in range(0, self.Nsite):
 			# Kxx_Conn
 			j = lat.nn_[i, 0]
@@ -110,8 +108,8 @@ class Hamiltonian:
 
 		return Ham
 
-	def BuildHeisenberg(self, para):
-		lat = Lattice(para)
+	def BuildHeisenberg(self):
+		lat = self.Lat
 
 		for bond in range(0, lat.Number1neigh):
 			for i in range(0, self.Nsite):
@@ -166,7 +164,7 @@ class Hamiltonian:
 
 		return Ham
 
-	def BuildHubbard(self, para):
+	def BuildHubbard(self):
 		pass
 
 
