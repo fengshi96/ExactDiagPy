@@ -14,7 +14,7 @@ class Observ:
         self.Oscurry = sp.eye(2 ** Lat.Nsite, dtype=complex) * 0
         self.Oscurrx = sp.eye(2 ** Lat.Nsite, dtype=complex) * 0
 
-        self.Tscurr_str = []  # total spin current
+        self.Tscurr_str = [[], [], []]  # total spin current
         self.Tscurrz = sp.eye(2 ** Lat.Nsite, dtype=complex) * 0
         self.Tscurry = sp.eye(2 ** Lat.Nsite, dtype=complex) * 0
         self.Tscurrx = sp.eye(2 ** Lat.Nsite, dtype=complex) * 0
@@ -30,7 +30,7 @@ class Observ:
             I = Spins.I
 
             nn_ = Lat.nn_[site, :]  # nn_[0]: i+x; nn_[1]: i+y; nn_[2]: i+z
-            print(nn_)
+            #print(nn_)
 
             self.Oscurrx *= 0
             self.Oscurry *= 0
@@ -137,6 +137,7 @@ class Observ:
         self.Tscurrx *= 0
         self.Tscurry *= 0
         self.Tscurrz *= 0
+        self.Tscurr_str = [[], [], []]  # jx, jy, jz
 
         if Lat.Model == "Kitaev":
 
@@ -145,6 +146,10 @@ class Observ:
                 self.Tscurrx += Oscurrxtmp
                 self.Tscurry += Oscurrytmp
                 self.Tscurrz += Oscurrztmp
+                self.Tscurr_str[0].append(self.Oscurr_str[0])
+                self.Tscurr_str[1].append(self.Oscurr_str[1])
+                self.Tscurr_str[2].append(self.Oscurr_str[2])
+
 
 
 
@@ -162,5 +167,10 @@ ob = Observ(para, Lat)
 #Oscurrx, Oscurry, Oscurrz = ob.OscurrBuild(0)
 Tscurrx, Tscurry, Tscurrz = ob.TscurrBuild()
 print("\n")
-print(*ob.Oscurr_str, sep="\n")
+#print(*ob.Oscurr_str, sep="\n")
+#print("\n", *ob.Tscurr_str, sep="\n")
+
+print("\n", " + ".join(ob.Tscurr_str[0]))
+print("\n", " + ".join(ob.Tscurr_str[1]))
+print("\n", " + ".join(ob.Tscurr_str[2]))
 
