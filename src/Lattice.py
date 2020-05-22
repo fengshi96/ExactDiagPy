@@ -7,23 +7,23 @@ class Lattice:
 
     def __init__(self, para):
 
-        self.LLX = para.LLX
-        self.LLY = para.LLY
-        self.IsPeriodicX = para.IsPeriodicX
+        self.LLX = para.LLX  # Number of unit cells in x
+        self.LLY = para.LLY  # Number of unit cells in y
+        self.IsPeriodicX = para.IsPeriodicX  # PBC (1) or OBC (0)
         self.IsPeriodicY = para.IsPeriodicY
-        self.Model = para.Model
+        self.Model = para.Model  # Name of the model.
 
         if para.Model == "Kitaev":
             self.Nsite = self.LLX * self.LLY * 2
             self.Hx = para.Hx; self.Kxx = para.Kxx
             self.Hy = para.Hy; self.Kyy = para.Kyy
             self.Hz = para.Hz; self.Kzz = para.Kzz
-            self.indx_ = np.zeros(self.Nsite, dtype=int)
+            self.indx_ = np.zeros(self.Nsite, dtype=int)  # x coordinate in mesh
             self.indy_ = np.zeros(self.Nsite, dtype=int)
-            self.Number1neigh = 3
-            self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)
-            self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)
-            self.BuildHoneycomb()
+            self.Number1neigh = 3  # number of nearest neighbors
+            self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
+            self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
+            self.BuildHoneycomb()  # build attributes in honeycomb lattice
         elif para.Model == "Heisenberg" or para.Model == "Hubbard":
             self.Nsite = self.LLX * self.LLY
             self.Hx = para.Hx; self.Kxx = para.Kxx
@@ -34,12 +34,14 @@ class Lattice:
             self.Number1neigh = 4
             self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
-            self.BuildSquare()
+            self.BuildSquare()  # build attributes in square lattice
         else:
-            pass
+            raise ValueError("Model not supported yet")
 
     def BuildHoneycomb(self):
-        """Construct Honeycomb Lattice mesh and nearest neighbor matrix"""
+        """
+        Construct Honeycomb Lattice mesh and nearest neighbor matrix
+        """
 
         print("[Lattice.py] building Honeycomb lattice...")
         scalex = 2
@@ -97,7 +99,7 @@ class Lattice:
             # n.n in y-bond
             jx = ix + 1
             jy = iy - 1  # move 1 step in x = (1,1) direction
-            if jx <= xmax and jy <= ymax and jy >= 0 and self.mesh_[jx, jy] != -1:
+            if jx <= xmax and ymax >= jy >= 0 and self.mesh_[jx, jy] != -1:
                 j = self.mesh_[jx, jy]  # site index of n.n. in x direction
                 self.nn_[i, 1] = j
                 self.nn_[j, 1] = i
