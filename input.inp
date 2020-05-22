@@ -1,10 +1,10 @@
-LLX=3
-LLY=3
+LLX=2
+LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
 
 # Kitaev, Heisenberg or Hubbard
-Model=Kitaev
+Model=Heisenberg
 
 
 Kxx=1.0

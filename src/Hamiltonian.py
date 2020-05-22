@@ -29,16 +29,16 @@ class Hamiltonian:
 
 		if self.Model == "Kitaev":
 			self.Nsite = Lat.LLX * Lat.LLY * 2
-			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 			self.Ham = self.BuildKitaev()
 
 		elif self.Model == "Heisenberg":
 			self.Nsite = Lat.LLX * Lat.LLY
-			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
-			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=int)
+			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 			self.Ham = self.BuildHeisenberg()
 
 		elif self.Model == "Hubbard":
