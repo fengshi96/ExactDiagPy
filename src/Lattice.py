@@ -7,12 +7,14 @@ class Lattice:
 
     def __init__(self, para):
 
+        # Shared attributes
         self.LLX = para.LLX  # Number of unit cells in x
         self.LLY = para.LLY  # Number of unit cells in y
         self.IsPeriodicX = para.IsPeriodicX  # PBC (1) or OBC (0)
         self.IsPeriodicY = para.IsPeriodicY
         self.Model = para.Model  # Name of the model.
 
+        # Model-dependent attributes
         if para.Model == "Kitaev":
             self.Nsite = self.LLX * self.LLY * 2
             self.Hx = para.Hx; self.Kxx = para.Kxx
