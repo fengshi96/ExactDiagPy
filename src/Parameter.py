@@ -31,9 +31,9 @@ class Parameter:
 			elif name=="LLY":
 				self.LLY = int(var)
 			elif name=="IsPeriodicX":
-				self.IsPeriodicX = bool(var)
+				self.IsPeriodicX = bool(int(var))
 			elif name=="IsPeriodicY":
-				self.IsPeriodicY = bool(var)
+				self.IsPeriodicY = bool(int(var))
 			elif name=="Model":
 				self.Model = var
 			elif name=="Kxx":

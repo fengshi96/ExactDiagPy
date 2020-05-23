@@ -23,7 +23,7 @@ class Lattice:
             self.indx_ = np.zeros(self.Nsite, dtype=int)  # x coordinate in mesh
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 3  # number of nearest neighbors
-            self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
+            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
         elif para.Model == "Heisenberg" or para.Model == "Hubbard":
@@ -34,7 +34,7 @@ class Lattice:
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 4
-            self.nn_ = np.zeros((self.Nsite, self.Number1neigh), dtype=int)
+            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
             self.BuildSquare()  # build attributes in square lattice
         else:

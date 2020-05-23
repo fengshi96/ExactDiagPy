@@ -114,7 +114,8 @@ class Hamiltonian:
 		for bond in range(0, lat.Number1neigh):
 			for i in range(0, self.Nsite):
 				j = lat.nn_[i, bond]
-				if i < j:
+				# print(j)
+				if i < j and j >= 0:
 					# Kxx_ij * S_i^x S_j^x
 					self.KxxGraph_[i, j] = self.Kxx
 					self.KxxGraph_[j, i] = self.Kxx

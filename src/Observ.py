@@ -19,6 +19,7 @@ class Observ:
 
     def OscurrBuild(self, site):  # onsite spin current
 
+        stringx = ""; stringy = ""; stringz = ""
         Lat = self.Lat
         if Lat.Model == "Kitaev":
             # print("Lat.Model", Lat.Model)
@@ -40,20 +41,22 @@ class Observ:
             # 1st term -- i + z
             indxS = min(site, nn_[2])
             indxL = max(site, nn_[2])
-            ida = sp.eye(2 ** indxS)
-            idm = sp.eye(2 ** (indxL - indxS - 1))
-            idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
-            self.Oscurrx += Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sy), idm), Sz), idb)
-            stringx = "Kz*Sy[" + str(site) + "]*" + "Sz[" + str(nn_[2]) + "]*|gs>"  # "js_x["+str(site)+"] = "+
+            if indxS >= 0:
+                ida = sp.eye(2 ** indxS)
+                idm = sp.eye(2 ** (indxL - indxS - 1))
+                idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
+                self.Oscurrx += Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sy), idm), Sz), idb)
+                stringx = "Kz*Sy[" + str(site) + "]*" + "Sz[" + str(nn_[2]) + "]*|gs>"  # "js_x["+str(site)+"] = "+
 
             # 2nd term -- i + y
             indxS = min(site, nn_[1])
             indxL = max(site, nn_[1])
-            ida = sp.eye(2 ** indxS)
-            idm = sp.eye(2 ** (indxL - indxS - 1))
-            idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
-            self.Oscurrx -= Lat.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sz), idm), Sy), idb)
-            stringx += " - Ky*Sz[" + str(site) + "]*" + "Sy[" + str(nn_[1]) + "]*|gs>"
+            if indxS >= 0:
+                ida = sp.eye(2 ** indxS)
+                idm = sp.eye(2 ** (indxL - indxS - 1))
+                idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
+                self.Oscurrx -= Lat.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sz), idm), Sy), idb)
+                stringx += " - Ky*Sz[" + str(site) + "]*" + "Sy[" + str(nn_[1]) + "]*|gs>"
 
             # 3rd & 4th term
             ida = sp.eye(2 ** site)
@@ -70,20 +73,22 @@ class Observ:
             # 1st term -- i + x
             indxS = min(site, nn_[0])
             indxL = max(site, nn_[0])
-            ida = sp.eye(2 ** indxS)
-            idm = sp.eye(2 ** (indxL - indxS - 1))
-            idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
-            self.Oscurry += Lat.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sz), idm), Sx), idb)
-            stringy = "Kx*Sz[" + str(site) + "]*" + "Sx[" + str(nn_[0]) + "]*|gs>"  # "js_y[" + str(site) + "] = " +
+            if indxS >= 0:  # if nn_[0] is not out of boundary
+                ida = sp.eye(2 ** indxS)
+                idm = sp.eye(2 ** (indxL - indxS - 1))
+                idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
+                self.Oscurry += Lat.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sz), idm), Sx), idb)
+                stringy = "Kx*Sz[" + str(site) + "]*" + "Sx[" + str(nn_[0]) + "]*|gs>"  # "js_y[" + str(site) + "] = " +
 
             # 2nd term -- i + z
             indxS = min(site, nn_[2])
             indxL = max(site, nn_[2])
-            ida = sp.eye(2 ** indxS)
-            idm = sp.eye(2 ** (indxL - indxS - 1))
-            idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
-            self.Oscurry -= Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sx), idm), Sz), idb)
-            stringy += " - Kz*Sx[" + str(site) + "]*" + "Sz[" + str(nn_[2]) + "]*|gs>"
+            if indxS >= 0:
+                ida = sp.eye(2 ** indxS)
+                idm = sp.eye(2 ** (indxL - indxS - 1))
+                idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
+                self.Oscurry -= Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sx), idm), Sz), idb)
+                stringy += " - Kz*Sx[" + str(site) + "]*" + "Sz[" + str(nn_[2]) + "]*|gs>"
 
             # 3rd & 4th term
             ida = sp.eye(2 ** site)
@@ -100,20 +105,22 @@ class Observ:
             # 1st term -- i + y
             indxS = min(site, nn_[1])
             indxL = max(site, nn_[1])
-            ida = sp.eye(2 ** indxS)
-            idm = sp.eye(2 ** (indxL - indxS - 1))
-            idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
-            self.Oscurrz += Lat.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sx), idm), Sy), idb)
-            stringz = "Ky*Sx[" + str(site) + "]*" + "Sy[" + str(nn_[1]) + "]*|gs>"  # "js_z[" + str(site) + "] = " +
+            if indxS >= 0:
+                ida = sp.eye(2 ** indxS)
+                idm = sp.eye(2 ** (indxL - indxS - 1))
+                idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
+                self.Oscurrz += Lat.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sx), idm), Sy), idb)
+                stringz = "Ky*Sx[" + str(site) + "]*" + "Sy[" + str(nn_[1]) + "]*|gs>"  # "js_z[" + str(site) + "] = " +
 
             # 2nd term -- i + x
             indxS = min(site, nn_[0])
             indxL = max(site, nn_[0])
-            ida = sp.eye(2 ** indxS)
-            idm = sp.eye(2 ** (indxL - indxS - 1))
-            idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
-            self.Oscurrz -= Lat.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sy), idm), Sx), idb)
-            stringz += " - Kx*Sy[" + str(site) + "]*" + "Sx[" + str(nn_[0]) + "]*|gs>"
+            if indxS >= 0:
+                ida = sp.eye(2 ** indxS)
+                idm = sp.eye(2 ** (indxL - indxS - 1))
+                idb = sp.eye(2 ** (Lat.Nsite - indxL - 1))
+                self.Oscurrz -= Lat.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sy), idm), Sx), idb)
+                stringz += " - Kx*Sy[" + str(site) + "]*" + "Sx[" + str(nn_[0]) + "]*|gs>"
 
             # 3rd & 4th term
             ida = sp.eye(2 ** site)
