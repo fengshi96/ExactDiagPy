@@ -35,10 +35,8 @@ def main(total, cmdargs):
     Eg = evals[0]  # ground state energy
 
     print(matele(gs, Tscurrx, gs))
-
-    omegasteps = 200
-    domega = 0.005
-    eta = 0.009
+    tmpscond = ob.Scond(evals, evecs)
+    print(np.real(tmpscond))
 
     # Sr = np.zeros(omegasteps)  # spin response
     # for oi in range(0, omegasteps):

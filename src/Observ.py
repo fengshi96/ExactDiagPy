@@ -308,14 +308,14 @@ class Observ:
         gs = evecs[:, 0]  # ground state
         Eg = evals[0]  # ground state energy
 
-        omegasteps = 200
+        omegasteps = 100
         domega = 0.005
         eta = 0.009
 
         # for each omega, define a matrix Mel_{si,mi}
-        Melx = np.zeros((Lat.Nsite, Nstates))  # <m|S_i^x|gs>
-        Mely = np.zeros((Lat.Nsite, Nstates))  # <m|S_i^y|gs>
-        Melz = np.zeros((Lat.Nsite, Nstates))  # <m|S_i^z|gs>
+        Melx = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^x|gs>
+        Mely = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^y|gs>
+        Melz = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^z|gs>
 
         for mi in range(0, Nstates):
             for si in range(0, Lat.Nsite):
@@ -327,18 +327,32 @@ class Observ:
                 Melx[si, mi] = matele(evecs[:, mi], Sxi, gs)
                 Mely[si, mi] = matele(evecs[:, mi], Syi, gs)
                 Melz[si, mi] = matele(evecs[:, mi], Szi, gs)
+        # print(np.real(Melx))
+        # print(np.real(Mely))
+        # print(np.real(Melz))
 
-        Sr = np.zeros(omegasteps)  # spin response
+        # elastic contribution <Sa>_i
+        mSx = np.zeros(Lat.Nsite, dtype=complex)
+        mSy = np.zeros(Lat.Nsite, dtype=complex)
+        mSz = np.zeros(Lat.Nsite, dtype=complex)
+        for si in range(0, Lat.Nsite):
+            mSx[si] = self.mLocalSx(gs, si)
+            mSy[si] = self.mLocalSy(gs, si)
+            mSz[si] = self.mLocalSz(gs, si)
+
+        Sr = np.zeros(omegasteps, dtype=complex)  # spin response
         # begin fill in vector Sr(\omega)
         for oi in range(0, omegasteps):
+            omegacounter = 0
             omega = domega * oi
-            Itensity = np.zeros((3, 3))
+            Itensity = np.zeros((3, 3), dtype=complex)
 
+            denom1 = complex(omega, -eta)
             # for each omega, define a matrix Mel_{si,mi}
-            for mi in range(0, Nstates):
-                Em = evals[mi]
-                for si in range(0, Lat.Nsite):
-                    denom = complex(omega - (Em - Eg), -eta)
+            for si in range(0, Lat.Nsite):
+                for mi in range(0, Nstates):
+                    Em = evals[mi]
+                    denom2 = complex(omega - (Em - Eg), -eta)
 
                     # <m|S_i^a|gs>
                     tmpx = Melx[si, mi]
@@ -354,37 +368,33 @@ class Observ:
                     tmpyz = tmpy.conjugate() * tmpz  # Siy Siz
                     tmpzz = tmpz.conjugate() * tmpz  # Siz Siz
 
+                    # update polarization matrix
+                    Itensity[0, 0] += tmpxx / denom2
+                    Itensity[0, 1] += tmpxy / denom2
+                    Itensity[0, 2] += tmpxz / denom2
+                    Itensity[1, 1] += tmpyy / denom2
+                    Itensity[1, 2] += tmpyz / denom2
+                    Itensity[2, 2] += tmpzz / denom2
 
+                # remove elastic contribution
+                Itensity[0, 0] -= mSx[si].conjugate() * mSx[si] / denom1
+                Itensity[0, 1] -= mSx[si].conjugate() * mSy[si] / denom1
+                Itensity[0, 2] -= mSx[si].conjugate() * mSz[si] / denom1
+                Itensity[1, 1] -= mSy[si].conjugate() * mSy[si] / denom1
+                Itensity[1, 2] -= mSy[si].conjugate() * mSz[si] / denom1
+                Itensity[2, 2] -= mSz[si].conjugate() * mSz[si] / denom1
 
+            Sr[omegacounter] = Itensity.sum()
+            omegacounter += 1
+        #print(Itensity)
 
-
-
-
-
-
-
+        return Sr
 
     def Econd(self, state, site):
         """
         Measure together energy conductivity
         """
         pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)
