@@ -86,14 +86,14 @@ class Hamiltonian:
 
 		print("[Hamiltonian.py] Building Hamiltonian as Sparse Matrix...")
 		Spins = Dofs("SpinHalf")
-		Sx = Spins.Sx
-		Sy = Spins.Sy
-		Sz = Spins.Sz
+		sx = Spins.Sx
+		sy = Spins.Sy
+		sz = Spins.Sz
 		I = Spins.I
 
-		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, Sx, self.Nsite)
-		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, Sy, self.Nsite)
-		Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, Sz, self.Nsite)
+		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, sx, self.Nsite)
+		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, sy, self.Nsite)
+		Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, sz, self.Nsite)
 
 		Ham = Hamx + Hamy + Hamz
 
@@ -102,9 +102,9 @@ class Hamiltonian:
 		for i in range(0, self.Nsite):
 			ida = sp.eye(2 ** i)
 			idb = sp.eye(2 ** (self.Nsite - i - 1))
-			Ham += sp.kron(ida, sp.kron(Sx, idb)) * self.Hx
-			Ham += sp.kron(ida, sp.kron(Sy, idb)) * self.Hy
-			Ham += sp.kron(ida, sp.kron(Sz, idb)) * self.Hz
+			Ham += sp.kron(ida, sp.kron(sx, idb)) * self.Hx
+			Ham += sp.kron(ida, sp.kron(sy, idb)) * self.Hy
+			Ham += sp.kron(ida, sp.kron(sz, idb)) * self.Hz
 
 		return Ham
 
@@ -143,14 +143,14 @@ class Hamiltonian:
 
 		print("[Hamiltonian.py] Building Hamiltonian as Sparse Matrix...")
 		Spins = Dofs("SpinHalf")
-		Sx = Spins.Sx
-		Sy = Spins.Sy
-		Sz = Spins.Sz
+		sx = Spins.Sx
+		sy = Spins.Sy
+		sz = Spins.Sz
 		I = Spins.I
 
-		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, Sx, self.Nsite)
-		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, Sy, self.Nsite)
-		Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, Sz, self.Nsite)
+		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, sx, self.Nsite)
+		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, sy, self.Nsite)
+		Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, sz, self.Nsite)
 
 		Ham = Hamx + Hamy + Hamz
 
@@ -159,9 +159,9 @@ class Hamiltonian:
 		for i in range(0, self.Nsite):
 			ida = sp.eye(2 ** i)
 			idb = sp.eye(2 ** (self.Nsite - i - 1))
-			Ham += sp.kron(ida, sp.kron(Sx, idb)) * self.Hx
-			Ham += sp.kron(ida, sp.kron(Sy, idb)) * self.Hy
-			Ham += sp.kron(ida, sp.kron(Sz, idb)) * self.Hz
+			Ham += sp.kron(ida, sp.kron(sx, idb)) * self.Hx
+			Ham += sp.kron(ida, sp.kron(sy, idb)) * self.Hy
+			Ham += sp.kron(ida, sp.kron(sz, idb)) * self.Hz
 
 		return Ham
 
