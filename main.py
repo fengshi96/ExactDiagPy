@@ -33,10 +33,6 @@ def main(total, cmdargs):
     # print("\n\nTotal spin current in x,y,z:", *ob.Tscurr_str, sep="\n")  # print string
 
     tmpsr = ob.SpRe(evals, evecs)
-    print("SR: -----------")
-    matprint(tmpsr)
-    print("End of SR-----------")
-
     matprintos(tmpsr, "SpinRes.dat")
 
 
