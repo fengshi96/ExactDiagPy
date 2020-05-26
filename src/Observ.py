@@ -385,7 +385,7 @@ class Observ:
                 Itensity[2, 2] -= mSz[si].conjugate() * mSz[si] / denom1
 
             Sr[omegacounter, 0] = round(omega, 4)
-            Sr[omegacounter, 1] = - Itensity.sum().imag / np.pi
+            Sr[omegacounter, 1] = Itensity.sum().imag / np.pi
             omegacounter += 1
         #print(Itensity)
 
