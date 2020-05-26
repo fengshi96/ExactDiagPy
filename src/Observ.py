@@ -296,9 +296,9 @@ class Observ:
     # ----------------------------- Transport measurement ----------------------------------
     # ----------------------------- Transport measurement ----------------------------------
     # ----------------------------- Transport measurement ----------------------------------
-    def Scond(self, evals, evecs):
+    def SpRe(self, evals, evecs):
         """
-        Measure together spin conductivity S(\omega)
+        Measure together spin response S(\omega)
         Parameter: evals, 1d array of eigen energies
                    evecs, 2d array, with cols being eigen vectors corresponding to evals
         """
@@ -308,7 +308,7 @@ class Observ:
         gs = evecs[:, 0]  # ground state
         Eg = evals[0]  # ground state energy
 
-        omegasteps = 100
+        omegasteps = 200
         domega = 0.005
         eta = 0.009
 
@@ -340,10 +340,10 @@ class Observ:
             mSy[si] = self.mLocalSy(gs, si)
             mSz[si] = self.mLocalSz(gs, si)
 
-        Sr = np.zeros(omegasteps, dtype=complex)  # spin response
+        Sr = np.zeros((omegasteps, 2), dtype=float)  # spin response
         # begin fill in vector Sr(\omega)
+        omegacounter = 0
         for oi in range(0, omegasteps):
-            omegacounter = 0
             omega = domega * oi
             Itensity = np.zeros((3, 3), dtype=complex)
 
@@ -384,7 +384,8 @@ class Observ:
                 Itensity[1, 2] -= mSy[si].conjugate() * mSz[si] / denom1
                 Itensity[2, 2] -= mSz[si].conjugate() * mSz[si] / denom1
 
-            Sr[omegacounter] = Itensity.sum()
+            Sr[omegacounter, 0] = round(omega, 4)
+            Sr[omegacounter, 1] = Itensity.sum().imag / np.pi
             omegacounter += 1
         #print(Itensity)
 
