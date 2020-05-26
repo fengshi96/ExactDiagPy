@@ -34,7 +34,14 @@ class Hamiltonian:
 			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 			self.Ham = self.BuildKitaev()
 
-		elif self.Model == "Heisenberg":
+		elif self.Model == "Heisenberg_Honeycomb":
+			self.Nsite = Lat.LLX * Lat.LLY * 2
+			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+			self.Ham = self.BuildHeisenberg()
+
+		elif self.Model == "Heisenberg_Square":
 			self.Nsite = Lat.LLX * Lat.LLY
 			self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 			self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
@@ -89,7 +96,6 @@ class Hamiltonian:
 		sx = Spins.Sx
 		sy = Spins.Sy
 		sz = Spins.Sz
-		I = Spins.I
 
 		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, sx, self.Nsite)
 		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, sy, self.Nsite)
@@ -135,6 +141,8 @@ class Hamiltonian:
 		print("\nKzzGraph_:")
 		matprint(self.KzzGraph_)
 
+		#matprint(self.KxxGraph_-self.KzzGraph_); matprint(self.KxxGraph_-self.KyyGraph_)
+
 		self.KxxPair_, self.Kxxcoef_ = PairConstructor(self.KxxGraph_, self.Nsite)
 		self.KyyPair_, self.Kyycoef_ = PairConstructor(self.KyyGraph_, self.Nsite)
 		self.KzzPair_, self.Kzzcoef_ = PairConstructor(self.KzzGraph_, self.Nsite)
@@ -146,7 +154,6 @@ class Hamiltonian:
 		sx = Spins.Sx
 		sy = Spins.Sy
 		sz = Spins.Sz
-		I = Spins.I
 
 		Hamx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, sx, self.Nsite)
 		Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, sy, self.Nsite)

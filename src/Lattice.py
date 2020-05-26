@@ -15,7 +15,7 @@ class Lattice:
         self.Model = para.Model  # Name of the model.
 
         # Model-dependent attributes
-        if para.Model == "Kitaev":
+        if para.Model == "Kitaev" or "Heisenberg_Honeycomb":
             self.Nsite = self.LLX * self.LLY * 2
             self.Hx = para.Hx; self.Kxx = para.Kxx
             self.Hy = para.Hy; self.Kyy = para.Kyy
