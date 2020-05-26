@@ -7,8 +7,8 @@ from src.Hamiltonian import Hamiltonian
 from src.Observ import Observ, matele
 from src.Lattice import Lattice
 from src.Helper import matprint, matprintos
-pi = np.pi
 
+pi = np.pi
 
 
 def main(total, cmdargs):
@@ -34,15 +34,6 @@ def main(total, cmdargs):
 
     tmpsr = ob.SpRe(evals, evecs)
     matprintos(tmpsr, "SpinRes.dat")
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

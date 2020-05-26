@@ -11,7 +11,7 @@ from src.Helper import matprint, matprintos
 pi = np.pi
 
 
-def observ(total, cmdargs):
+def observe(total, cmdargs):
     if total != 2:
         print(" ".join(str(x) for x in cmdargs))
         raise ValueError('Missing arguments')
@@ -25,8 +25,8 @@ def observ(total, cmdargs):
 
     Nstates = para.Nstates  # Number of eigenstates to keep
     evals, evecs = primme.eigsh(ham, Nstates, tol=1e-6, which='SA')
-    print("\nEigen Values:-----------\n", *evals, sep='\n')
-    print("\nEnd of Eigen Values-----------\n\n")
+    #print("\nEigen Values:-----------\n", *evals, sep='\n')
+    #print("\nEnd of Eigen Values-----------\n\n")
 
     ob = Observ(Lat)  # creat Observable object
     # Tscurrx, Tscurry, Tscurrz = ob.TscurrBuild()  # Build total spin current operators in 3 directions
@@ -40,4 +40,4 @@ if __name__ == '__main__':
     sys.argv  ## get the input argument
     total = len(sys.argv)
     cmdargs = sys.argv
-    observ(total, cmdargs)
+    observe(total, cmdargs)
