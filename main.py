@@ -2,6 +2,7 @@ import sys, re, math, random
 import numpy as np
 import scipy.sparse as sp
 import primme
+import h5py
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
 from src.Observ import Observ, matele
@@ -28,12 +29,29 @@ def main(total, cmdargs):
     print("\nEigen Values:-----------\n", *evals, sep='\n')
     print("\nEnd of Eigen Values-----------\n\n")
 
-    ob = Observ(Lat)  # creat Observable object
-    # Tscurrx, Tscurry, Tscurrz = ob.TscurrBuild()  # Build total spin current operators in 3 directions
-    # print("\n\nTotal spin current in x,y,z:", *ob.Tscurr_str, sep="\n")  # print string
+    file = h5py.File('dataSpec.hdf5', 'w')
 
-    tmpsr = ob.SpRe(evals, evecs)
-    matprintos(tmpsr, "SpinRes.dat")
+    LatGrp = file.create_group("1.Lattice")
+    meshDat = LatGrp.create_dataset("Mesh", data=Lat.mesh_)
+    nnDat = LatGrp.create_dataset("Nearest Neighbors", data=Lat.nn_)
+
+    ConnGrp = file.create_group("2.Connectors")
+    kxxDat = ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
+    kyyDat = ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
+    kyyDat = ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
+
+    EigGrp = file.create_group("3.Eigen")
+    evalDat = EigGrp.create_dataset("Eigen Values", data=evals)
+    evalDat = EigGrp.create_dataset("Wavefunctions", data=evecs)
+
+
+    print(list(file.keys()))
+    print(file.name)
+    print(type(evecs))
+
+    # ob = Observ(Lat)  # creat Observable object
+    # tmpsr = ob.SpRe(evals, evecs)
+    # matprintos(tmpsr, "SpinRes.dat")
 
 
 if __name__ == '__main__':

@@ -12,10 +12,13 @@ pi = np.pi
 
 
 def observe(total, cmdargs):
-    if total != 2:
+    if total < 2:
         print(" ".join(str(x) for x in cmdargs))
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
+    outputname = "../observe.dat"
+    if total == 3:
+        outputname = cmdargs[2]
     # ---------------------------------------------------------------
 
     para = Parameter(inputname)  # import parameters from input.inp
@@ -33,7 +36,7 @@ def observe(total, cmdargs):
     # print("\n\nTotal spin current in x,y,z:", *ob.Tscurr_str, sep="\n")  # print string
 
     tmpsr = ob.SpRe(evals, evecs)
-    matprintos(tmpsr, "SpinRes.dat")
+    matprintos(tmpsr, outputname)
 
 
 if __name__ == '__main__':
