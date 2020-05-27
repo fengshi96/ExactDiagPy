@@ -24,34 +24,40 @@ def main(total, cmdargs):
     Hamil = Hamiltonian(Lat)  # Build Hamiltonian
     ham = Hamil.Ham  # Hamiltonian as sparse matrix
 
-    Nstates = para.Nstates  # Number of eigenstates to keep
-    evals, evecs = primme.eigsh(ham, Nstates, tol=1e-6, which='SA')
+    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-6, which='SA')
     print("\nEigen Values:-----------\n", *evals, sep='\n')
     print("\nEnd of Eigen Values-----------\n\n")
 
+    # ------------------------ Hdf5 Ostream ------------------------------
     file = h5py.File('dataSpec.hdf5', 'w')
+    file.attrs["LLX"] = para.LLX
+    file.attrs["LLY"] = para.LLY
+    file.attrs["IsPeriodicX"] = para.IsPeriodicX
+    file.attrs["IsPeriodicY"] = para.IsPeriodicY
+    file.attrs["Kx"] = para.Kxx
+    file.attrs["Ky"] = para.Kyy
+    file.attrs["Kz"] = para.Kzz
+    file.attrs["Hx"] = para.Hz
+    file.attrs["Hy"] = para.Hy
+    file.attrs["Hz"] = para.Hz
+    file.attrs["#States2Keep"] = para.Nstates
+    file.attrs["Model"] = para.Model
 
     LatGrp = file.create_group("1.Lattice")
-    meshDat = LatGrp.create_dataset("Mesh", data=Lat.mesh_)
-    nnDat = LatGrp.create_dataset("Nearest Neighbors", data=Lat.nn_)
+    LatGrp.create_dataset("Mesh", data=Lat.mesh_)
+    LatGrp.create_dataset("Nearest Neighbors", data=Lat.nn_)
 
     ConnGrp = file.create_group("2.Connectors")
-    kxxDat = ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
-    kyyDat = ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
-    kyyDat = ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
+    ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
+    ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
+    ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
 
     EigGrp = file.create_group("3.Eigen")
-    evalDat = EigGrp.create_dataset("Eigen Values", data=evals)
-    evalDat = EigGrp.create_dataset("Wavefunctions", data=evecs)
+    EigGrp.create_dataset("Eigen Values", data=evals)
+    EigGrp.create_dataset("Wavefunctions", data=evecs)
+    # ------------------------ End: Hdf5 Ostream ------------------------------
 
 
-    print(list(file.keys()))
-    print(file.name)
-    print(type(evecs))
-
-    # ob = Observ(Lat)  # creat Observable object
-    # tmpsr = ob.SpRe(evals, evecs)
-    # matprintos(tmpsr, "SpinRes.dat")
 
 
 if __name__ == '__main__':

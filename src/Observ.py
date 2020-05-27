@@ -308,7 +308,7 @@ class Observ:
         gs = evecs[:, 0]  # ground state
         Eg = evals[0]  # ground state energy
 
-        omegasteps = 200
+        omegasteps = 400
         domega = 0.005
         eta = 0.009
 

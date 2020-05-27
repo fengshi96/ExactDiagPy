@@ -17,3 +17,4 @@ def matprintos(A, filename):
             file.write(str(A[i, j]) + "\t")
         file.write("\n")
     file.close()
+

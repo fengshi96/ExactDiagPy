@@ -1,7 +1,9 @@
 import sys, re, math, random
 import numpy as np
+import h5py
 import scipy.sparse as sp
 import primme
+sys.path.insert(0, '../')
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
 from src.Observ import Observ, matele
@@ -17,26 +19,31 @@ def observe(total, cmdargs):
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
     outputname = "../observe.dat"
+    # outputname = "observe.dat"  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
     if total == 3:
         outputname = cmdargs[2]
     # ---------------------------------------------------------------
 
-    para = Parameter(inputname)  # import parameters from input.inp
-    Lat = Lattice(para)  # Build lattice
-    Hamil = Hamiltonian(Lat)  # Build Hamiltonian
-    ham = Hamil.Ham  # Hamiltonian as sparse matrix
+    para = Parameter(inputname)
+    Lat = Lattice(para)
+    ob = Observ(Lat)
 
-    Nstates = para.Nstates  # Number of eigenstates to keep
-    evals, evecs = primme.eigsh(ham, Nstates, tol=1e-6, which='SA')
-    #print("\nEigen Values:-----------\n", *evals, sep='\n')
-    #print("\nEnd of Eigen Values-----------\n\n")
+    # Read HDF5 file
+    file = h5py.File('../dataSpec.hdf5', 'r')
+    # file = h5py.File('dataSpec.hdf5', 'r')  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
+    group = file["3.Eigen"]
+    evalset = group["Eigen Values"]
+    evecset = group["Wavefunctions"]
 
-    ob = Observ(Lat)  # creat Observable object
-    # Tscurrx, Tscurry, Tscurrz = ob.TscurrBuild()  # Build total spin current operators in 3 directions
-    # print("\n\nTotal spin current in x,y,z:", *ob.Tscurr_str, sep="\n")  # print string
+    # extract eigen value and eigen vector from HDF5 file
+    evals = np.zeros(para.Nstates, dtype=float)
+    evecs = np.zeros((2 ** Lat.Nsite, para.Nstates), dtype=complex)
+    evalset.read_direct(evals)
+    evecset.read_direct(evecs)
 
-    tmpsr = ob.SpRe(evals, evecs)
-    matprintos(tmpsr, outputname)
+    #  Calculate spin response S(\omega)
+    SpinRes = ob.SpRe(evals, evecs)
+    matprintos(SpinRes, outputname)
 
 
 if __name__ == '__main__':
