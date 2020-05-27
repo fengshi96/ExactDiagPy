@@ -2,7 +2,6 @@ import sys, re, math, random
 import numpy as np
 import h5py
 import scipy.sparse as sp
-
 sys.path.insert(0, '../')
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
