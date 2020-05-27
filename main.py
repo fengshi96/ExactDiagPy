@@ -42,6 +42,8 @@ def main(total, cmdargs):
     file.attrs["Hz"] = para.Hz
     file.attrs["#States2Keep"] = para.Nstates
     file.attrs["Model"] = para.Model
+    file.attrs["Nsites"] = Lat.Nsite
+
 
     LatGrp = file.create_group("1.Lattice")
     LatGrp.create_dataset("Mesh", data=Lat.mesh_)
@@ -55,6 +57,8 @@ def main(total, cmdargs):
     EigGrp = file.create_group("3.Eigen")
     EigGrp.create_dataset("Eigen Values", data=evals)
     EigGrp.create_dataset("Wavefunctions", data=evecs)
+
+    file.close()
     # ------------------------ End: Hdf5 Ostream ------------------------------
 
 
