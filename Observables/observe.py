@@ -2,7 +2,7 @@ import sys, re, math, random
 import numpy as np
 import h5py
 import scipy.sparse as sp
-sys.path.insert(0, '../')
+sys.path.insert(0, '/fs/byo/trivedi/feng.934/2.Projects_2020/3.Kitaev_Transport/2.ED/ExactDiagPy')
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
 from src.Observ import Observ, matele
