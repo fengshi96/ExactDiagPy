@@ -2,7 +2,6 @@ import sys, re, math, random
 import numpy as np
 import h5py
 import scipy.sparse as sp
-sys.path.insert(0, '/fs/byo/trivedi/feng.934/2.Projects_2020/3.Kitaev_Transport/2.ED/ExactDiagPy')
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
 from src.Observ import Observ, matele
@@ -18,8 +17,7 @@ def observe(total, cmdargs):
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
     observname = cmdargs[2]
-    # outputname = "../dataObserve.hdf5"
-    outputname = "dataObserve.hdf5"  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
+    outputname = "dataObserve.hdf5"
     if total == 4:
         outputname = cmdargs[3]
     # ---------------------------------------------------------------
@@ -29,8 +27,7 @@ def observe(total, cmdargs):
     ob = Observ(Lat)
 
     # ------- Read dataSpec file -------
-    # rfile = h5py.File('../dataSpec.hdf5', 'r')
-    rfile = h5py.File('dataSpec.hdf5', 'r')  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
+    rfile = h5py.File('dataSpec.hdf5', 'r')
     group = rfile["3.Eigen"]
     evalset = group["Eigen Values"]
     evecset = group["Wavefunctions"]
