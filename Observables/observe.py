@@ -18,8 +18,8 @@ def observe(total, cmdargs):
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
     observname = cmdargs[2]
-    outputname = "../dataObserve.hdf5"
-    # outputname = "dataObserve.hdf5"  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
+    # outputname = "../dataObserve.hdf5"
+    outputname = "dataObserve.hdf5"  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
     if total == 4:
         outputname = cmdargs[3]
     # ---------------------------------------------------------------
@@ -29,8 +29,8 @@ def observe(total, cmdargs):
     ob = Observ(Lat)
 
     # ------- Read dataSpec file -------
-    rfile = h5py.File('../dataSpec.hdf5', 'r')
-    # rfile = h5py.File('dataSpec.hdf5', 'r')  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
+    # rfile = h5py.File('../dataSpec.hdf5', 'r')
+    rfile = h5py.File('dataSpec.hdf5', 'r')  ### uncomment for production !!!!!!!!!!!!!!!!!!!!!!!!!
     group = rfile["3.Eigen"]
     evalset = group["Eigen Values"]
     evecset = group["Wavefunctions"]

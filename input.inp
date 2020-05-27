@@ -16,6 +16,6 @@ Byy=-0.0
 Bzz=-0.0
 
 # Number of states to keep
-Nstates=3
+Nstates=500
 
 
