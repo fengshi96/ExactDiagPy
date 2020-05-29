@@ -1,5 +1,6 @@
 import sys, re, math, random
 import numpy as np
+import time
 import scipy.sparse as sp
 import primme
 import h5py
@@ -18,17 +19,23 @@ def main(total, cmdargs):
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
     # ---------------------------------------------------------------
-
     para = Parameter(inputname)  # import parameters from input.inp
     Lat = Lattice(para)  # Build lattice
+    tic = time.perf_counter()
     Hamil = Hamiltonian(Lat)  # Build Hamiltonian
     ham = Hamil.Ham  # Hamiltonian as sparse matrix
+    toc = time.perf_counter()
+    print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
+    tic = time.perf_counter()
     evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-6, which='SA')
+    toc = time.perf_counter()
     print("\nEigen Values:-----------\n", *evals, sep='\n')
     print("\nEnd of Eigen Values-----------\n\n")
+    print(f"Diagonalization time = {toc - tic:0.4f} sec")
 
     # ------------------------ Hdf5 Ostream ------------------------------
+    tic = time.perf_counter()
     file = h5py.File('dataSpec.hdf5', 'w')
     file.attrs["LLX"] = para.LLX
     file.attrs["LLY"] = para.LLY
@@ -59,6 +66,8 @@ def main(total, cmdargs):
     EigGrp.create_dataset("Wavefunctions", data=evecs)
 
     file.close()
+    toc = time.perf_counter()
+    print(f"HDF5 time = {toc - tic:0.4f} sec")
     # ------------------------ End: Hdf5 Ostream ------------------------------
 
 
