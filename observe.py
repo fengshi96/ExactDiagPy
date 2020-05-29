@@ -1,4 +1,5 @@
 import sys, re, math, random
+import time
 import numpy as np
 import h5py
 import scipy.sparse as sp
@@ -28,9 +29,8 @@ def observe(total, cmdargs):
 
     # ------- Read dataSpec file -------
     rfile = h5py.File('dataSpec.hdf5', 'r')
-    group = rfile["3.Eigen"]
-    evalset = group["Eigen Values"]
-    evecset = group["Wavefunctions"]
+    evalset = rfile["3.Eigen"]["Eigen Values"]
+    evecset = rfile["3.Eigen"]["Wavefunctions"]
 
     # extract eigen value and eigen vector from HDF5 rfile
     evals = np.zeros(para.Nstates, dtype=float)
@@ -42,9 +42,15 @@ def observe(total, cmdargs):
 
     # ------- Calculate spin response S(\omega) & write to HDF5---------
     if observname == "spin_response":
+        print("Calculating S(omega)...")
+        tic = time.perf_counter()
         SpinRes = ob.SpRe(evals, evecs)
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+
         wfile = h5py.File(outputname, 'w')
         wfile.create_dataset("Spin Response", data=SpinRes)
+        wfile["Spin Response"].attrs["time"] = toc - tic
         wfile.close()
     # ------- Calculate spin conductivity & write to HDF5---------
     elif observname == "spin_cond":

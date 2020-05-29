@@ -327,9 +327,6 @@ class Observ:
                 Melx[si, mi] = matele(evecs[:, mi], Sxi, gs)
                 Mely[si, mi] = matele(evecs[:, mi], Syi, gs)
                 Melz[si, mi] = matele(evecs[:, mi], Szi, gs)
-        # print(np.real(Melx))
-        # print(np.real(Mely))
-        # print(np.real(Melz))
 
         # elastic contribution <Sa>_i
         mSx = np.zeros(Lat.Nsite, dtype=complex)
