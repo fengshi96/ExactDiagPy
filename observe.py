@@ -48,9 +48,12 @@ def observe(total, cmdargs):
         toc = time.perf_counter()
         print(f"time = {toc-tic:0.4f} sec")
 
-        wfile = h5py.File(outputname, 'w')
+        wfile = h5py.File(outputname, 'a')
+        if "Spin Response" in list(wfile.keys()):
+            wfile.__delitem__("Spin Response")  # over write if existed
         wfile.create_dataset("Spin Response", data=SpinRes)
         wfile["Spin Response"].attrs["time"] = toc - tic
+
         wfile.close()
     # ------- Calculate spin conductivity & write to HDF5---------
     elif observname == "spin_cond":
