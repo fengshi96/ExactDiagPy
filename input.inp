@@ -1,12 +1,12 @@
-LLX=4
-LLY=3
-IsPeriodicX=0
+LLX=2
+LLY=2
+IsPeriodicX=1
 IsPeriodicY=1
 
 # Kitaev, Heisenberg_Square, Heisenberg_Honeycomb
 # Hubbard, AKLT
 
-Model=AKLT
+Model=Kitaev
 
 
 Kxx=1.0
