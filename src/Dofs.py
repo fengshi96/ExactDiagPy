@@ -53,4 +53,9 @@ class Dofs:
 # Spins = Dofs("SpinOne")
 # print(Spins.Sx, "\n")
 # print(Spins.Sy, "\n")
-# print(Spins.Sz)
+# print(Spins.Sz, "\n")
+#
+# print(Spins.Sz * Spins.Sz)
+
+#
+# print(Spins.Sx.shape[0])

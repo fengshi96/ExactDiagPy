@@ -27,7 +27,7 @@ class Lattice:
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
-        elif para.Model == "Heisenberg" or para.Model == "Hubbard":
+        elif para.Model == "Heisenberg_Square" or para.Model == "Hubbard":
             self.Nsite = self.LLX * self.LLY
             self.Hx = para.Hx; self.Kxx = para.Kxx
             self.Hy = para.Hy; self.Kyy = para.Kyy
@@ -289,6 +289,6 @@ class Lattice:
                     self.nn_[i, 3] = j
         matprint(self.nn_)
 
-param = Parameter("../input.inp")
-lat = Lattice(param)
+# param = Parameter("../input.inp")
+# lat = Lattice(param)
 

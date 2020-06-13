@@ -1,5 +1,5 @@
-LLX=6
-LLY=2
+LLX=4
+LLY=3
 IsPeriodicX=0
 IsPeriodicY=1
 
@@ -19,6 +19,6 @@ Bzz=-0.0
 
 
 # Number of states to keep
-Nstates=5
+Nstates=81
 
 
