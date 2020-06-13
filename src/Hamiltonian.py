@@ -172,7 +172,6 @@ class Hamiltonian:
 		Ham += sp.eye(Ham.shape[0]) * 2.0 / 3.0 * len(self.Kxx1coef_)
 		return Ham
 
-
 	def BuildKitaev(self):
 
 		lat = self.Lat
