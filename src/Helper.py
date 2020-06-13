@@ -8,6 +8,13 @@ def matprint(A):
     print("\n")
 
 
+def vecprint(A):
+    row = len(A)
+    for i in range(row):
+        print(A[i], end='\t')
+    print("\n")
+
+
 def matprintos(A, filename):
     file = open(filename, "w")
     row = A.shape[0]
@@ -17,4 +24,3 @@ def matprintos(A, filename):
             file.write(str(A[i, j]) + "\t")
         file.write("\n")
     file.close()
-

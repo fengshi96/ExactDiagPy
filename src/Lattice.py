@@ -1,6 +1,7 @@
 import numpy as np
 import math as m
-from src.Helper import matprint
+from src.Helper import matprint, vecprint
+from src.Parameter import Parameter
 
 
 class Lattice:
@@ -15,7 +16,7 @@ class Lattice:
         self.Model = para.Model  # Name of the model.
 
         # Model-dependent attributes
-        if para.Model == "Kitaev" or "Heisenberg_Honeycomb":
+        if para.Model == "Kitaev" or para.Model == "Heisenberg_Honeycomb":
             self.Nsite = self.LLX * self.LLY * 2
             self.Hx = para.Hx; self.Kxx = para.Kxx
             self.Hy = para.Hy; self.Kyy = para.Kyy
@@ -37,8 +38,66 @@ class Lattice:
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
             self.BuildSquare()  # build attributes in square lattice
+        elif para.Model == "AKLT":
+            self.Nsite = self.LLX
+            self.Hx = para.Hx; self.Kxx1 = para.Kxx; self.Kxx2 = para.Kxx / 3.0
+            self.Hy = para.Hy; self.Kyy1 = para.Kyy; self.Kyy2 = para.Kyy / 3.0
+            self.Hz = para.Hz; self.Kzz1 = para.Kzz; self.Kzz2 = para.Kzz / 3.0
+            self.indx_ = np.zeros(self.Nsite, dtype=int)
+            self.Number1neigh = 2
+            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+            self.mesh_ = -np.ones(self.LLX, dtype=int)
+            self.BuildBLBQChain()  # build attributes in square lattice
         else:
             raise ValueError("Model not supported yet")
+
+    def BuildBLBQChain(self):
+        """
+        Construct Spin-1 BLBQ Chain and nearest neighbor matrix
+        Neighbor Label:  —— (1) ——  i  ——  (0) ——
+        """
+        print("[Lattice.py] building 1D BLBQ Chain...")
+        counter = 0
+        for ix in range(0, self.LLX):
+            self.mesh_[ix] = counter
+            self.indx_[counter] = ix
+            counter += 1
+        vecprint(self.mesh_)
+
+        print("\n[Lattice.py] Looking for nearest neighbors...")
+        for i in range(0, self.Nsite):
+            ix = self.indx_[i]
+
+            # ----------------------------OBC-----------------------------------
+            # +x - 1neighbor 0
+            if ix + 1 < self.LLX:  # if not at the bottom edge
+                jx = ix + 1
+                j = self.mesh_[jx]  # (+x)-neighbor index
+                self.nn_[i, 0] = j
+
+            # -x - 1neighbor 1
+            if ix > 0:  # if not at the top edge
+                jx = ix - 1
+                j = self.mesh_[jx]  # (-x)-neighbor index
+                self.nn_[i, 1] = j
+
+            # ----------------------------OBC-----------------------------------
+
+            # --------------------------Apply PBC-------------------------------
+            if self.IsPeriodicX:
+                # +x - 1neighbor 0
+                if ix == self.LLX - 1:  # bottom edge
+                    jx = 0
+                    j = self.mesh_[jx]
+                    self.nn_[i, 0] = j
+
+                # -x - 1neighbor 1
+                if ix == 0:  # top edge
+                    jx = self.LLX - 1
+                    j = self.mesh_[jx]
+                    self.nn_[i, 1] = j
+
+        matprint(self.nn_)
 
     def BuildHoneycomb(self):
         """
@@ -230,5 +289,6 @@ class Lattice:
                     self.nn_[i, 3] = j
         matprint(self.nn_)
 
-# param = Parameter("../input.inp")
-# lat = Lattice(param)
+param = Parameter("../input.inp")
+lat = Lattice(param)
+

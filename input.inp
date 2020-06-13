@@ -1,10 +1,12 @@
-LLX=2
+LLX=6
 LLY=2
-IsPeriodicX=1
+IsPeriodicX=0
 IsPeriodicY=1
 
-# Kitaev, Heisenberg_Square, Heisenberg_Honeycomb or Hubbard
-Model=Kitaev
+# Kitaev, Heisenberg_Square, Heisenberg_Honeycomb
+# Hubbard, AKLT
+
+Model=AKLT
 
 
 Kxx=1.0
@@ -14,6 +16,7 @@ Kzz=1.0
 Bxx=-0.0
 Byy=-0.0
 Bzz=-0.0
+
 
 # Number of states to keep
 Nstates=5
