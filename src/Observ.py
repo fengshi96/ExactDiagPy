@@ -505,7 +505,7 @@ class Observ:
 
             # for each omega, define a matrix Mel_{si,mi}
             for si in range(0, Lat.Nsite):
-                for mi in range(0, Nstates):
+                for mi in range(1, Nstates):
                     Em = evals[mi]
                     denom2 = complex(omega - (Em - Eg), -eta)
 
