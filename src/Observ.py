@@ -596,6 +596,71 @@ class Observ:
 
         return SzSz
 
+    def SpSm(self, evals, evecs, qm="SpinHalf"):
+        """
+        Measure Single < Sz Sz >
+        """
+        Lat = self.Lat
+        Nstates = len(evals)
+
+        gs = evecs[:, 0]  # ground state
+        Eg = evals[0]  # ground state energy
+
+        omegasteps = 400
+        domega = 0.005
+        eta = 0.009
+
+        # for each omega, define a matrix Mel_{si,mi}
+        Melp = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^+|gs>
+        Melm = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^-|gs>
+        # Melz = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^z|gs>
+
+        for mi in range(0, Nstates):
+            for si in range(0, Lat.Nsite):
+                Spi = self.LSpBuild(si, qm)
+                Smi = self.LSmBuild(si, qm)
+                Szi = self.LSzBuild(si, qm)
+
+                # <m|S_i^a|gs>
+                Melp[si, mi] = matele(evecs[:, mi], Spi, gs)
+                Melm[si, mi] = matele(evecs[:, mi], Smi, gs)
+                # Melz[si, mi] = matele(evecs[:, mi], Szi, gs)
+
+        SpSm = np.zeros((omegasteps, 2), dtype=float)  # spin response
+        # begin fill in vector Sr(\omega)
+        omegacounter = 0
+        for oi in range(0, omegasteps):
+            omega = domega * oi
+            Itensity = np.zeros((3, 3), dtype=complex)
+
+            # for each omega, define a matrix Mel_{si,mi}
+            for si in range(0, Lat.Nsite):
+                for mi in range(1, Nstates):
+                    Em = evals[mi]
+                    denom2 = complex(omega - (Em - Eg), -eta)
+
+                    # <m|S_i^a|gs>
+                    tmpp = Melp[si, mi]
+                    tmpm = Melm[si, mi]
+                    #tmpz = Melz[si, mi]
+
+                    # <gs|S_i^a|m><m|S_i^b|gs>
+                    tmppm = tmpp.conjugate() * tmpm  # Sip Sim
+                    #tmpmp = tmpm.conjugate() * tmpp  # Sim Sip
+                    #tmpzz = tmpz.conjugate() * tmpz  # Siz Siz
+
+                    # update polarization matrix
+                    Itensity[0, 1] += tmppm / denom2
+                    #Itensity[1, 0] += tmpmp / denom2
+                    #Itensity[2, 2] += tmpzz / denom2
+
+            SpSm[omegacounter, 0] = round(omega, 4)
+            SpSm[omegacounter, 1] = Itensity.sum().imag / (np.pi * Lat.Nsite)
+            omegacounter += 1
+        # print(Itensity)
+
+        return SpSm
+
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)
 # ob = Observ(Lat)

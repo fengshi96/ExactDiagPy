@@ -98,6 +98,22 @@ def observe(total, cmdargs):
         wfile["SzSz"].attrs["time"] = toc - tic
 
         wfile.close()
+
+        # ------- Calculate SpSm DOS & write to HDF5---------
+    elif observname == "spsm":
+        print("Calculating SpSm spectrum...")
+        tic = time.perf_counter()
+        SZSZ = ob.SzSz(evals, evecs, dof.type)
+        toc = time.perf_counter()
+        print(f"time = {toc - tic:0.4f} sec")
+
+        wfile = h5py.File(outputname, 'a')
+        if "SpSm" in list(wfile.keys()):
+            wfile.__delitem__("SpSm")  # over write if existed
+        wfile.create_dataset("SpSm", data=SZSZ)
+        wfile["SpSm"].attrs["time"] = toc - tic
+
+        wfile.close()
     else:
         raise ValueError("Observable not supported yet")
 
