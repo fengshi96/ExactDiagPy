@@ -48,6 +48,16 @@ class Lattice:
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones(self.LLX, dtype=int)
             self.BuildBLBQChain()  # build attributes in square lattice
+        elif para.Model == "TFIM":
+            self.Nsite = self.LLX
+            self.Hx = para.Hx; self.Kxx1 = 0; self.Kxx2 = 0
+            self.Hy = 0; self.Kyy1 = 0; self.Kyy2 = 0
+            self.Hz = 0; self.Kzz1 = para.Kzz; self.Kzz2 = 0
+            self.indx_ = np.zeros(self.Nsite, dtype=int)
+            self.Number1neigh = 2
+            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+            self.mesh_ = -np.ones(self.LLX, dtype=int)
+            self.BuildBLBQChain()  # build attributes in square lattice
         else:
             raise ValueError("Model not supported yet")
 

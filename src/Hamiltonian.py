@@ -17,7 +17,7 @@ class Hamiltonian:
 		self.Hy = Lat.Hy
 		self.Hz = Lat.Hz
 
-		if self.Model != "AKLT":
+		if self.Model != "AKLT" and self.Model != "TFIM":
 			self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
 			self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
 			self.KzzPair_ = np.zeros(())
@@ -58,7 +58,7 @@ class Hamiltonian:
 			self.tGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 			self.Ham = self.BuildHubbard()
 
-		elif self.Model == "AKLT":
+		elif self.Model == "AKLT" or self.Model == "TFIM":
 			self.Nsite = Lat.LLX
 
 			self.Kxx1Graph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
@@ -135,9 +135,12 @@ class Hamiltonian:
 
 		print("[Hamiltonian.py] Building Hamiltonian as Sparse Matrix...")
 		Spins = Dofs("SpinOne")
+		if lat.Model == "TFIM":
+			Spins = Dofs("SpinHalf")
 		sx = Spins.Sx
 		sy = Spins.Sy
 		sz = Spins.Sz
+		print("-------------------------------------------", sx.shape)
 
 		Hamx1 = TwoSpinOps(self.Kxx1Pair_, self.Kxx1coef_, sx, sx, self.Nsite)
 		Hamy1 = TwoSpinOps(self.Kyy1Pair_, self.Kyy1coef_, sy, sy, self.Nsite)

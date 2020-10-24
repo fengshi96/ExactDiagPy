@@ -661,6 +661,36 @@ class Observ:
 
         return SpSm
 
+    def ecurrent1(self, evals, evecs, site):
+        """
+        Measure energy current at a given site in TFIM
+        """
+
+        Lat = self.Lat
+        si = site; qm ="SpinHalf"
+
+        if Lat.Model != "TFIM":
+            raise ValueError("ecurrent1 is designed for TFIM exclusively")
+        elif si+1 > Lat.Nsite or si-1 < 0:
+            raise ValueError("I'm falling out of boundary!")
+
+        gs = evecs[:, 0]  # ground state
+        Eg = evals[0]  # ground state energy
+        # Build local spin operator in full Hilbert space
+        Syi = self.LSyBuild(si, qm)
+        Szi = self.LSzBuild(si, qm)  # Sz(i)
+        Szim1 = self.LSzBuild(si - 1, qm)  #Sz(i-1)
+        Szip1 = self.LSzBuild(si + 1, qm)  #Sz(i+1)
+
+        # Build current operator    -Jh z(i-1)y(i)                  Not J[  z(i-1)y(i) + y(i)z(i+1)  ]  - h y(i)z(i+1)
+        J = Lat.Kzz1; H = Lat.Hx
+        # ECurr = J * H * (Szim1 * Syi + Syi * Szip1) - H * Syi * Szip1
+        ECurr = - J * H * (Szim1 * Syi)
+
+        # Measure current at ground state
+        mECurr = matele(gs, ECurr, gs)
+        return mECurr
+
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)
 # ob = Observ(Lat)

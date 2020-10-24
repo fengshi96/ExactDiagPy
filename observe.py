@@ -28,7 +28,7 @@ def observe(total, cmdargs):
     para = Parameter(inputname)
     Lat = Lattice(para)
     ob = Observ(Lat)
-
+    print(Lat.Model)
     dof = Dofs("SpinHalf")  # default spin-1/2
     if Lat.Model == "AKLT":
         dof = Dofs("SpinOne")
@@ -39,6 +39,7 @@ def observe(total, cmdargs):
     evecset = rfile["3.Eigen"]["Wavefunctions"]
 
     # extract eigen value and eigen vector from HDF5 rfile
+    print(dof.hilbsize ** Lat.Nsite)
     evals = np.zeros(para.Nstates, dtype=float)
     evecs = np.zeros((dof.hilbsize ** Lat.Nsite, para.Nstates), dtype=complex)
     evalset.read_direct(evals)
@@ -114,6 +115,17 @@ def observe(total, cmdargs):
         wfile["SpSm"].attrs["time"] = toc - tic
 
         wfile.close()
+        # ------- Calculate energy current of TFIM & write to HDF5---------
+    elif observname == "ecurrent1":
+        site = 2
+        if para.Model != "TFIM":
+            raise ValueError("ecurrent1 is designed for TFIM exclusively")
+        print("Calculating energy current of TFIM...")
+        tic = time.perf_counter()
+        mEcurr = ob.ecurrent1(evals, evecs, site)
+        toc = time.perf_counter()
+        print(f"time = {toc - tic:0.4f} sec")
+        print("Current at site=", site, "is ", mEcurr)
     else:
         raise ValueError("Observable not supported yet")
 
