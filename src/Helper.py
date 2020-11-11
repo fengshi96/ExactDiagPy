@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 
 def matprint(A):
@@ -34,3 +35,18 @@ def sort(evals, evecs):
     evals_sorted = evals[index_ascend]
     evecs_sorted = evecs[:, index_ascend]
     return evals_sorted, evecs_sorted
+
+
+class Logger:
+    def __init__(self):
+        self.terminal = sys.stdout
+        self.log = open("logfile.log", "w")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        # this flush method is needed for python 3 compatibility.
+        # this handles the flush command by doing nothing.
+        pass

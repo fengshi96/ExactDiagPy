@@ -5,8 +5,9 @@ import primme
 import h5py
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
-from src.Observ import EntSpec
+from src.Observ import Observ
 from src.Lattice import Lattice
+from src.Helper import Logger
 
 pi = np.pi
 
@@ -16,6 +17,8 @@ def main(total, cmdargs):
         print(" ".join(str(x) for x in cmdargs))
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
+    sys.stdout = Logger()  # for exporting the logfile
+
     # ----------------------- Build and Diagonalize ---------------------------------
     para = Parameter(inputname)  # import parameters from input.inp
     Lat = Lattice(para)  # Build lattice
@@ -30,11 +33,13 @@ def main(total, cmdargs):
     toc = time.perf_counter()
 
     evals = np.round(evals, 10)
-    print("\nEigen Values:-----------\n", *evals, sep='\n')
-    print("\nEnd of Eigen Values-----------\n\n")
-    print(f"Diagonalization time = {toc - tic:0.4f} sec")
+    print("\n-----------Beg of Eigen Values-----------\n", *evals, sep='\n')
+    print("\n-----------End of Eigen Values-----------")
+    print(f"Diagonalization time = {toc - tic:0.4f} sec \n\n")
 
-
+    # ----------------------- Entanglement properties of GS ---------------------------------
+    ob = Observ(Lat)
+    ob.EntSpec(evecs[:, 0])
 
 
 
@@ -81,7 +86,7 @@ def main(total, cmdargs):
 
     file.close()
     toc = time.perf_counter()
-    print(f"HDF5 time = {toc - tic:0.4f} sec")
+    print(f"\nHDF5 time = {toc - tic:0.4f} sec")
     # ------------------------ End: Hdf5 Ostream ------------------------------
     # ------------------------ End: Hdf5 Ostream ------------------------------
     # ------------------------ End: Hdf5 Ostream ------------------------------

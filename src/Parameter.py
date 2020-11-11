@@ -13,9 +13,9 @@ class Parameter:
 		self.Hy = 0.0
 		self.Hz = 0.0
 		self.Nstates = 1
+		self.SysIndx = None
 		self.GetParameter(path)
-		if "EE" in self.Option:
-			self.SysIndx = []
+
 	
 	def GetParameter(self, path):
 		file = open(path, 'r')		

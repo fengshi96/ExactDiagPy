@@ -693,18 +693,26 @@ class Observ:
         return mECurr
 
 
-    def EntSpec(self, vec, Lat):
+    def EntSpec(self, vec):
         """
         Calculates Entanglement spectrum and Entanglement entropy given the state vector and the Lattice
         """
+
+        print("Calculating entanglement spectrum and entropy...")
         try:
-            sysindx = np.array(Lat.SysIndx)
+            sysindx = np.array(self.Lat.SysIndx)
         except Exception:
             print("EE is not an option in your input, or SysIndx is ill defined")
             raise
 
-        evnindx = [i for i in Lat.mesh_ if i not in sysindx]
-        print(evnindx)
+        evnindx = np.array([i for i in self.Lat.mesh_ if i not in sysindx])
+        print("System Index:", sysindx)
+        print("Evironment Index:", evnindx)
+
+        sysHilDim = pow(2, sysindx.size)
+        evnHilDim = pow(2, evnindx.size)
+
+        print(sysHilDim, evnHilDim)
         #Pwavefunc = pwavefunction(left_block.dim, right_block.dim)
 
 
