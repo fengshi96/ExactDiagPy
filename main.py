@@ -64,7 +64,7 @@ def main(total, cmdargs):
     # ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
     # ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
 
-    # uncomment for AKLT
+    # uncomment for Heisenberg/AKLT
     ConnGrp.create_dataset("Kxx1Graph", data=Hamil.Kxx1Graph_)
     ConnGrp.create_dataset("Kyy1Graph", data=Hamil.Kyy1Graph_)
     ConnGrp.create_dataset("Kzz1Graph", data=Hamil.Kzz1Graph_)

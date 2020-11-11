@@ -5,7 +5,7 @@ IsPeriodicY=1
 
 # Kitaev, Heisenberg_Square, Heisenberg_Honeycomb
 # Hubbard, AKLT
-
+# For TFIM, LLY, Kxx, Kyy are frozen
 Model=TFIM
 
 
