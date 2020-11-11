@@ -14,6 +14,8 @@ class Lattice:
         self.IsPeriodicX = para.IsPeriodicX  # PBC (1) or OBC (0)
         self.IsPeriodicY = para.IsPeriodicY
         self.Model = para.Model  # Name of the model.
+        if "EE" in para.Option:
+            self.SysIndx = para.SysIndx
 
         # Model-dependent attributes
         if para.Model == "Kitaev" or para.Model == "Heisenberg_Honeycomb":

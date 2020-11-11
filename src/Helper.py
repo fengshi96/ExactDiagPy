@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def matprint(A):
     row = A.shape[0]
     col = A.shape[1]
@@ -24,3 +27,10 @@ def matprintos(A, filename):
             file.write(str(A[i, j]) + "\t")
         file.write("\n")
     file.close()
+
+
+def sort(evals, evecs):
+    index_ascend = np.argsort(evals)
+    evals_sorted = evals[index_ascend]
+    evecs_sorted = evecs[:, index_ascend]
+    return evals_sorted, evecs_sorted

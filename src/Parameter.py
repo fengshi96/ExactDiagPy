@@ -1,9 +1,10 @@
 class Parameter:
-	def __init__(self,path):
+	def __init__(self, path):
 		self.LLX = 1
 		self.LLY = 1
 		self.IsPeriodicX = True
 		self.IsPeriodicY = True
+		self.Option = None
 		self.Model = "Kitaev"
 		self.Kxx = 1.0
 		self.Kyy = 1.0
@@ -13,15 +14,17 @@ class Parameter:
 		self.Hz = 0.0
 		self.Nstates = 1
 		self.GetParameter(path)
+		if "EE" in self.Option:
+			self.SysIndx = []
 	
-	def GetParameter(self,path):
+	def GetParameter(self, path):
 		file = open(path, 'r')		
 		lines = file.readlines()
 		file.close()
 		
 		for i in range(0,len(lines)):
 			if lines[i] != '\n' and '#' not in lines[i]:
-				line = lines[i].strip('\n').split("=")
+				line = lines[i].strip('\n').strip(' ').split("=")
 			#print(line)
 			name = line[0]
 			var = line[1]
@@ -50,18 +53,25 @@ class Parameter:
 				self.Hz = float(var)	
 			elif name=="Nstates":
 				self.Nstates = int(var)
+			elif name == "Option":
+				self.Option = var.strip(' ').split(',')
+			elif name == "SysIndx" and "EE" in self.Option:
+				self.SysIndx = eval(var)
 			else:
 				pass
+
 				
-		print("Parameters:")
+		print("Parameters are ....")
 		print("LLX=", self.LLX, "\nLLY=",self.LLY)
 		print("IsPeriodicX=", self.IsPeriodicX,"\nIsPeriodicY=", self.IsPeriodicY)
 		print("Model=", self.Model)
 		print("Kx=", self.Kxx, "\nKy=", self.Kyy, "\nKz=", self.Kzz)
 		print("Hx=", self.Hx, "\nHy=", self.Hy, "\nHz=", self.Hz)
-		print("#States2Keep:", self.Nstates)
-		
-		print("\n-----------------")
+		print("NStates2Keep:", self.Nstates)
+		print("option:", self.Option)
+		if "EE" in self.Option:
+			print("System index=", self.SysIndx)
+		print("----------------- End of Parameters -----------------\n")
 				
 #param = Parameter("../input.inp")
 #param.GetParameter("../input.inp")	

@@ -1,6 +1,7 @@
 import scipy.sparse as sp
 import numpy as np
 from src.Dofs import Dofs
+from src.Wavefunction import *
 
 
 def matele(A, Op, B):
@@ -682,7 +683,7 @@ class Observ:
         Szim1 = self.LSzBuild(si - 1, qm)  #Sz(i-1)
         Szip1 = self.LSzBuild(si + 1, qm)  #Sz(i+1)
 
-        # Build current operator    -Jh z(i-1)y(i)                  Not J[  z(i-1)y(i) + y(i)z(i+1)  ]  - h y(i)z(i+1)
+        # Build current operator
         J = Lat.Kzz1; H = Lat.Hx
         # ECurr = J * H * (Szim1 * Syi + Syi * Szip1) - H * Syi * Szip1
         ECurr = - J * H * (Szim1 * Syi)
@@ -690,6 +691,23 @@ class Observ:
         # Measure current at ground state
         mECurr = matele(gs, ECurr, gs)
         return mECurr
+
+
+    def EntSpec(self, vec, Lat):
+        """
+        Calculates Entanglement spectrum and Entanglement entropy given the state vector and the Lattice
+        """
+        try:
+            sysindx = np.array(Lat.SysIndx)
+        except Exception:
+            print("EE is not an option in your input, or SysIndx is ill defined")
+            raise
+
+        evnindx = [i for i in Lat.mesh_ if i not in sysindx]
+        print(evnindx)
+        #Pwavefunc = pwavefunction(left_block.dim, right_block.dim)
+
+
 
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)

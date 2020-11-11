@@ -1,14 +1,12 @@
-import sys, re, math, random
+import sys
 import numpy as np
 import time
-import scipy.sparse as sp
 import primme
 import h5py
 from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
-from src.Observ import Observ, matele
+from src.Observ import EntSpec
 from src.Lattice import Lattice
-from src.Helper import matprint, matprintos
 
 pi = np.pi
 
@@ -18,7 +16,7 @@ def main(total, cmdargs):
         print(" ".join(str(x) for x in cmdargs))
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
-    # ---------------------------------------------------------------
+    # ----------------------- Build and Diagonalize ---------------------------------
     para = Parameter(inputname)  # import parameters from input.inp
     Lat = Lattice(para)  # Build lattice
     tic = time.perf_counter()
@@ -36,19 +34,24 @@ def main(total, cmdargs):
     print("\nEnd of Eigen Values-----------\n\n")
     print(f"Diagonalization time = {toc - tic:0.4f} sec")
 
+
+
+
+
+
+
+
+
+
+    # ------------------------ Hdf5 Ostream ------------------------------
+    # ------------------------ Hdf5 Ostream ------------------------------
     # ------------------------ Hdf5 Ostream ------------------------------
     tic = time.perf_counter()
     file = h5py.File('dataSpec.hdf5', 'w')
-    file.attrs["LLX"] = para.LLX
-    file.attrs["LLY"] = para.LLY
-    file.attrs["IsPeriodicX"] = para.IsPeriodicX
-    file.attrs["IsPeriodicY"] = para.IsPeriodicY
-    file.attrs["Kx"] = para.Kxx
-    file.attrs["Ky"] = para.Kyy
-    file.attrs["Kz"] = para.Kzz
-    file.attrs["Hx"] = para.Hz
-    file.attrs["Hy"] = para.Hy
-    file.attrs["Hz"] = para.Hz
+    file.attrs["LLX"] = para.LLX; file.attrs["LLY"] = para.LLY
+    file.attrs["IsPeriodicX"] = para.IsPeriodicX; file.attrs["IsPeriodicY"] = para.IsPeriodicY
+    file.attrs["Kx"] = para.Kxx; file.attrs["Ky"] = para.Kyy; file.attrs["Kz"] = para.Kzz
+    file.attrs["Hx"] = para.Hz; file.attrs["Hy"] = para.Hy; file.attrs["Hz"] = para.Hz
     file.attrs["#States2Keep"] = para.Nstates
     file.attrs["Model"] = para.Model
     file.attrs["Nsites"] = Lat.Nsite
@@ -79,6 +82,8 @@ def main(total, cmdargs):
     file.close()
     toc = time.perf_counter()
     print(f"HDF5 time = {toc - tic:0.4f} sec")
+    # ------------------------ End: Hdf5 Ostream ------------------------------
+    # ------------------------ End: Hdf5 Ostream ------------------------------
     # ------------------------ End: Hdf5 Ostream ------------------------------
 
 

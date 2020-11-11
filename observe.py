@@ -126,6 +126,7 @@ def observe(total, cmdargs):
         toc = time.perf_counter()
         print(f"time = {toc - tic:0.4f} sec")
         print("Current at site=", site, "is ", mEcurr)
+
     else:
         raise ValueError("Observable not supported yet")
 

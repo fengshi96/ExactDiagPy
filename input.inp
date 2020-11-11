@@ -2,10 +2,9 @@ LLX=6
 LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
+Option=EE
 
-# Kitaev, Heisenberg_Square, Heisenberg_Honeycomb
-# Hubbard, AKLT
-# For TFIM, LLY, Kxx, Kyy are frozen
+# Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Hubbard, AKLT  # For TFIM, LLY, Kxx, Kyy are frozen
 Model=TFIM
 
 
@@ -17,6 +16,8 @@ Bxx=-1.0
 Byy=-0.0
 Bzz=0.0
 
+# For EE
+SysIndx=[1, 2]
 
 # Number of states to keep
 Nstates=5
