@@ -35,7 +35,7 @@ class pwavefunction(object):
 
         Parameters
         ----------
-        block_to_be_traced_over : a string, left or right block to be traced over
+        block_to_be_traced_over : a string, sys or evn block to be traced over
         """
 
         if block_to_be_traced_over not in ('sys', 'evn'):
