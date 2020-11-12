@@ -5,13 +5,14 @@ class pwavefunction(object):
     """ The wavefunction of a bipartite system, comes with trash elements.
     """
 
-    def __init__(self, sys_dim, evn_dim, num_type='double'):
+    def __init__(self, vec, sys_dim, evn_dim, num_type='double'):
         """Creates an empty partioned wavefunction
 
         The wavefunction of a bipartite system, comes with trash elements.
 
         Parameters
         ----------
+        vec: A pure state vector
         sys_dim : The dimension of the Hilbert space of the system (int type)
         evn_dim : The dimension of the Hilbert space of the environment (int type)
         num_type : a double or complex
@@ -21,6 +22,7 @@ class pwavefunction(object):
         super(pwavefunction, self).__init__()
         try:
             self.as_matrix = np.empty((sys_dim, evn_dim), num_type)
+            self.as_matrix = np.reshape(vec, (sys_dim, evn_dim))
         except TypeError:
             print("Bad args for pwavefunction")
             raise
