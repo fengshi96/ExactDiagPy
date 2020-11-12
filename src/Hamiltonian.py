@@ -17,7 +17,7 @@ class Hamiltonian:
 		self.Hy = Lat.Hy
 		self.Hz = Lat.Hz
 
-		if self.Model != "AKLT" and self.Model != "TFIM":
+		if self.Model != "AKLT":
 			self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
 			self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
 			self.KzzPair_ = np.zeros(())
@@ -58,7 +58,7 @@ class Hamiltonian:
 			self.tGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 			self.Ham = self.BuildHubbard()
 
-		elif self.Model == "AKLT" or self.Model == "TFIM":
+		elif self.Model == "AKLT":
 			self.Nsite = Lat.LLX
 
 			self.Kxx1Graph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
@@ -172,6 +172,7 @@ class Hamiltonian:
 			Ham += sp.kron(ida, sp.kron(sy, idb)) * self.Hy
 			Ham += sp.kron(ida, sp.kron(sz, idb)) * self.Hz
 
+		#if lat.Model == "AKLT":
 		Ham += sp.eye(Ham.shape[0]) * 2.0 / 3.0 * len(self.Kxx1coef_)
 		return Ham
 

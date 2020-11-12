@@ -25,8 +25,8 @@ class pwavefunction(object):
             print("Bad args for pwavefunction")
             raise
 
-        self.left_dim = sys_dim
-        self.right_dim = evn_dim
+        self.sys_dim = sys_dim
+        self.evn_dim = evn_dim
         self.num_type = num_type
 
     def rdm(self, block_to_be_traced_over):

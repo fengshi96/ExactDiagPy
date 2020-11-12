@@ -29,7 +29,7 @@ def main(total, cmdargs):
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-6, which='SA')
+    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-8, which='SA')
     toc = time.perf_counter()
 
     evals = np.round(evals, 10)
@@ -69,17 +69,17 @@ def main(total, cmdargs):
 
     ConnGrp = file.create_group("2.Connectors")
     # # uncomment for Kitaev, Heisenberg
-    # ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
-    # ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
-    # ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
+    ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
+    ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
+    ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
 
-    # uncomment for Heisenberg/AKLT
-    ConnGrp.create_dataset("Kxx1Graph", data=Hamil.Kxx1Graph_)
-    ConnGrp.create_dataset("Kyy1Graph", data=Hamil.Kyy1Graph_)
-    ConnGrp.create_dataset("Kzz1Graph", data=Hamil.Kzz1Graph_)
-    ConnGrp.create_dataset("Kxx2Graph", data=Hamil.Kxx2Graph_)
-    ConnGrp.create_dataset("Kyy2Graph", data=Hamil.Kyy2Graph_)
-    ConnGrp.create_dataset("Kzz2Graph", data=Hamil.Kzz2Graph_)
+    # uncomment for AKLT
+    # ConnGrp.create_dataset("Kxx1Graph", data=Hamil.Kxx1Graph_)
+    # ConnGrp.create_dataset("Kyy1Graph", data=Hamil.Kyy1Graph_)
+    # ConnGrp.create_dataset("Kzz1Graph", data=Hamil.Kzz1Graph_)
+    # ConnGrp.create_dataset("Kxx2Graph", data=Hamil.Kxx2Graph_)
+    # ConnGrp.create_dataset("Kyy2Graph", data=Hamil.Kyy2Graph_)
+    # ConnGrp.create_dataset("Kzz2Graph", data=Hamil.Kzz2Graph_)
 
     EigGrp = file.create_group("3.Eigen")
     EigGrp.create_dataset("Eigen Values", data=evals)

@@ -710,26 +710,11 @@ class Observ:
 
         evnindx = np.array([i for i in self.Lat.mesh_ if i not in sysindx])
         print("System Index:", sysindx)
-        print("Evironment Index:", evnindx)
+        print("Evironment Index:", *evnindx)
 
         sysHilDim = pow(2, sysindx.size)
         evnHilDim = pow(2, evnindx.size)
         print("System Hilbert Dim=", sysHilDim, ", Environment Hilbert Dim=", evnHilDim)
-
-        # Levnindx = np.array([i for i in evnindx if i < min(sysindx)])  # Left environment indices
-        # RevnIndx = np.array([i for i in evnindx if i > max(sysindx)])  # Right environment indices
-        # sysRevnIndx = np.hstack([sysindx, RevnIndx])  # system + Right environment indices
-        #
-        # LevnHilDim = pow(2, Levnindx.size)  # Hilbert space dimension of Left environment
-        # sysRevnHilDim = pow(2, sysRevnIndx.size)  # Hilbert space dimension of system + Right environment
-        # print("LevnHilDim=", LevnHilDim)
-        # print("sysRevnHilDim=", sysRevnHilDim)
-        #
-        # vec_Levn = vec[0:LevnHilDim]  # vector elements led by Left environment indices
-        # vec_sysRevn = vec[LevnHilDim+1:LevnHilDim+sysRevnHilDim]   # vector elements led by system + Right env indices
-        # gvec = np.hstack([vec_sysRevn, vec_Levn])  # "gauged" vector
-        # if LevnHilDim+1+sysRevnHilDim != pow(2, max(self.Lat.mesh_)+1):
-        #     raise ValueError("Failed to *gauge* the vector, Hilbert space size mismatch")
 
         Pwavefunc = pwavefunction(sysHilDim, evnHilDim)
         Pwavefunc.as_matrix = np.reshape(vec, (sysHilDim, evnHilDim))
