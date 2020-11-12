@@ -40,6 +40,7 @@ def main(total, cmdargs):
     # ----------------------- Entanglement properties of GS ---------------------------------
     ob = Observ(Lat)
     EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
+    EntS_log = -np.log(EntS)
     EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
     print("Entanglement Entropy=", EE)
 
@@ -86,6 +87,7 @@ def main(total, cmdargs):
 
     EigGrp = file.create_group("4.Entanglment")
     EigGrp.create_dataset("ES", data=EntS)
+    EigGrp.create_dataset("ESlog", data=EntS_log)
     EigGrp.create_dataset("EE", data=EE)
 
     file.close()
