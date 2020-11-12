@@ -22,6 +22,7 @@ To install Primme by pip:
 pip install numpy   # if numpy is not installed yet
 pip install scipy   # if scipy is not installed yet
 pip install future  # if using python 2
+pip install h5py    # if HDF5 is not installed
 conda install mkl-devel # if using Anaconda Python distribution
 pip install primme
 ```
