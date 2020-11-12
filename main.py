@@ -53,9 +53,9 @@ def main(total, cmdargs):
             file.write("\n")
 
 
-    # ------------------------ Hdf5 Ostream (Long-term Storage) ------------------------------
-    # ------------------------ Hdf5 Ostream (Long-term Storage) ------------------------------
-    # ------------------------ Hdf5 Ostream (Long-term Storage) ------------------------------
+    # ------------------------ Hdf5 Ostream (Big Data Storage) ------------------------------
+    # ------------------------ Hdf5 Ostream (Big Data Storage) ------------------------------
+    # ------------------------ Hdf5 Ostream (Big Data Storage) ------------------------------
     tic = time.perf_counter()
     file = h5py.File('dataSpec.hdf5', 'w')
     file.attrs["LLX"] = para.LLX; file.attrs["LLY"] = para.LLY
@@ -98,9 +98,9 @@ def main(total, cmdargs):
     file.close()
     toc = time.perf_counter()
     print(f"\nHDF5 time = {toc - tic:0.4f} sec")
-    # ------------------------ End: Hdf5 Ostream (Long-term Storage) ------------------------------
-    # ------------------------ End: Hdf5 Ostream (Long-term Storage) ------------------------------
-    # ------------------------ End: Hdf5 Ostream (Long-term Storage) ------------------------------
+    # ------------------------ End: Hdf5 Ostream (Big Data Storage) ------------------------------
+    # ------------------------ End: Hdf5 Ostream (Big Data Storage) ------------------------------
+    # ------------------------ End: Hdf5 Ostream (Big Data Storage) ------------------------------
 
 
 
