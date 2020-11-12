@@ -1,15 +1,11 @@
-import sys, re, math, random
+import sys
 import time
 import numpy as np
 import h5py
-import scipy.sparse as sp
-
 from src.Dofs import Dofs
 from src.Parameter import Parameter
-from src.Hamiltonian import Hamiltonian
-from src.Observ import Observ, matele
+from src.Observ import Observ
 from src.Lattice import Lattice
-from src.Helper import matprint, matprintos
 
 pi = np.pi
 

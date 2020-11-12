@@ -39,7 +39,7 @@ class pwavefunction(object):
         """
 
         if block_to_be_traced_over not in ('sys', 'evn'):
-            print("block_to_be_traced_over must be left or right")
+            print("block_to_be_traced_over must be sys or evn")
             raise
 
         if block_to_be_traced_over == 'sys':

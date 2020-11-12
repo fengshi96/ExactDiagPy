@@ -39,7 +39,8 @@ def main(total, cmdargs):
 
     # ----------------------- Entanglement properties of GS ---------------------------------
     ob = Observ(Lat)
-    ob.EntSpec(evecs[:, 0])
+    EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
+    print(EntS)
 
 
 

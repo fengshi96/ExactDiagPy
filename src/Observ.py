@@ -2,6 +2,7 @@ import scipy.sparse as sp
 import numpy as np
 from src.Dofs import Dofs
 from src.Wavefunction import *
+from src.Helper import sort
 
 
 def matele(A, Op, B):
@@ -547,8 +548,8 @@ class Observ:
         eta = 0.009
 
         # for each omega, define a matrix Mel_{si,mi}
-        #Melp = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^+|gs>
-        #Melm = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^-|gs>
+        # Melp = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^+|gs>
+        # Melm = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^-|gs>
         Melz = np.zeros((Lat.Nsite, Nstates), dtype=complex)  # <m|S_i^z|gs>
 
         for mi in range(0, Nstates):
@@ -558,8 +559,8 @@ class Observ:
                 Szi = self.LSzBuild(si, qm)
 
                 # <m|S_i^a|gs>
-                #Melp[si, mi] = matele(evecs[:, mi], Spi, gs)
-                #Melm[si, mi] = matele(evecs[:, mi], Smi, gs)
+                # Melp[si, mi] = matele(evecs[:, mi], Spi, gs)
+                # Melm[si, mi] = matele(evecs[:, mi], Smi, gs)
                 Melz[si, mi] = matele(evecs[:, mi], Szi, gs)
 
         SzSz = np.zeros((omegasteps, 2), dtype=float)  # spin response
@@ -576,18 +577,18 @@ class Observ:
                     denom2 = complex(omega - (Em - Eg), -eta)
 
                     # <m|S_i^a|gs>
-                    #tmpp = Melp[si, mi]
-                    #tmpm = Melm[si, mi]
+                    # tmpp = Melp[si, mi]
+                    # tmpm = Melm[si, mi]
                     tmpz = Melz[si, mi]
 
                     # <gs|S_i^a|m><m|S_i^b|gs>
-                    #tmppm = tmpp.conjugate() * tmpm  # Sip Sim
-                    #tmpmp = tmpm.conjugate() * tmpp  # Sim Sip
+                    # tmppm = tmpp.conjugate() * tmpm  # Sip Sim
+                    # tmpmp = tmpm.conjugate() * tmpp  # Sim Sip
                     tmpzz = tmpz.conjugate() * tmpz  # Siz Siz
 
                     # update polarization matrix
-                    #Itensity[0, 1] += tmppm / denom2
-                    #Itensity[1, 0] += tmpmp / denom2
+                    # Itensity[0, 1] += tmppm / denom2
+                    # Itensity[1, 0] += tmpmp / denom2
                     Itensity[2, 2] += tmpzz / denom2
 
             SzSz[omegacounter, 0] = round(omega, 4)
@@ -643,17 +644,17 @@ class Observ:
                     # <m|S_i^a|gs>
                     tmpp = Melp[si, mi]
                     tmpm = Melm[si, mi]
-                    #tmpz = Melz[si, mi]
+                    # tmpz = Melz[si, mi]
 
                     # <gs|S_i^a|m><m|S_i^b|gs>
                     tmppm = tmpp.conjugate() * tmpm  # Sip Sim
-                    #tmpmp = tmpm.conjugate() * tmpp  # Sim Sip
-                    #tmpzz = tmpz.conjugate() * tmpz  # Siz Siz
+                    # tmpmp = tmpm.conjugate() * tmpp  # Sim Sip
+                    # tmpzz = tmpz.conjugate() * tmpz  # Siz Siz
 
                     # update polarization matrix
                     Itensity[0, 1] += tmppm / denom2
-                    #Itensity[1, 0] += tmpmp / denom2
-                    #Itensity[2, 2] += tmpzz / denom2
+                    # Itensity[1, 0] += tmpmp / denom2
+                    # Itensity[2, 2] += tmpzz / denom2
 
             SpSm[omegacounter, 0] = round(omega, 4)
             SpSm[omegacounter, 1] = Itensity.sum().imag / (np.pi * Lat.Nsite)
@@ -668,11 +669,12 @@ class Observ:
         """
 
         Lat = self.Lat
-        si = site; qm ="SpinHalf"
+        si = site;
+        qm = "SpinHalf"
 
         if Lat.Model != "TFIM":
             raise ValueError("ecurrent1 is designed for TFIM exclusively")
-        elif si+1 > Lat.Nsite or si-1 < 0:
+        elif si + 1 > Lat.Nsite or si - 1 < 0:
             raise ValueError("I'm falling out of boundary!")
 
         gs = evecs[:, 0]  # ground state
@@ -680,11 +682,12 @@ class Observ:
         # Build local spin operator in full Hilbert space
         Syi = self.LSyBuild(si, qm)
         Szi = self.LSzBuild(si, qm)  # Sz(i)
-        Szim1 = self.LSzBuild(si - 1, qm)  #Sz(i-1)
-        Szip1 = self.LSzBuild(si + 1, qm)  #Sz(i+1)
+        Szim1 = self.LSzBuild(si - 1, qm)  # Sz(i-1)
+        Szip1 = self.LSzBuild(si + 1, qm)  # Sz(i+1)
 
         # Build current operator
-        J = Lat.Kzz1; H = Lat.Hx
+        J = Lat.Kzz1
+        H = Lat.Hx
         # ECurr = J * H * (Szim1 * Syi + Syi * Szip1) - H * Syi * Szip1
         ECurr = - J * H * (Szim1 * Syi)
 
@@ -692,10 +695,10 @@ class Observ:
         mECurr = matele(gs, ECurr, gs)
         return mECurr
 
-
     def EntSpec(self, vec):
         """
         Calculates Entanglement spectrum and Entanglement entropy given the state vector and the Lattice
+        Current version is only designed for spin-1/2 and bipartition from ends
         """
 
         print("Calculating entanglement spectrum and entropy...")
@@ -711,11 +714,29 @@ class Observ:
 
         sysHilDim = pow(2, sysindx.size)
         evnHilDim = pow(2, evnindx.size)
+        print("System Hilbert Dim=", sysHilDim, ", Environment Hilbert Dim=", evnHilDim)
 
-        print(sysHilDim, evnHilDim)
-        #Pwavefunc = pwavefunction(left_block.dim, right_block.dim)
+        # Levnindx = np.array([i for i in evnindx if i < min(sysindx)])  # Left environment indices
+        # RevnIndx = np.array([i for i in evnindx if i > max(sysindx)])  # Right environment indices
+        # sysRevnIndx = np.hstack([sysindx, RevnIndx])  # system + Right environment indices
+        #
+        # LevnHilDim = pow(2, Levnindx.size)  # Hilbert space dimension of Left environment
+        # sysRevnHilDim = pow(2, sysRevnIndx.size)  # Hilbert space dimension of system + Right environment
+        # print("LevnHilDim=", LevnHilDim)
+        # print("sysRevnHilDim=", sysRevnHilDim)
+        #
+        # vec_Levn = vec[0:LevnHilDim]  # vector elements led by Left environment indices
+        # vec_sysRevn = vec[LevnHilDim+1:LevnHilDim+sysRevnHilDim]   # vector elements led by system + Right env indices
+        # gvec = np.hstack([vec_sysRevn, vec_Levn])  # "gauged" vector
+        # if LevnHilDim+1+sysRevnHilDim != pow(2, max(self.Lat.mesh_)+1):
+        #     raise ValueError("Failed to *gauge* the vector, Hilbert space size mismatch")
 
-
+        Pwavefunc = pwavefunction(sysHilDim, evnHilDim)
+        Pwavefunc.as_matrix = np.reshape(vec, (sysHilDim, evnHilDim))
+        rdm = Pwavefunc.rdm("evn")  # Build reduced density matrix
+        evals, evecs = np.linalg.eigh(rdm)
+        evals_sorted, evecs_sorted = sort(evals, evecs)
+        return evals_sorted, evecs_sorted
 
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)
