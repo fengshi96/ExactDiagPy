@@ -37,6 +37,8 @@ class Lattice:
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 4
+            if self.LLX == 1 or self.LLY == 1:
+                self.Number1neigh = 2
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
             self.BuildSquare()  # build attributes in square lattice

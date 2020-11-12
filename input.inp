@@ -1,10 +1,11 @@
 LLX=12
 LLY=1
 IsPeriodicX=1
-IsPeriodicY=1
+IsPeriodicY=0
 Option=EE
 
 # Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Hubbard, AKLT
+# for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified
 Model=Heisenberg_Square
 
 
