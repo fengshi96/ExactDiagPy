@@ -51,12 +51,44 @@ that is, in the basis of $\ket{\psi_r}\bra{\psi_r'}$ the elements of RDM are
 \begin{equation}
 	\rho_{r',r} = \sum_{l}\omega_{r'l}^*\omega_{lr} =  \hat{\Omega}^\dagger \hat{\Omega}
 \end{equation}
-In other words, if we can construct the bipartite wavefunction explicitly as a matrix form, the RDM is simply a matrix product of it with its complex conjugation. 
-
-
-
-
-
+In the same way we can show the left RDM by tracing out right is simply:
+\begin{equation}
+	\rho_{l',l} = \hat{\Omega}\hat{\Omega}^\dagger
+\end{equation}
+In other words, if we can construct the bipartite wavefunction explicitly as a matrix form, the RDM is simply a matrix product of it with its complex conjugation. To do this, note that the tensor product of the left and right (or sys and evn) follows a "distributive" pattern. A trivial example to make this clear is as follows:
+\begin{equation}
+	v \otimes w = 
+	\begin{pmatrix}
+		v1 \\ v2
+	\end{pmatrix}
+	\otimes
+	\begin{pmatrix}
+		w_1 \\ w_2 \\ w_3
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		v_1 w_1 \\ v_1 w_2 \\ v_1 w_3 \\ v_2 w_1 \\ v_2 w_2 \\ v_2 w_3
+	\end{pmatrix}
+	\simeq
+	\begin{pmatrix}
+		v_1 w_1 & v_1 w_2 & v_1 w_3 \\
+		v_2 w_1 & v_2 w_2 & v_3 w_3
+	\end{pmatrix}
+	= \hat{\Omega}
+\end{equation}
+where $v$ and $w$  represents the left and right block of the pure state. That is, the factorization of left and right block is simply a reshaping process of a $dim(\psi) = dim(v)\times dim(w)$ vector into a matrix with $dim(v)$ rows and  $dim(w)$ columns, which is can be easily achieved by the numpy command:
+\begin{verbatim}
+	Omega = numpy.reshape(wavefunction, (left.size, right.size))
+\end{verbatim}
+which gives the $\hat{\Omega}$ we want. Hence the right RDM is
+\begin{verbatim}
+	right_RDM = numpy.dot(np.transpose(Omega.conj()), Omega)
+\end{verbatim}
+and the left RDM is
+\begin{verbatim}
+	left_RDM = numpy.dot(Omega, numpy.transpose(Omega.conj()))
+\end{verbatim}
+The procedure descibed above is implemented in the \textit{pwavefunction} class (p for partition) defined in \textit{src/Wavefunction.py}. 
 
 
 
