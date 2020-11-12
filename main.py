@@ -30,7 +30,7 @@ def main(total, cmdargs):
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-14, which='SA')
+    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-12, which='SA')
     toc = time.perf_counter()
 
     evals = np.round(evals, 10)
@@ -87,10 +87,11 @@ def main(total, cmdargs):
     EigGrp.create_dataset("Eigen Values", data=evals)
     EigGrp.create_dataset("Wavefunctions", data=evecs)
 
-    EigGrp = file.create_group("4.Entanglment")
-    EigGrp.create_dataset("ES", data=EntS)
-    EigGrp.create_dataset("ESlog", data=EntS_log)
-    EigGrp.create_dataset("EE", data=EE)
+    if "EE" in para.Option:
+        EigGrp = file.create_group("4.Entanglment")
+        EigGrp.create_dataset("ES", data=EntS)
+        EigGrp.create_dataset("ESlog", data=EntS_log)
+        EigGrp.create_dataset("EE", data=EE)
 
     file.close()
     toc = time.perf_counter()

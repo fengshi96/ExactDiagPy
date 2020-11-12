@@ -1,6 +1,6 @@
-LLX=12
+LLX=14
 LLY=1
-IsPeriodicX=0
+IsPeriodicX=1
 IsPeriodicY=0
 Option=EE
 
