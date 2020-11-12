@@ -1,6 +1,6 @@
 LLX=12
 LLY=1
-IsPeriodicX=1
+IsPeriodicX=0
 IsPeriodicY=0
 Option=EE
 
@@ -14,13 +14,13 @@ Kyy=0.0
 Kzz=-1.0
 
 Bxx=-1.0
-Byy=-0.0
+Byy=0.0
 Bzz=0.0
 
 # For EE
-SysIndx=[0,1,2,3,4,5]
+SysIndx=[0,1,2]
 
 # Number of states to keep
-Nstates=50
+Nstates=5
 
 

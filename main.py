@@ -29,7 +29,7 @@ def main(total, cmdargs):
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-8, which='SA')
+    evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-14, which='SA')
     toc = time.perf_counter()
 
     evals = np.round(evals, 10)
@@ -40,9 +40,8 @@ def main(total, cmdargs):
     # ----------------------- Entanglement properties of GS ---------------------------------
     ob = Observ(Lat)
     EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
-    print(EntS)
-
-
+    EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
+    print("Entanglement Entropy=", EE)
 
 
 
@@ -84,6 +83,10 @@ def main(total, cmdargs):
     EigGrp = file.create_group("3.Eigen")
     EigGrp.create_dataset("Eigen Values", data=evals)
     EigGrp.create_dataset("Wavefunctions", data=evecs)
+
+    EigGrp = file.create_group("4.Entanglment")
+    EigGrp.create_dataset("ES", data=EntS)
+    EigGrp.create_dataset("EE", data=EE)
 
     file.close()
     toc = time.perf_counter()

@@ -43,7 +43,7 @@ class pwavefunction(object):
             raise
 
         if block_to_be_traced_over == 'sys':
-            result = np.dot(np.transpose(self.as_matrix), self.as_matrix)
+            result = np.dot(np.transpose(self.as_matrix.conj()), self.as_matrix)
         else:
-            result = np.dot(self.as_matrix, np.transpose(self.as_matrix))
+            result = np.dot(self.as_matrix, np.transpose(self.as_matrix.conj()))
         return result
