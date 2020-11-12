@@ -716,8 +716,7 @@ class Observ:
         evnHilDim = pow(2, evnindx.size)
         print("System Hilbert Dim=", sysHilDim, ", Environment Hilbert Dim=", evnHilDim)
 
-        Pwavefunc = pwavefunction(sysHilDim, evnHilDim)
-        Pwavefunc.as_matrix = np.reshape(vec, (sysHilDim, evnHilDim))
+        Pwavefunc = pwavefunction(vec, sysHilDim, evnHilDim)
         rdm = Pwavefunc.rdm("evn")  # Build reduced density matrix
         evals, evecs = np.linalg.eigh(rdm)
         evals_sorted, evecs_sorted = sort(evals, evecs)
