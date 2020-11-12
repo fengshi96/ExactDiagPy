@@ -155,7 +155,7 @@ KzzGraph_:
 0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	-1.0	0.0	
 
 [Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
-Hamiltonian construction time = 0.0617 sec
+Hamiltonian construction time = 0.0572 sec
 
 -----------Beg of Eigen Values-----------
 
@@ -166,13 +166,16 @@ Hamiltonian construction time = 0.0617 sec
 -5.5424372481
 
 -----------End of Eigen Values-----------
-Diagonalization time = 0.1679 sec 
+Diagonalization time = 0.1348 sec 
 
 
 Calculating entanglement spectrum and entropy...
 System Index: [0 1 2]
 Evironment Index: [3] [4] [5] [6] [7] [8] [9] [10] [11]
 System Hilbert Dim= 8 , Environment Hilbert Dim= 512
+Entanglement Spectrum=
+ [9.19451753e-17 3.41057223e-15 1.17230841e-11 6.53541986e-10
+ 9.26341964e-08 5.16417012e-06 1.76216773e-02 9.82373065e-01]
 Entanglement Entropy= 0.0887024
 
-HDF5 time = 0.0044 sec
+HDF5 time = 0.0043 sec

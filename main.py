@@ -22,6 +22,7 @@ def main(total, cmdargs):
     # ----------------------- Build and Diagonalize ---------------------------------
     para = Parameter(inputname)  # import parameters from input.inp
     Lat = Lattice(para)  # Build lattice
+    ob = Observ(Lat)  # initialize observables
     tic = time.perf_counter()
     Hamil = Hamiltonian(Lat)  # Build Hamiltonian
     ham = Hamil.Ham  # Hamiltonian as sparse matrix
@@ -37,12 +38,13 @@ def main(total, cmdargs):
     print("\n-----------End of Eigen Values-----------")
     print(f"Diagonalization time = {toc - tic:0.4f} sec \n\n")
 
-    # ----------------------- Entanglement properties of GS ---------------------------------
-    ob = Observ(Lat)
-    EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
-    EntS_log = np.log(EntS)
-    EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
-    print("Entanglement Entropy=", EE)
+    # -------------- Entanglement properties of GS -----------
+    if "EE" in para.Option:
+        EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
+        EntS_log = np.log(EntS)
+        EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
+        print("Entanglement Spectrum=\n", EntS)
+        print("Entanglement Entropy=", EE)
 
 
 
