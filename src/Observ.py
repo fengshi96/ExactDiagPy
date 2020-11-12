@@ -1,5 +1,4 @@
 import scipy.sparse as sp
-import numpy as np
 from src.Dofs import Dofs
 from src.Wavefunction import *
 from src.Helper import sort

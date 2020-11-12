@@ -1,7 +1,6 @@
 import numpy as np
 import math as m
 from src.Helper import matprint, vecprint
-from src.Parameter import Parameter
 
 
 class Lattice:
