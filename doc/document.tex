@@ -1,0 +1,88 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{graphicx}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}[thm]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\usepackage{bbold}
+\numberwithin{thm}{section}
+\usepackage{hyperref}
+\usepackage[usenames,dvipsnames]{xcolor}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=cyan,
+}
+\urlstyle{same}
+\usepackage[sort&compress,numbers]{natbib}
+\bibliographystyle{naturemag}
+\usepackage{doi}
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\numberwithin{equation}{section}
+\title{Document}
+\author{Shi Feng}
+\date{}
+\begin{document}
+\maketitle
+\section{Entanglement Entropy}
+In this section we describe in detail how Entanglement-related properties are to be calculated. First of all let's see how joint operators act on wavefunctions. Let $\ket{\Psi}$ be an arbitrary pure state from ED, which can be factorized into a bipartite wavefunction:
+\begin{equation}
+	|\psi \rangle  =  \sum_{l,r}\omega_{lr}|\psi_l \rangle  |\psi_r \rangle \equiv \hat{\Omega}
+\end{equation}
+where we defined $\hat{\Omega}$ to be the matrix written under the bipartite basis. The right reduced density matrix (RDM) is then obtained by tracing out the left dofs:
+\begin{equation}
+	\begin{split}
+		\rho_r &= Tr_l [|\psi \rangle \langle \psi |]  =  \sum_{l''} \sum_{l,r}\sum_{l',r'}\omega_{lr}\omega_{r'l'}^*   \langle \psi_{l''}|\psi_l \rangle  |\psi_r \rangle \langle \psi_r' |\langle \psi_l' |\psi_{l''} \rangle\\
+		       &=\sum_{l''} \sum_{l,r}\sum_{r',l'}\omega_{lr}\omega_{l'r'}^*   \delta_{l,l''}  |\psi_r \rangle \langle \psi_r' |\delta_{l',l''}\\
+		       &=\sum_{lr,r'}\omega_{lr}\omega_{r'l}^* |\psi_r \rangle \langle \psi_r' |
+	\end{split}	
+\end{equation}
+we can rewrite this as:
+\begin{equation}
+	\rho_r &= \sum_{lr,r'}\omega_{r'l}^*\omega_{lr} |\psi_r \rangle \langle \psi_r' |\\
+	       &= \sum_{r,r'} \left(\sum_l\omega_{r'l}^*\omega_{lr}\right) |\psi_r \rangle \langle \psi_r' |
+\end{equation}
+that is, in the basis of $\ket{\psi_r}\bra{\psi_r'}$ the elements of RDM are 
+\begin{equation}
+	\rho_{r',r} = \sum_{l}\omega_{r'l}^*\omega_{lr} =  \hat{\Omega}^\dagger \hat{\Omega}
+\end{equation}
+In other words, if we can construct the bipartite wavefunction explicitly as a matrix form, the RDM is simply a matrix product of it with its complex conjugation. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\nocite{*}
+%\printbibliography
+%\bibliography{references.bib}
+\end{document}
