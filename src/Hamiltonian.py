@@ -1,9 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 from src.Dofs import Dofs
-from src.Helper import matprint, vecprint
-from src.Lattice import Lattice
-from src.Parameter import Parameter
+from src.Helper import matprint
 
 
 class Hamiltonian:
