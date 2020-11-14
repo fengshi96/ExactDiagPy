@@ -41,6 +41,7 @@ def main(total, cmdargs):
     # -------------- Entanglement properties of GS -----------
     if "EE" in para.Option:
         EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
+        EntS = np.round(EntS, decimals=10)
         EntS_log = np.log(EntS)
         EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
         print("Entanglement Spectrum=\n", EntS)
