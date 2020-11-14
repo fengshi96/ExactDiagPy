@@ -48,7 +48,7 @@ def main(total, cmdargs):
                 EntS_log[i] = 0
             else:
                 EntS_log[i] = math.log(EntS[i])
-        EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
+        EE = - np.around(np.dot(EntS, EntS_log), decimals=8)
         print("Entanglement Spectrum=\n", EntS)
         print("Entanglement Entropy=", EE)
 

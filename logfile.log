@@ -7,7 +7,7 @@ Model= Heisenberg_Square
 Kx= 0.0 
 Ky= 0.0 
 Kz= -1.0
-Hx= -0.5 
+Hx= -0.1 
 Hy= 0.0 
 Hz= 0.0
 NStates2Keep: 5
@@ -175,18 +175,18 @@ KzzGraph_:
 -1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	-1.0	0.0	
 
 [Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
-Hamiltonian construction time = 0.1587 sec
+Hamiltonian construction time = 0.1315 sec
 
 -----------Beg of Eigen Values-----------
 
--4.4657021352
--4.4376227375
--4.241773183
--4.2151018035
--4.2151018035
+-3.535088389
+-3.5350883889
+-2.7288447315
+-2.7228953356
+-2.7228953356
 
 -----------End of Eigen Values-----------
-Diagonalization time = 0.5906 sec 
+Diagonalization time = 0.8928 sec 
 
 
 Calculating entanglement spectrum and entropy...
@@ -194,8 +194,8 @@ System Index: [0 1 2]
 Evironment Index: [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13]
 System Hilbert Dim= 8 , Environment Hilbert Dim= 2048
 Entanglement Spectrum=
- [1.63290000e-06 5.15340000e-06 8.45144000e-05 2.66715600e-04
- 4.55946400e-03 1.43890260e-02 2.35978522e-01 7.44714972e-01]
-Entanglement Entropy= 0.64894198
+ [0.00000000e+00 0.00000000e+00 2.29740000e-06 2.30900000e-06
+ 4.18650000e-06 4.20760000e-06 4.98696424e-01 5.01290575e-01]
+Entanglement Entropy= 0.69331153
 
-HDF5 time = 0.0081 sec
+HDF5 time = 0.0052 sec
