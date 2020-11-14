@@ -1,0 +1,26 @@
+LLX=#LLXLLX
+LLY=#LLYLLY
+IsPeriodicX=#PBCX
+IsPeriodicY=#PBCY
+Option=EE
+
+# Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Hubbard, AKLT
+# for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified
+Model=Heisenberg_Square
+
+
+Kxx=#KXKXKX
+Kyy=#KYKYKY
+Kzz=#KZKZKZ
+
+Bxx=#BXBXBX
+Byy=#BYBYBY
+Bzz=#BZBZBZ
+
+# For EE
+SysIndx=#SYSTEMINDEX
+
+# Number of states to keep
+Nstates=#NSTATESNSTATES
+
+

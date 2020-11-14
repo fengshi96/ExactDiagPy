@@ -7,7 +7,7 @@ from src.Parameter import Parameter
 from src.Hamiltonian import Hamiltonian
 from src.Observ import Observ
 from src.Lattice import Lattice
-from src.Helper import Logger
+from src.Helper import Logger, sort
 
 pi = np.pi
 
@@ -31,6 +31,7 @@ def main(total, cmdargs):
 
     tic = time.perf_counter()
     evals, evecs = primme.eigsh(ham, para.Nstates, tol=1e-12, which='SA')
+    evals, evecs = sort(evals, evecs)
     toc = time.perf_counter()
 
     evals = np.round(evals, 10)
