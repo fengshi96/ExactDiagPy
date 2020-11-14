@@ -1,4 +1,4 @@
-import sys
+import sys, math
 import numpy as np
 import time
 import primme
@@ -42,7 +42,12 @@ def main(total, cmdargs):
     if "EE" in para.Option:
         EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
         EntS = np.round(EntS, decimals=10)
-        EntS_log = np.log(EntS)
+        EntS_log = np.zeros(len(EntS))
+        for i in range(len(EntS)):
+            if EntS[i] <= 0:
+                EntS_log[i] = 0
+            else:
+                EntS_log[i] = math.log(EntS[i])
         EE = - np.around(np.dot(EntS, np.log(EntS)), decimals=8)
         print("Entanglement Spectrum=\n", EntS)
         print("Entanglement Entropy=", EE)
