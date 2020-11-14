@@ -49,7 +49,7 @@ def main(total, cmdargs):
         # ------------------------ Ascii Ostream for EE--------
         file = open("entspec.dat", "w")
         for i in range(EntS.size):
-            file.write(str(para.Hx) + str(EntS[i]))
+            file.write(str(abs(para.Hx)) + str(EntS[i]))
             file.write("\n")
 
 
