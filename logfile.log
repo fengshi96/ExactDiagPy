@@ -73,14 +73,14 @@ tGraph_:
 -1.0	0.0	0.0	0.0	0.0	0.0	-1.0	0.0	
 
 [Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
-Hamiltonian construction time = 0.6773 sec
+Hamiltonian construction time = 0.6664 sec
 
 -----------Beg of Eigen Values-----------
 
 -40.7994984506
 
 -----------End of Eigen Values-----------
-Diagonalization time = 12.8355 sec 
+Diagonalization time = 12.9007 sec 
 
 
 Calculating entanglement spectrum and entropy...
