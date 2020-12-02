@@ -4,8 +4,8 @@ import scipy.sparse as sp
 
 class Dofs:
 
-    def __init__(self, spin="SpinHalf"):
-        if spin == "SpinHalf":
+    def __init__(self, dof="SpinHalf", boson_dim=0):
+        if dof == "SpinHalf":
 
             self.hilbsize = 2
             self.type = "SpinHalf"
@@ -37,7 +37,7 @@ class Dofs:
 
             self.I = sp.eye(2)
 
-        elif spin == "SpinOne":
+        elif dof == "SpinOne":
 
             self.hilbsize = 3
             self.type = "SpinOne"
@@ -69,15 +69,32 @@ class Dofs:
 
             self.I = sp.eye(3)
 
+        elif dof == "Boson":
+
+            self.hilbsize = boson_dim
+            self.type = str(boson_dim)+"_Boson"
+
+            # define a and a^\dagger
+            I = np.array(range(0, boson_dim-1), dtype=int)
+            J = np.array(range(1, boson_dim), dtype=int)
+            V = np.sqrt(np.array(range(1, boson_dim)), dtype=complex)
+            self.annih = sp.coo_matrix((V, (I, J)), shape=(boson_dim, boson_dim))
+            self.creat = np.transpose(self.annih)
+            self.occup = self.creat.dot(self.annih)
+            self.I = sp.eye(boson_dim)
+
+
+
+
+
         else:
             raise TypeError("Dof type not yet supported..")
 
-# Spins = Dofs("SpinOne")
-# print(Spins.Sx, "\n")
-# print(Spins.Sy, "\n")
-# print(Spins.Sz, "\n")
-# print(Spins.Sp, "\n")
-# print(Spins.Sm, "\n")
+# boson = Dofs("Boson", 4)
+# print(boson.annih, "\n")
+# print(boson.creat, "\n")
+# print(boson.occup, "\n")
+
 #
 # print(Spins.Sz * Spins.Sz)
 

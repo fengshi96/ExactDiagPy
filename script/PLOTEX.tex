@@ -1,0 +1,37 @@
+\documentclass{standalone}
+\usepackage{txfonts}
+\usepackage[mathscr]{euscript}
+\usepackage{pgfplots}
+\usetikzlibrary{pgfplots.groupplots}
+\usetikzlibrary{arrows, backgrounds, shapes}
+
+\newcommand{\mytick}[2]{\draw[thick,#2] (#1, 0.01) -- (#1, -0.15);}
+
+\begin{document}
+	
+\pgfplotsset{every axis legend/.append style={
+			legend columns=1},
+}
+
+\begin{tabular}{c}
+\begin{tikzpicture}
+	\begin{axis}[name=plot1,
+	%xmin=0.00,
+	ylabel={$E.S.$},
+	xlabel={$H_x$},
+%	ylabel style = {yshift=-1.4cm},
+	yticklabel style = {/pgf/number format/fixed, /pgf/number format/zerofill, /pgf/number format/precision=1}, %, xshift=0.1cm},
+	xticklabel style = {/pgf/number format/fixed, /pgf/number format/zerofill, /pgf/number format/precision=2},
+	tickpos=left,
+	ytick align=inside,
+	%title={(a)},
+	%title style = {yshift=-1cm, xshift=-2.9cm},
+	legend style = {anchor = south east,at={(axis description cs: 0.99, 0.1)}}
+	]
+	%%%%%% marker for perl, DO NOT DELET %%%%%%	
+\end{axis}
+\end{tikzpicture}
+\end{tabular}
+\end{document}
+
+

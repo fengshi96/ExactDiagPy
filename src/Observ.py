@@ -697,7 +697,7 @@ class Observ:
     def EntSpec(self, vec):
         """
         Calculates Entanglement spectrum and Entanglement entropy given the state vector and the Lattice
-        Current version is only designed for spin-1/2 and bipartition from ends
+        Current version is only designed for spin-1/2 or Bose Hubbard and bipartition from ends
         """
 
         print("Calculating entanglement spectrum and entropy...")
@@ -711,8 +711,14 @@ class Observ:
         print("System Index:", sysindx)
         print("Evironment Index:", *evnindx)
 
-        sysHilDim = pow(2, sysindx.size)
-        evnHilDim = pow(2, evnindx.size)
+        # for spin-1/2
+        dimDof = 2
+        # for Bose Hubbard
+        if self.Lat.Model == "Bose_Hubbard":
+            dimDof = self.Lat.maxOccupation
+
+        sysHilDim = pow(dimDof, sysindx.size)
+        evnHilDim = pow(dimDof, evnindx.size)
         print("System Hilbert Dim=", sysHilDim, ", Environment Hilbert Dim=", evnHilDim)
 
         Pwavefunc = pwavefunction(vec, sysHilDim, evnHilDim)
