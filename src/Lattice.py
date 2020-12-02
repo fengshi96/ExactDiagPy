@@ -28,7 +28,7 @@ class Lattice:
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
-        elif para.Model == "Heisenberg_Square" or para.Model == "Hubbard":
+        elif para.Model == "Heisenberg_Square":
             self.Nsite = self.LLX * self.LLY
             self.Hx = para.Hx; self.Kxx = para.Kxx
             self.Hy = para.Hy; self.Kyy = para.Kyy
@@ -61,6 +61,19 @@ class Lattice:
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones(self.LLX, dtype=int)
             self.BuildBLBQChain()  # build attributes in square lattice
+        elif para.Model == "Bose_Hubbard":
+            self.Nsite = self.LLX * self.LLY
+            self.t = para.t; self.U = para.U; self.mu = para.mu
+            self.maxOccupation = para.maxOccupation
+            self.indx_ = np.zeros(self.Nsite, dtype=int)
+            self.indy_ = np.zeros(self.Nsite, dtype=int)
+            self.Number1neigh = 4
+            if self.LLX == 1 or self.LLY == 1:
+                self.Number1neigh = 2
+            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+            self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
+            self.BuildSquare()  # build attributes in square lattice
+
         else:
             raise ValueError("Model not supported yet")
 

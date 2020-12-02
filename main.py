@@ -79,18 +79,20 @@ def main(total, cmdargs):
     LatGrp.create_dataset("Nearest Neighbors", data=Lat.nn_)
 
     ConnGrp = file.create_group("2.Connectors")
-    # # uncomment for Kitaev, Heisenberg
-    ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
-    ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
-    ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
+    if para.Model == "Heisenberg_Square" or para.Model == "Kitaev":
+        ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
+        ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
+        ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
 
-    # uncomment for AKLT
-    # ConnGrp.create_dataset("Kxx1Graph", data=Hamil.Kxx1Graph_)
-    # ConnGrp.create_dataset("Kyy1Graph", data=Hamil.Kyy1Graph_)
-    # ConnGrp.create_dataset("Kzz1Graph", data=Hamil.Kzz1Graph_)
-    # ConnGrp.create_dataset("Kxx2Graph", data=Hamil.Kxx2Graph_)
-    # ConnGrp.create_dataset("Kyy2Graph", data=Hamil.Kyy2Graph_)
-    # ConnGrp.create_dataset("Kzz2Graph", data=Hamil.Kzz2Graph_)
+    elif para.Model == "AKLT":
+        ConnGrp.create_dataset("Kxx1Graph", data=Hamil.Kxx1Graph_)
+        ConnGrp.create_dataset("Kyy1Graph", data=Hamil.Kyy1Graph_)
+        ConnGrp.create_dataset("Kzz1Graph", data=Hamil.Kzz1Graph_)
+        ConnGrp.create_dataset("Kxx2Graph", data=Hamil.Kxx2Graph_)
+        ConnGrp.create_dataset("Kyy2Graph", data=Hamil.Kyy2Graph_)
+        ConnGrp.create_dataset("Kzz2Graph", data=Hamil.Kzz2Graph_)
+    elif para.Model == "Bose_Hubbard":
+        ConnGrp.create_dataset("tGraph", data=Hamil.tGraph_)
 
     EigGrp = file.create_group("3.Eigen")
     EigGrp.create_dataset("Eigen Values", data=evals)

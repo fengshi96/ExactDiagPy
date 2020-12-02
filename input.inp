@@ -1,14 +1,15 @@
-LLX=14
+LLX=8
 LLY=1
 IsPeriodicX=1
 IsPeriodicY=0
 Option=EE
 
-# Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Hubbard, AKLT
-# for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified
-Model=Heisenberg_Square
+### Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Bose_Hubbard, AKLT
+### for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified
+### Bose_Hubbard Hamiltonian: H = +t \sum (a*a + aa*) + U \sum n(n-1) + \mu \sum n
+Model=Bose_Hubbard
 
-
+# For spin models
 Kxx=0.0
 Kyy=0.0
 Kzz=-1.0
@@ -17,10 +18,16 @@ Bxx=-0.1
 Byy=0.0
 Bzz=0.0
 
+# For Bose Hubbard
+t=-1.0
+U=20
+mu=-5
+maxOccupation=5
+
 # For EE
 SysIndx=[0,1,2]
 
 # Number of states to keep
-Nstates=5
+Nstates=1
 
 
