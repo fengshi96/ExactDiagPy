@@ -55,9 +55,15 @@ def main(total, cmdargs):
 
         # ------------------------ Ascii Ostream for EE--------
         file = open("entspec.dat", "w")
-        for i in range(EntS.size):
-            file.write(str(abs(para.Hx)) + " " + str(EntS[i]))
-            file.write("\n")
+        # For a U-scan of Bose-Hubbard model
+        if para.Model == "Bose_Hubbard":
+            for i in range(EntS.size):
+                file.write(str(abs(para.U)) + " " + str(EntS[i]))
+                file.write("\n")
+        else:
+            for i in range(EntS.size):
+                file.write(str(abs(para.Hx)) + " " + str(EntS[i]))
+                file.write("\n")
 
 
     # ------------------------ Hdf5 Ostream (Big Data Storage) ------------------------------
