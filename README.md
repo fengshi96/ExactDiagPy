@@ -41,8 +41,10 @@ IsPeriodicX    # PBC (1) or OBC (0) in X direction
 IsPeriodicY    # PBC (1) or OBC (0) in Y direction
 Kxx, Kyy, Kzz  # The coupling constant of spins
 Bxx, Byy, Bzz  # Magnetic field in x, y, z directions
-t, U, mu       # Standard Constants in Hubbard Model <comming soon...>
+t, U, mu       # Standard Constants in Hubbard Model
+maxOccupation  # The upper bound of boson occupation number
 Nstates        # Number of eigen states to keep
+Option         # Axiliary options. "option=EE" calculates entanglement spectrum and entropy 
 ```
 
 
