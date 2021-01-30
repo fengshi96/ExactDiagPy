@@ -54,7 +54,7 @@ KzzGraph_:
 -1.0	0.0	
 
 [Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
-Hamiltonian construction time = 0.0099 sec
+Hamiltonian construction time = 0.0109 sec
 
 -----------Beg of Eigen Values-----------
 
@@ -62,7 +62,7 @@ Hamiltonian construction time = 0.0099 sec
 0.75
 
 -----------End of Eigen Values-----------
-Diagonalization time = 0.0307 sec 
+Diagonalization time = 0.0483 sec 
 
 
 
