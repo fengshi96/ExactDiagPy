@@ -40,18 +40,19 @@ def main(total, cmdargs):
     print(f"Diagonalization time = {toc - tic:0.4f} sec \n\n")
 
     # -------------- Entanglement properties of GS -----------
-    if "EE" in para.Option:
-        EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
-        EntS = np.round(EntS, decimals=10)
-        EntS_log = np.zeros(len(EntS))
-        for i in range(len(EntS)):
-            if EntS[i] <= 0:
-                EntS_log[i] = 0
-            else:
-                EntS_log[i] = math.log(EntS[i])
-        EE = - np.around(np.dot(EntS, EntS_log), decimals=8)
-        print("Entanglement Spectrum=\n", EntS)
-        print("Entanglement Entropy=", EE)
+    if para.Option is not None:
+        if "EE" in para.Option:
+            EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
+            EntS = np.round(EntS, decimals=10)
+            EntS_log = np.zeros(len(EntS))
+            for i in range(len(EntS)):
+                if EntS[i] <= 0:
+                    EntS_log[i] = 0
+                else:
+                    EntS_log[i] = math.log(EntS[i])
+            EE = - np.around(np.dot(EntS, EntS_log), decimals=8)
+            print("Entanglement Spectrum=\n", EntS)
+            print("Entanglement Entropy=", EE)
 
         # ------------------------ Ascii Ostream for EE--------
         file = open("entspec.dat", "w")
@@ -104,11 +105,12 @@ def main(total, cmdargs):
     EigGrp.create_dataset("Eigen Values", data=evals)
     EigGrp.create_dataset("Wavefunctions", data=evecs)
 
-    if "EE" in para.Option:
-        EigGrp = file.create_group("4.Entanglment")
-        EigGrp.create_dataset("ES", data=EntS)
-        EigGrp.create_dataset("ESlog", data=EntS_log)
-        EigGrp.create_dataset("EE", data=EE)
+    if para.Option is not None:
+        if "EE" in para.Option:
+            EigGrp = file.create_group("4.Entanglment")
+            EigGrp.create_dataset("ES", data=EntS)
+            EigGrp.create_dataset("ESlog", data=EntS_log)
+            EigGrp.create_dataset("EE", data=EE)
 
     file.close()
     toc = time.perf_counter()
