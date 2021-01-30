@@ -22,7 +22,7 @@ class pwavefunction(object):
         super(pwavefunction, self).__init__()
         try:
             self.as_matrix = np.empty((sys_dim, evn_dim), num_type)
-            self.as_matrix = np.reshape(vec, (sys_dim, evn_dim))
+            self.as_matrix = np.reshape(vec, (sys_dim, evn_dim)).T
         except TypeError:
             print("Bad args for pwavefunction")
             raise

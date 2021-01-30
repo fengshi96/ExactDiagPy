@@ -13,8 +13,9 @@ class Lattice:
         self.IsPeriodicX = para.IsPeriodicX  # PBC (1) or OBC (0)
         self.IsPeriodicY = para.IsPeriodicY
         self.Model = para.Model  # Name of the model.
-        if "EE" in para.Option:
-            self.SysIndx = para.SysIndx
+        if para.Option is not None:
+            if "EE" in para.Option:
+                self.SysIndx = para.SysIndx
 
         # Model-dependent attributes
         if para.Model == "Kitaev" or para.Model == "Heisenberg_Honeycomb":
@@ -283,6 +284,12 @@ class Lattice:
             # ----------------------------OBC-----------------------------------
 
             # --------------------------Apply PBC-------------------------------
+            if self.IsPeriodicX * self.LLX == 1:
+                raise ValueError("PBC is ill-defined along X when LLY = 1. For 1D X-chain Plz set OBC for Y")
+
+            if self.IsPeriodicY * self.LLY == 1:
+                raise ValueError("PBC is ill-defined along Y when LLX = 1. For 1D Y-chain Plz set OBC for X")
+
             if self.IsPeriodicX:
                 # +x - 1neighbor 0
                 if ix == self.LLX - 1:  # bottom edge

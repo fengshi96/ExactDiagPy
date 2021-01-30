@@ -60,8 +60,10 @@ class Parameter:
                 self.Nstates = int(var)
             elif name == "Option":
                 self.Option = var.strip(' ').split(',')
-            elif name == "SysIndx" and "EE" in self.Option:
-                self.SysIndx = eval(var)
+                if name == "SysIndx":
+                    self.SysIndx = eval(var)
+                else:
+                    ValueError('EE option is on, but no partition of sys and env is specified')
             elif name == "t":
                 self.t = float(var)
             elif name == "U":
@@ -87,8 +89,9 @@ class Parameter:
             print("Hx=", self.Hx, "\nHy=", self.Hy, "\nHz=", self.Hz)
         print("NStates2Keep:", self.Nstates)
         print("option:", self.Option)
-        if "EE" in self.Option:
-            print("System index=", self.SysIndx)
+        if self.Option is not None:
+            if "EE" in self.Option:
+                print("System index=", self.SysIndx)
         print("----------------- End of Parameters -----------------\n")
 
 # param = Parameter("../input.inp")
