@@ -13,8 +13,8 @@ The program is designed to exactly diagonalize several common quantum many-body 
 
 The program supports the following models: 
 (1) Kitaev's honeycomb model + external field
-(2) 2D Heisenberg model + external field
-(3) 2D Hubbard model < Comming soon... >
+(2) 1D and 2D Heisenberg model + external field
+(3) 1D and 2D Bose Hubbard model 
 
 The program is dependent on Primme(https://pypi.org/project/primme/). 
 To install Primme by pip:
