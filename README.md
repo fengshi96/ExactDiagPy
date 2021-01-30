@@ -13,8 +13,8 @@ The program is designed to exactly diagonalize several common quantum many-body 
 
 The program supports the following models: 
 (1) Kitaev's honeycomb model + external field
-(2) 2D Heisenberg model + external field
-(3) 2D Hubbard model < Comming soon... >
+(2) 1D and 2D Heisenberg model + external field
+(3) 1D and 2D Bose Hubbard model 
 
 The program is dependent on Primme(https://pypi.org/project/primme/). 
 To install Primme by pip:
@@ -41,8 +41,10 @@ IsPeriodicX    # PBC (1) or OBC (0) in X direction
 IsPeriodicY    # PBC (1) or OBC (0) in Y direction
 Kxx, Kyy, Kzz  # The coupling constant of spins
 Bxx, Byy, Bzz  # Magnetic field in x, y, z directions
-t, U, mu       # Standard Constants in Hubbard Model <comming soon...>
+t, U, mu       # Standard Constants in Hubbard Model
+maxOccupation  # The upper bound of boson occupation number
 Nstates        # Number of eigen states to keep
+Option         # Axiliary options. "option=EE" calculates entanglement spectrum and entropy 
 ```
 
 
