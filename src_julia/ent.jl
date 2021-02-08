@@ -2,18 +2,18 @@ using HDF5
 using LinearAlgebra
 
 function basisPartition(wf, sysIndx, 
-        envIndx, nSites)
+        envIndx, nSites, dim)
 
     nSys = size(sysIndx)[1]
     nEnv = size(envIndx)[1]
     @assert nSys + nEnv == nSites
     
-    dimDof = 2
+    dimDof = dim
     dimHilSys = dimDof^nSys
     dimHilEnv = dimDof^nEnv
 
-    sysBitConfig = zeros(Bool, (dimHilSys, nSites))
-    envBitConfig = zeros(Bool, (dimHilEnv, nSites))
+    sysBitConfig = zeros(Int, (dimHilSys, nSites))
+    envBitConfig = zeros(Int, (dimHilEnv, nSites))
 
     axisScalar = ones(UInt32, nSites)  # UInt32: upto 2^32 (32 sites ED)
     for i = 1 : nSites
@@ -21,8 +21,8 @@ function basisPartition(wf, sysIndx,
     end
 
     for i = 1 : dimDof^nSys
-        upperpad::Int = size(digits(dimDof^(nSys - 1), base = 2))[1]
-        exBits = digits(i-1, base = 2, pad = upperpad)  # expose bits' position for sys dofs
+        upperpad::Int = size(digits(dimDof^(nSys - 1), base = dimDof))[1]
+        exBits = digits(i-1, base = dimDof, pad = upperpad)  # expose bits' position for sys dofs
 
         for j = 1 : size(sysIndx)[1]
             sysBitConfig[i, sysIndx[j]] = exBits[j]
@@ -31,8 +31,8 @@ function basisPartition(wf, sysIndx,
     end
 
     for i = 1 : dimDof^nEnv
-        upperpad::Int = size(digits(dimDof^(nEnv - 1), base = 2))[1]
-        exBits = digits(i-1, base = 2, pad = upperpad)  # expose bits' position for evn dofs
+        upperpad::Int = size(digits(dimDof^(nEnv - 1), base = dimDof))[1]
+        exBits = digits(i-1, base = dimDof, pad = upperpad)  # expose bits' position for evn dofs
 
         for j = 1 : size(envIndx)[1]
             envBitConfig[i, envIndx[j]] = exBits[j]
