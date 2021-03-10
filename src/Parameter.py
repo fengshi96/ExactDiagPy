@@ -60,10 +60,8 @@ class Parameter:
                 self.Nstates = int(var)
             elif name == "Option":
                 self.Option = var.strip(' ').split(',')
-                if name == "SysIndx":
-                    self.SysIndx = eval(var)
-                else:
-                    ValueError('EE option is on, but no partition of sys and env is specified')
+            elif name == "SysIndx" and "EE" in self.Option:
+                self.SysIndx = eval(var)
             elif name == "t":
                 self.t = float(var)
             elif name == "U":

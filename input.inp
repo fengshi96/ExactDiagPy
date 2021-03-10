@@ -1,9 +1,9 @@
-LLX=2
+LLX=8
 LLY=1
 IsPeriodicX=1
 IsPeriodicY=0
-# Option=EE
-# SysIndx=[0,1,2]
+Option=EE
+SysIndx=[0,1,2]
 
 ### Number of states to keep
 Nstates=2
@@ -14,11 +14,11 @@ Nstates=2
 Model=Heisenberg_Square
 
 # For spin models
-Kxx=-1.0
-Kyy=-1.0
+Kxx=-0.0
+Kyy=-0.0
 Kzz=-1.0
 
-Bxx=-0.0
+Bxx=-1.0
 Byy=0.0
 Bzz=0.0
 
