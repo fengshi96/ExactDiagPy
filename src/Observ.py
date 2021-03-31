@@ -32,6 +32,10 @@ class Observ:
         self.Oscurr_str = []  # on-site spin current string
         self.Tscurr_str = [[], [], []]  # total spin current string of x,y,z
 
+        self.Oexcurr_str = []  # on-site energy current string
+        self.Oeycurr_str = []
+        self.Oezcurr_str = []
+
     def LscurrBuild(self, site, qm="SpinHalf"):  # onsite spin current
 
         if qm not in ["SpinHalf", "SpinOne"]:
@@ -159,6 +163,189 @@ class Observ:
 
         if Lat.Model == "Heisenberg":
             pass
+
+    # ----------------------------- Energy currents ----------------------------------
+    # ----------------------------- Energy currents ----------------------------------
+    # ------------------------ energy current in x direction ---------------------------
+
+    def LexcurrBuild(self, site, qm="SpinHalf"):  # onsite energy current in x direction
+
+        if qm not in ["SpinHalf", "SpinOne"]:
+            raise ValueError("Must be SpinHalf or SpinOne")
+        Lat = self.Lat
+        Spins = Dofs(qm)
+        Sx = Spins.Sx
+        Sy = Spins.Sy
+        Sz = Spins.Sz
+        hilbsize = Spins.hilbsize
+
+        self.Oexcurr_str = []  # on-site energy current
+
+        Oecurrx = sp.eye(hilbsize ** Lat.Nsite, dtype=complex) * 0
+        stringx = ""
+
+        if Lat.Model == "Kitaev":
+
+            nn_ = Lat.nn_  # nn_[site, 0]: i+x; nn_[site, 1]: i+y; nn_[site, 2]: i+z
+            # print(nn_)
+            # indx in 1st term --
+            indxList = [site, nn_[site, 0], nn_[nn_[site, 0], 1]]
+            indxList.sort()  # compare indx of site i, i+x, i+x+y
+            indxS1 = indxList[0]
+            indxM1 = indxList[1]
+            indxL1 = indxList[2]
+
+            # indx in 2nd term --
+            indxList = [site, nn_[site, 0], nn_[nn_[site, 0], 2]]
+            indxList.sort()  # compare indx of site i, i+x, i+x+z
+            indxS2 = indxList[0]
+            indxM2 = indxList[1]
+            indxL2 = indxList[2]
+
+            if indxS1 >= 0 and indxS2 >= 0:
+                ida = sp.eye(hilbsize ** indxS1)
+                idm1 = sp.eye(hilbsize ** (indxM1 - indxS1 - 1))
+                idm2 = sp.eye(hilbsize ** (indxL1 - indxM1 - 1))
+                idb = sp.eye(hilbsize ** (Lat.Nsite - indxL1 - 1))
+                Oecurrx += Lat.Kxx * Lat.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(sp.kron(
+                    sp.kron(ida, Sx), idm1), Sz), idm2), Sy), idb)
+                stringx = "KxKy*Sx[" + str(site) + "]*" + "Sz[" + str(nn_[site, 0]) + "]*" + "Sy[" \
+                          + str(nn_[nn_[site, 0], 1]) + "|gs>"
+
+                ida = sp.eye(hilbsize ** indxS2)
+                idm1 = sp.eye(hilbsize ** (indxM2 - indxS2 - 1))
+                idm2 = sp.eye(hilbsize ** (indxL2 - indxM2 - 1))
+                idb = sp.eye(hilbsize ** (Lat.Nsite - indxL2 - 1))
+                Oecurrx -= Lat.Kxx * Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(sp.kron(
+                    sp.kron(ida, Sx), idm1), Sy), idm2), Sz), idb)
+                stringx += "-KxKz*Sx[" + str(site) + "]*" + "Sy[" + str(nn_[site, 0]) + "]*" + "Sz[" \
+                           + str(nn_[nn_[site, 0], 2]) + "|gs>"
+
+            self.Oexcurr_str.append(stringx)
+            # print(stringx)
+
+            return Oecurrx
+
+    # ------------------------ energy current in y direction ---------------------------
+    def LeycurrBuild(self, site, qm="SpinHalf"):  # onsite energy current in y direction
+
+        if qm not in ["SpinHalf", "SpinOne"]:
+            raise ValueError("Must be SpinHalf or SpinOne")
+        Lat = self.Lat
+        Spins = Dofs(qm)
+        Sx = Spins.Sx
+        Sy = Spins.Sy
+        Sz = Spins.Sz
+        hilbsize = Spins.hilbsize
+
+        self.Oeycurr_str = []  # on-site energy current
+        Oecurry = sp.eye(hilbsize ** Lat.Nsite, dtype=complex) * 0
+        stringy = ""
+
+        if Lat.Model == "Kitaev":
+
+            nn_ = Lat.nn_  # nn_[site, 0]: i+x; nn_[site, 1]: i+y; nn_[site, 2]: i+z
+            # print(nn_)
+            # indx in 1st term --
+            indxList = [site, nn_[site, 1], nn_[nn_[site, 1], 0]]
+            indxList.sort()  # compare indx of site i, i+y, i+y+x
+            indxS1 = indxList[0]
+            indxM1 = indxList[1]
+            indxL1 = indxList[2]
+
+            # indx in 2nd term --
+            indxList = [site, nn_[site, 1], nn_[nn_[site, 1], 2]]
+            indxList.sort()  # compare indx of site i, i+y, i+y+z
+            indxS2 = indxList[0]
+            indxM2 = indxList[1]
+            indxL2 = indxList[2]
+
+            if indxS1 >= 0 and indxS2 >= 0:
+                ida = sp.eye(hilbsize ** indxS1)
+                idm1 = sp.eye(hilbsize ** (indxM1 - indxS1 - 1))
+                idm2 = sp.eye(hilbsize ** (indxL1 - indxM1 - 1))
+                idb = sp.eye(hilbsize ** (Lat.Nsite - indxL1 - 1))
+                Oecurry -= Lat.Kxx * Lat.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(sp.kron(
+                    sp.kron(ida, Sy), idm1), Sz), idm2), Sx), idb)
+                stringy = "-KyKx*Sy[" + str(site) + "]*" + "Sz[" + str(nn_[site, 1]) + "]*" + "Sx[" \
+                          + str(nn_[nn_[site, 1], 0]) + "|gs>"
+
+                ida = sp.eye(hilbsize ** indxS2)
+                idm1 = sp.eye(hilbsize ** (indxM2 - indxS2 - 1))
+                idm2 = sp.eye(hilbsize ** (indxL2 - indxM2 - 1))
+                idb = sp.eye(hilbsize ** (Lat.Nsite - indxL2 - 1))
+                Oecurry += Lat.Kyy * Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(sp.kron(
+                    sp.kron(ida, Sy), idm1), Sx), idm2), Sz), idb)
+                stringy += "KyKz*Sy[" + str(site) + "]*" + "Sx[" + str(nn_[site, 1]) + "]*" + "Sz[" \
+                           + str(nn_[nn_[site, 1], 2]) + "|gs>"
+
+            self.Oeycurr_str.append(stringy)
+            # print(stringx)
+
+            return Oecurry
+
+    # ------------------------ energy current in z direction ---------------------------
+    def LezcurrBuild(self, site, qm="SpinHalf"):  # onsite energy current in y direction
+
+        if qm not in ["SpinHalf", "SpinOne"]:
+            raise ValueError("Must be SpinHalf or SpinOne")
+        Lat = self.Lat
+        Spins = Dofs(qm)
+        Sx = Spins.Sx
+        Sy = Spins.Sy
+        Sz = Spins.Sz
+        hilbsize = Spins.hilbsize
+
+        self.Oeycurr_str = []  # on-site energy current
+        Oecurrz = sp.eye(hilbsize ** Lat.Nsite, dtype=complex) * 0
+        stringz = ""
+
+        if Lat.Model == "Kitaev":
+
+            nn_ = Lat.nn_  # nn_[site, 0]: i+x; nn_[site, 1]: i+y; nn_[site, 2]: i+z
+            # print(nn_)
+            # indx in 1st term --
+            indxList = [site, nn_[site, 2], nn_[nn_[site, 2], 0]]
+            indxList.sort()  # compare indx of site i, i+z, i+z+x
+            indxS1 = indxList[0]
+            indxM1 = indxList[1]
+            indxL1 = indxList[2]
+
+            # indx in 2nd term --
+            indxList = [site, nn_[site, 2], nn_[nn_[site, 2], 1]]
+            indxList.sort()  # compare indx of site i, i+z, i+z+y
+            indxS2 = indxList[0]
+            indxM2 = indxList[1]
+            indxL2 = indxList[2]
+
+            if indxS1 >= 0 and indxS2 >= 0:
+                ida = sp.eye(hilbsize ** indxS1)
+                idm1 = sp.eye(hilbsize ** (indxM1 - indxS1 - 1))
+                idm2 = sp.eye(hilbsize ** (indxL1 - indxM1 - 1))
+                idb = sp.eye(hilbsize ** (Lat.Nsite - indxL1 - 1))
+                Oecurrz += Lat.Kxx * Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(sp.kron(
+                    sp.kron(ida, Sz), idm1), Sy), idm2), Sx), idb)
+                stringz = "KzKx*Sz[" + str(site) + "]*" + "Sy[" + str(nn_[site, 2]) + "]*" + "Sx[" \
+                          + str(nn_[nn_[site, 2], 0]) + "|gs>"
+
+                ida = sp.eye(hilbsize ** indxS2)
+                idm1 = sp.eye(hilbsize ** (indxM2 - indxS2 - 1))
+                idm2 = sp.eye(hilbsize ** (indxL2 - indxM2 - 1))
+                idb = sp.eye(hilbsize ** (Lat.Nsite - indxL2 - 1))
+                Oecurrz -= Lat.Kyy * Lat.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(sp.kron(
+                    sp.kron(ida, Sz), idm1), Sx), idm2), Sy), idb)
+                stringz += "-KyKz*Sz[" + str(site) + "]*" + "Sx[" + str(nn_[site, 2]) + "]*" + "Sy[" \
+                           + str(nn_[nn_[site, 2], 1]) + "|gs>"
+
+            self.Oeycurr_str.append(stringz)
+            # print(stringx)
+
+            return Oecurrz
+
+
+    # ----------------------------- End Energy currents ----------------------------------
+    # ----------------------------- End Energy currents ----------------------------------
+
 
     def TscurrBuild(self, qm="SpinHalf"):
 
@@ -322,7 +509,7 @@ class Observ:
 
     def mLocalSp(self, state, site, qm="SpinHalf"):
         """
-        Measure local <Sz>
+        Measure local <Sp>
         """
         Sp = self.LSpBuild(site, qm)
         Speval = matele(state, Sp, state)
@@ -330,7 +517,7 @@ class Observ:
 
     def mLocalSm(self, state, site, qm="SpinHalf"):
         """
-        Measure local <Sz>
+        Measure local <Sm>
         """
         Sm = self.LSmBuild(site, qm)
         Smeval = matele(state, Sm, state)
@@ -362,7 +549,10 @@ class Observ:
         """
         Measure together all local energy current <Jex>, <Jey>, <Jez>
         """
-        pass
+        Jex, Jey, Jez = self.LscurrBuild(site, qm)
+
+
+
 
     # ------------ End: local current measurement -----------------
 
@@ -461,11 +651,57 @@ class Observ:
 
         return Sr
 
-    def Econd(self, state, site):
+    def EcondLocal(self, evals, evecs, qm="SpinHalf"):
         """
-        Measure together energy conductivity
+        Measure local energy conductivity of jx
         """
-        pass
+        Lat = self.Lat
+        Nstates = len(evals)
+
+        gs = evecs[:, 0]  # ground state
+        Eg = evals[0]  # ground state energy
+
+        omegasteps = 400
+        domega = 0.005
+        eta = 0.02
+
+        # for each omega, define a matrix Mel_{j_x,mi}
+        Melp = np.zeros(Nstates, dtype=complex)  # <m|j_x|gs>
+
+        # Build total energy current-x operator
+        hilbsize = Dofs(qm).hilbsize
+        Je = sp.eye(hilbsize ** Lat.Nsite, dtype=complex) * 0
+        for i in range(0, Lat.Nsite):
+            Je += self.LexcurrBuild(i, qm)
+            # Je += self.LeycurrBuild(i, qm)
+            # Je += self.LezcurrBuild(i, qm)
+
+        # Je -= sp.eye(hilbsize ** Lat.Nsite, dtype=complex) * matele(gs, Je, gs)
+
+        for mi in range(0, Nstates):
+            Melp[mi] = matele(evecs[:, mi], Je, gs)  # <m|j_x|gs>
+        # print(Melp)
+
+        SigmaEx = np.zeros((omegasteps, 2), dtype=float)  # sigma_e,x
+
+        # begin fill in vector sigma_ex(\omega)
+        omegacounter = 0
+        for oi in range(0, omegasteps):
+            omega = domega * oi
+            Itensity = 0
+            # for each omega, define a matrix Mel_{si,mi}
+            for mi in range(1, Nstates):
+                Em = evals[mi]
+                denom2 = complex(omega - (Em - Eg), -eta)
+                # print(denom2)
+                Itensity += Melp[mi] * Melp[mi].conjugate() / denom2
+
+            SigmaEx[oi, 0] = omegacounter
+            SigmaEx[oi, 1] = Itensity.imag / np.pi
+            omegacounter += domega
+
+        return SigmaEx
+
 
     def SingleMagnon(self, evals, evecs, qm="SpinHalf"):
         """
@@ -599,7 +835,7 @@ class Observ:
 
     def SpSm(self, evals, evecs, qm="SpinHalf"):
         """
-        Measure Single < Sz Sz >
+        Measure Single < Sp Sm >
         """
         Lat = self.Lat
         Nstates = len(evals)

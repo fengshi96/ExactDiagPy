@@ -62,8 +62,27 @@ def observe(total, cmdargs):
     elif observname == "spin_cond":
         pass
     # ------- Calculate energy conductivity & write to HDF5---------
-    elif observname == "energy_cond":
-        pass
+    elif observname == "energy_condx":
+        print("Calculating energy conductivity in x...")
+        tic = time.perf_counter()
+        Econdx = ob.EcondLocal(evals, evecs)
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+
+        file = open("energy_condx.dat", 'w')
+        for i in range(0, 400):
+            string = str(Econdx[i, 0]) + " " + str(Econdx[i, 1]) + "\n"
+            file.write(string)
+        file.close()
+
+        # wfile = h5py.File(outputname, 'a')
+        # if "energy_condx" in list(wfile.keys()):
+        #     wfile.__delitem__("energy_condx")  # over write if existed
+        # wfile.create_dataset("energy_condx", data=Econdx)
+        # wfile["energy_condx"].attrs["time"] = toc - tic
+        #
+        # wfile.close()
+
     # ------- Calculate Single-Magnon DOS & write to HDF5---------
     elif observname == "singlemagnon":
         print("Calculating Single-Magnon DOS...")
