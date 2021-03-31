@@ -83,6 +83,24 @@ def observe(total, cmdargs):
         #
         # wfile.close()
 
+    # ------- Calculate TotalS & write to ascii---------
+    elif observname == "TotalS":
+        print("Calculating magnitization...")
+        tic = time.perf_counter()
+        St = ob.TotalS(evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec\n")
+        print("Magnitization=", St)
+
+    # ------- Calculate magnetization (Total Sz) & write to ascii---------
+    elif observname == "totalSz":
+        print("Calculating totalSz...")
+        tic = time.perf_counter()
+        Magz = ob.TotalSz(evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec\n")
+        print(f"totalSz= {Magz.real:.6f}")
+
     # ------- Calculate Single-Magnon DOS & write to HDF5---------
     elif observname == "singlemagnon":
         print("Calculating Single-Magnon DOS...")

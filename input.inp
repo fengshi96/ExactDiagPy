@@ -6,7 +6,7 @@ IsPeriodicY=1
 #SysIndx=[0 ]
 
 ### Number of states to keep
-Nstates=6
+Nstates=1
 
 ### model options: Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Bose_Hubbard, AKLT
 ### for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified

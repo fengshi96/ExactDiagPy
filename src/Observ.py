@@ -556,6 +556,43 @@ class Observ:
 
     # ------------ End: local current measurement -----------------
 
+    # ----------------------------- Magnetization measurement ----------------------------------
+    # ----------------------------- Magnetization measurement ----------------------------------
+    def TotalS(self, evec, qm = "SpinHalf"):
+        """
+        Measure S_t^2 = < \sum_ij (s_i s_j) > _
+        S_t^2 = s_t (s_t + 1)
+        """
+        Nsite = self.Lat.Nsite
+        hilbsize = Dofs(qm).hilbsize
+        St2 = sp.eye(hilbsize ** Nsite, dtype=complex) * 0
+
+        for i in range(0, Nsite):
+            for j in range(0, Nsite):
+                Six = self.LSxBuild(i, qm); Sjx = self.LSxBuild(j, qm)
+                Siy = self.LSyBuild(i, qm); Sjy = self.LSyBuild(j, qm)
+                Siz = self.LSzBuild(i, qm); Sjz = self.LSzBuild(j, qm)
+                St2 += Six * Sjx + Siy * Sjy + Siz * Sjz
+
+        st2 = matele(evec, St2, evec)
+        st = 0.5 * (-1 + np.sqrt(1 + 4 * st2))
+        return st
+
+    # ----------------------------- Magnetization measurement (Total Sz) ----------------------------------
+    def TotalSz(self, evec, qm = "SpinHalf"):
+        """
+        Measure S_z = < \sum_i S_z^i > _
+        """
+        Nsite = self.Lat.Nsite
+        hilbsize = Dofs(qm).hilbsize
+        Sz = sp.eye(hilbsize ** Nsite, dtype=complex) * 0
+
+        for i in range(0, Nsite):
+            Sz += self.LSzBuild(i, qm)
+
+        sz = matele(evec, Sz, evec)
+        return sz
+
     # ----------------------------- Transport measurement ----------------------------------
     # ----------------------------- Transport measurement ----------------------------------
     # ----------------------------- Transport measurement ----------------------------------
