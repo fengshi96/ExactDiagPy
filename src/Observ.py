@@ -25,10 +25,10 @@ class Observ:
     This class is designed for construction of all kinds of Observable operators and their evaluation
     """
 
-    def __init__(self, Lat):
+    def __init__(self, Lat, Para):
 
         self.Lat = Lat
-
+        self.Para = Para
         self.Oscurr_str = []  # on-site spin current string
         self.Tscurr_str = [[], [], []]  # total spin current string of x,y,z
 
@@ -987,7 +987,7 @@ class Observ:
         # for spin-1/2
         dimDof = 2
         # for Bose Hubbard
-        if self.Lat.Model == "Bose_Hubbard":
+        if self.Para.Model == "Bose_Hubbard":
             dimDof = self.Lat.maxOccupation
 
         sysHilDim = pow(dimDof, sysindx.size)

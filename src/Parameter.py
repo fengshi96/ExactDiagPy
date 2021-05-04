@@ -6,7 +6,9 @@ class Parameter:
         self.IsPeriodicX = True
         self.IsPeriodicY = True
         self.Option = None
-        self.Model = "Kitaev"
+        self.Dof = None
+        self.Geometry = None
+        self.Model = None
         self.Kxx = 1.0
         self.Kyy = 1.0
         self.Kzz = 1.0
@@ -42,6 +44,10 @@ class Parameter:
                 self.IsPeriodicX = bool(int(var))
             elif name == "IsPeriodicY":
                 self.IsPeriodicY = bool(int(var))
+            elif name == "Dof":
+                self.Dof = var
+            elif name == "Geometry":
+                self.Geometry = var
             elif name == "Model":
                 self.Model = var
             elif name == "Kxx":
@@ -77,7 +83,7 @@ class Parameter:
         print("LLX=", self.LLX, "\nLLY=", self.LLY)
         print("IsPeriodicX=", self.IsPeriodicX, "\nIsPeriodicY=", self.IsPeriodicY)
         print("Model=", self.Model)
-        if "Hubbard" in self.Model:
+        if "Fermions" in self.Model or "Bose_Hubbard" in self.Model:
             print("t=", self.t)
             print("U=", self.U)
             print("mu=", self.mu)

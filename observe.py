@@ -99,7 +99,7 @@ def observe(total, cmdargs):
         Magz = ob.TotalSz(evecs[:, 0])
         toc = time.perf_counter()
         print(f"time = {toc-tic:0.4f} sec\n")
-        print(f"totalSz= {Magz.real:.6f}")
+        print(f"totalSz = {Magz.real:.6f}")
 
     # ------- Calculate Single-Magnon DOS & write to HDF5---------
     elif observname == "singlemagnon":

@@ -83,17 +83,29 @@ class Dofs:
             self.occup = self.creat.dot(self.annih)
             self.I = sp.eye(boson_dim)
 
+        elif dof == "Fermion":
 
+            self.hilbsize = 2
+            self.type = "Fermion"
+
+            # define f and f^\dagger
+            I = np.array(range(0, 1), dtype=int)
+            J = np.array(range(1, 2), dtype=int)
+            V = np.sqrt(np.array(range(1, 2)), dtype=float)
+            self.annih = sp.coo_matrix((V, (I, J)), shape=(2, 2))
+            self.creat = np.transpose(self.annih)
+            self.occup = self.creat.dot(self.annih)
+            self.I = sp.eye(2)
 
 
 
         else:
             raise TypeError("Dof type not yet supported..")
 
-# boson = Dofs("Boson", 4)
-# print(boson.annih, "\n")
-# print(boson.creat, "\n")
-# print(boson.occup, "\n")
+# fermion = Dofs("Fermion")
+# print(fermion.annih, "\n")
+# print(fermion.creat, "\n")
+# print(fermion.occup, "\n")
 
 #
 # print(Spins.Sz * Spins.Sz)

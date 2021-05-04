@@ -12,28 +12,24 @@ class Lattice:
         self.LLY = para.LLY  # Number of unit cells in y
         self.IsPeriodicX = para.IsPeriodicX  # PBC (1) or OBC (0)
         self.IsPeriodicY = para.IsPeriodicY
-        self.Model = para.Model  # Name of the model.
+        # self.Model = para.Model  # Name of the model.
+        self.Geometry = para.Geometry
         if para.Option is not None:
             if "EE" in para.Option:
                 self.SysIndx = para.SysIndx
 
-        # Model-dependent attributes
-        if para.Model == "Kitaev" or para.Model == "Heisenberg_Honeycomb":
+        # Geometry-dependent attributes
+        if para.Geometry == "Honeycomb":
             self.Nsite = self.LLX * self.LLY * 2
-            self.Hx = para.Hx; self.Kxx = para.Kxx
-            self.Hy = para.Hy; self.Kyy = para.Kyy
-            self.Hz = para.Hz; self.Kzz = para.Kzz
             self.indx_ = np.zeros(self.Nsite, dtype=int)  # x coordinate in mesh
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 3  # number of nearest neighbors
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
-        elif para.Model == "Heisenberg_Square":
+
+        elif para.Geometry == "Square":
             self.Nsite = self.LLX * self.LLY
-            self.Hx = para.Hx; self.Kxx = para.Kxx
-            self.Hy = para.Hy; self.Kyy = para.Kyy
-            self.Hz = para.Hz; self.Kzz = para.Kzz
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 4
@@ -42,43 +38,19 @@ class Lattice:
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
             self.BuildSquare()  # build attributes in square lattice
-        elif para.Model == "AKLT":
+
+        elif para.Geometry == "Chain":
             self.Nsite = self.LLX
-            self.Hx = para.Hx; self.Kxx1 = para.Kxx; self.Kxx2 = para.Kxx / 3.0
-            self.Hy = para.Hy; self.Kyy1 = para.Kyy; self.Kyy2 = para.Kyy / 3.0
-            self.Hz = para.Hz; self.Kzz1 = para.Kzz; self.Kzz2 = para.Kzz / 3.0
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 2
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones(self.LLX, dtype=int)
-            self.BuildBLBQChain()  # build attributes in square lattice
-        elif para.Model == "TFIM":
-            self.Nsite = self.LLX
-            self.Hx = para.Hx; self.Kxx1 = 0; self.Kxx2 = 0
-            self.Hy = 0; self.Kyy1 = 0; self.Kyy2 = 0
-            self.Hz = 0; self.Kzz1 = para.Kzz; self.Kzz2 = 0
-            self.indx_ = np.zeros(self.Nsite, dtype=int)
-            self.Number1neigh = 2
-            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
-            self.mesh_ = -np.ones(self.LLX, dtype=int)
-            self.BuildBLBQChain()  # build attributes in square lattice
-        elif para.Model == "Bose_Hubbard":
-            self.Nsite = self.LLX * self.LLY
-            self.t = para.t; self.U = para.U; self.mu = para.mu
-            self.maxOccupation = para.maxOccupation
-            self.indx_ = np.zeros(self.Nsite, dtype=int)
-            self.indy_ = np.zeros(self.Nsite, dtype=int)
-            self.Number1neigh = 4
-            if self.LLX == 1 or self.LLY == 1:
-                self.Number1neigh = 2
-            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
-            self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
-            self.BuildSquare()  # build attributes in square lattice
+            self.BuildChain()  # build attributes in square lattice
 
         else:
-            raise ValueError("Model not supported yet")
+            raise ValueError("Geometry not supported yet")
 
-    def BuildBLBQChain(self):
+    def BuildChain(self):
         """
         Construct Spin-1 BLBQ Chain and nearest neighbor matrix
         Neighbor Label:  —— (1) ——  i  ——  (0) ——
