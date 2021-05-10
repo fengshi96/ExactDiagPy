@@ -3,8 +3,7 @@ import numpy as np
 import time
 import primme
 from src.Parameter import Parameter
-from src.models.Fermions import Fermions
-from src.models.Bosons import Bosons
+from src.models.Kitaev import Kitaev
 from src.Observ import Observ
 from src.Lattice import Lattice
 from src.Helper import Logger, sort, hd5Storage
@@ -25,9 +24,9 @@ def main(total, cmdargs):
 
     tic = time.perf_counter()
     #######################################
-    Hamil = Fermions(Lat, Para)  # Hamiltonian(Lat)  # Build Hamiltonian
+    Hamil = Kitaev(Lat, Para)    # Build Hamiltonian object
     #######################################
-    ham = Hamil.Ham  # Hamiltonian as sparse matrix
+    ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
     toc = time.perf_counter()
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
