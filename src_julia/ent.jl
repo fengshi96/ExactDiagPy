@@ -2,7 +2,11 @@ using HDF5
 using LinearAlgebra
 
 function basisPartition(wf, sysIndx, nSites)
-
+    """
+    	wf: wavefunction mounted from hdf5
+    	sysIndx: Array{Int, 1}, Index of sites for RDM
+    	nSites: Int, number of sites of the whole system
+    """
     nSys = size(sysIndx)[1]
     envIndx = [i for i = 1:nSites]
     for i = 1:nSys
@@ -69,3 +73,28 @@ function basisPartition(wf, sysIndx, nSites)
     
     return wf_as_mat
 end
+
+# Parameters
+sysIndx = Int8[1,2]
+Nsite = 8
+
+# read data
+hd5 = h5open("../dataSpec.hdf5","r")
+dset=hd5["3.Eigen/Wavefunctions"]
+evec=read(dset)
+close(hd5)
+
+# bipartition of wavefunction
+@time wf_as_mat = basisPartition(evec, sysIndx, Nsite)
+@show size(wf_as_mat);
+
+# then trace out enironment
+rdm = wf_as_mat * adjoint(wf_as_mat)
+entS = eigvals(rdm)
+topop = count(i->(i<0), entS)
+PentS = entS[topop+1:end]  # popped out negative values
+@show ee = - transpose(PentS) * log.(PentS)
+
+
+
+
