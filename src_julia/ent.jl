@@ -75,25 +75,34 @@ function basisPartition(wf, sysIndx, nSites)
 end
 
 # Parameters
-sysIndx = Int8[1,2]
+sysIndx = Int8[6,7,8]
 Nsite = 8
 
 # read data
-hd5 = h5open("../dataSpec.hdf5","r")
+hd5 = h5open("dataSpec.hdf5","r")
 dset=hd5["3.Eigen/Wavefunctions"]
 evec=read(dset)
 close(hd5)
 
 # bipartition of wavefunction
-@time wf_as_mat = basisPartition(evec, sysIndx, Nsite)
+@time wf_as_mat = basisPartition(evec[1,:], sysIndx, Nsite)
 @show size(wf_as_mat);
 
 # then trace out enironment
 rdm = wf_as_mat * adjoint(wf_as_mat)
 entS = eigvals(rdm)
 topop = count(i->(i<0), entS)
-PentS = entS[topop+1:end]  # popped out negative values
+@show PentS = entS[topop+1:end]  # popped out negative values
+
+# println("\nEigen Spectrum:"); show(stdout, "text/plain", PentS); println()
+
 @show ee = - transpose(PentS) * log.(PentS)
+
+# Store RDM into hdf5
+h5open("ent.hdf5", "w") do file
+    write(file, "rdm", rdm)
+    write(file, "rdmEigen", PentS)
+end
 
 
 
