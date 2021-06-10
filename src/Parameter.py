@@ -16,6 +16,7 @@ class Parameter:
         self.Hy = 0.0
         self.Hz = 0.0
         self.Nstates = 1
+        self.tolerance = 1e-12
         self.SysIndx = None
         # For Bosons
         self.t = None
@@ -64,6 +65,8 @@ class Parameter:
                 self.Hz = float(var)
             elif name == "Nstates":
                 self.Nstates = int(var)
+            elif name == "tolerance":
+                self.tolerance = float(var)
             elif name == "Option":
                 self.Option = var.strip(' ').split(',')
             elif name == "SysIndx" and "EE" in self.Option:

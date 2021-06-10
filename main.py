@@ -25,14 +25,14 @@ def main(total, cmdargs):
 
     tic = time.perf_counter()
     #######################################
-    Hamil = Fermions(Lat, Para)    # Build Hamiltonian object
+    Hamil = Kitaev(Lat, Para)    # Build Hamiltonian object
     #######################################
     ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
     toc = time.perf_counter()
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, Para.Nstates, tol=1e-8, which='SA')
+    evals, evecs = primme.eigsh(ham, Para.Nstates, tol=Para.tolerance, which='SA')
     evals, evecs = sort(evals, evecs)
     toc = time.perf_counter()
 

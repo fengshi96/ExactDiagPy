@@ -1,5 +1,5 @@
-LLX=4
-LLY=4
+LLX=3
+LLY=3
 IsPeriodicX=1
 IsPeriodicY=1
 #Option=EE
@@ -7,13 +7,14 @@ IsPeriodicY=1
 
 ### Number of states to probe
 Nstates=1
+tolerance=1e-8
 
 ### model options: Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Bose_Hubbard, AKLT, Fermions
 ### for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified
 ### Bose_Hubbard/Fermi_Hubbard Hamiltonian: H = +t \sum (a*a + aa*) + U \sum n(n-1) + \mu \sum n
-Dof=Fermion
-Geometry=Square
-Model=Fermi_Hubbard
+Dof=SpinHalf
+Geometry=Honeycomb
+Model=Kitaev
 
 # For spin models
 Kxx=1.0
@@ -25,9 +26,9 @@ Byy=0
 Bzz=0
 
 ### For Bose Hubbard and Fermions
-t=1.0
-U=0
-mu=1
+#t=1.0
+#U=0
+#mu=1
 #maxOccupation=3
 
 
