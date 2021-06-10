@@ -83,7 +83,7 @@ class Parameter:
         print("LLX=", self.LLX, "\nLLY=", self.LLY)
         print("IsPeriodicX=", self.IsPeriodicX, "\nIsPeriodicY=", self.IsPeriodicY)
         print("Model=", self.Model)
-        if "Fermions" in self.Model or "Bose_Hubbard" in self.Model:
+        if "Fermi" in self.Model or "Bose_Hubbard" in self.Model:
             print("t=", self.t)
             print("U=", self.U)
             print("mu=", self.mu)

@@ -75,8 +75,8 @@ function basisPartition(wf, sysIndx, nSites)
 end
 
 # Parameters
-sysIndx = Int8[6,7,8]
-Nsite = 8
+sysIndx = Int8[1,2,3,6,7,8] .+1
+Nsite = 18
 
 # read data
 hd5 = h5open("dataSpec.hdf5","r")
