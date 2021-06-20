@@ -4,7 +4,7 @@ import time
 import primme
 from src.Parameter import Parameter
 from src.models.Kitaev import Kitaev
-from src.models.Fermions import Fermions
+from src.models.Heisenberg import Heisenberg
 from src.Observ import Observ
 from src.Lattice import Lattice
 from src.Helper import Logger, sort, hd5Storage
@@ -25,7 +25,10 @@ def main(total, cmdargs):
 
     tic = time.perf_counter()
     #######################################
-    Hamil = Kitaev(Lat, Para)    # Build Hamiltonian object
+    if Para.Model == "Heisenberg":
+        Hamil = Heisenberg(Lat, Para)    # Build Hamiltonian object
+    elif Para.Model == "Kitaev":
+        Hamil = Kitaev(Lat, Para)
     #######################################
     ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
     toc = time.perf_counter()

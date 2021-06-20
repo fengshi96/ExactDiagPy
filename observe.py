@@ -11,22 +11,25 @@ pi = np.pi
 
 
 def observe(total, cmdargs):
+    localSite = None
     if total < 3:
         print(" ".join(str(x) for x in cmdargs))
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
     observname = cmdargs[2]
+    # Needed for loacl measurement
+    localSite = int(cmdargs[3])
     outputname = "dataObserve.hdf5"
-    if total == 4:
-        outputname = cmdargs[3]
+    #if total == 4:
+    #   outputname = cmdargs[3]
     # ---------------------------------------------------------------
 
     para = Parameter(inputname)
     Lat = Lattice(para)
-    ob = Observ(Lat)
-    print(Lat.Model)
+    ob = Observ(Lat, para)
+    print(para.Model)
     dof = Dofs("SpinHalf")  # default spin-1/2
-    if Lat.Model == "AKLT":
+    if para.Model == "AKLT":
         dof = Dofs("SpinOne")
 
     # ------- Read dataSpec file -------
@@ -43,8 +46,28 @@ def observe(total, cmdargs):
 
     rfile.close()
 
+    # ------- Calculate local Sx Sy Sz (for gs) & write to ASCII---------
+    if observname == "local_spin":
+        if localSite is None:
+            raise ValueError("localSite = None!")
+        if localSite >= Lat.Nsite:
+            raise ValueError("site index exceeds lattice boundary")
+
+        print("Calculating local_Sx...")
+        tic = time.perf_counter()
+        local_Sx = round(ob.mLocalSx(evecs[:, 0], localSite), 9)
+        local_Sy = round(ob.mLocalSy(evecs[:, 0], localSite), 9)
+        local_Sz = round(ob.mLocalSz(evecs[:, 0], localSite), 9)
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+
+        print("Local_Sx = ", local_Sx)
+        print("Local_Sy = ", local_Sy)
+        print("Local_Sz = ", local_Sz)
+
+    #====================================================================
     # ------- Calculate spin response S(\omega) & write to HDF5---------
-    if observname == "spin_response":
+    elif observname == "spin_response":
         print("Calculating S(omega)...")
         tic = time.perf_counter()
         SpinRes = ob.SpRe(evals, evecs, dof.type)
