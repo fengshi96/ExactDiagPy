@@ -1,12 +1,12 @@
-LLX=3
-LLY=3
+LLX=2
+LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
 #Option=EE
 #SysIndx=[0,1,2,3,4,5,6]
 
 ### Number of states to probe
-Nstates=1
+Nstates=100
 tolerance=1e-8
 
 ### model options: Kitaev, Heisenberg_Square, Heisenberg_Honeycomb, Bose_Hubbard, AKLT, Fermions
