@@ -18,7 +18,8 @@ def observe(total, cmdargs):
     inputname = cmdargs[1]
     observname = cmdargs[2]
     # Needed for loacl measurement
-    localSite = int(cmdargs[3])
+    if total > 3:
+        localSite = int(cmdargs[3])
     outputname = "dataObserve.hdf5"
     #if total == 4:
     #   outputname = cmdargs[3]
