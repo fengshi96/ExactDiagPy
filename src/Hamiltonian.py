@@ -18,7 +18,7 @@ class Hamiltonian:
         else:
             raise ValueError("Geometry not yet supported")
 
-        if Para.Dof == "Fermion":
+        if Para.parameters["Dof"] == "Fermion":
             Fermion = Dofs("Fermion")
             self.annih = Fermion.annih
             self.creat = Fermion.creat
@@ -29,8 +29,8 @@ class Hamiltonian:
             self.tPair_ = np.zeros(())
             self.tcoef_ = np.zeros(())
 
-        elif Para.Dof == "Boson":
-            Boson = Dofs("Boson", Para.maxOccupation)
+        elif Para.parameters["Dof"] == "Boson":
+            Boson = Dofs("Boson", Para.parameters["maxOccupation"])
             self.annih = Boson.annih
             self.creat = Boson.creat
             self.occup = Boson.occup
@@ -40,13 +40,13 @@ class Hamiltonian:
             self.tPair_ = np.zeros(())
             self.tcoef_ = np.zeros(())
 
-        elif Para.Dof == "SpinHalf" or Para.Dof == "SpinOne":
-            Spins = Dofs(Para.Dof)
+        elif Para.parameters["Dof"] == "SpinHalf" or Para.parameters["Dof"] == "SpinOne":
+            Spins = Dofs(Para.parameters["Dof"])
             self.sx = Spins.Sx
             self.sy = Spins.Sy
             self.sz = Spins.Sz
 
-            if Para.Model == "BLBQ" or Para.Dof == "AKLT":
+            if Para.parameters["Model"] == "BLBQ" or Para.parameters["Dof"] == "AKLT":
                 self.Kxx1Graph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
                 self.Kyy1Graph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
                 self.Kzz1Graph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)

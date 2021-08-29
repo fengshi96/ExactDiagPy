@@ -25,9 +25,9 @@ def main(total, cmdargs):
 
     tic = time.perf_counter()
     #######################################
-    if Para.Model == "Heisenberg":
+    if Para.parameters["Model"] == "Heisenberg":
         Hamil = Heisenberg(Lat, Para)    # Build Hamiltonian object
-    elif Para.Model == "Kitaev":
+    elif Para.parameters["Model"] == "Kitaev":
         Hamil = Kitaev(Lat, Para)
     #######################################
     ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
@@ -35,7 +35,7 @@ def main(total, cmdargs):
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, Para.Nstates, tol=Para.tolerance, which='SA')
+    evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which='SA')
     evals, evecs = sort(evals, evecs)
     toc = time.perf_counter()
 
@@ -48,8 +48,8 @@ def main(total, cmdargs):
     ob = Observ(Lat, Para)  # initialize observables
 
     # -------------- Entanglement properties of GS -----------
-    if Para.Option is not None:
-        if "EE" in Para.Option:
+    if "Option" in Para.parameters.keys():
+        if "EE" in Para.parameters["Option"]:
             EntS, Entvec = ob.EntSpec(evecs[:, 0])  # Entanglement spectrum and vector
             EntS = np.round(EntS, decimals=10)
             EntS_log = np.zeros(len(EntS))

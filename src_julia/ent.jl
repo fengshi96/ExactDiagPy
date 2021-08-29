@@ -75,11 +75,12 @@ function basisPartition(wf, sysIndx, nSites)
 end
 
 # Parameters
-sysIndx = Int8[0,1,2,4] .+1
-Nsite = 8
+sysIndx = Int8[1,2,3,6,7,8] .+1
+Nsite = 18
 
 # read data
-hd5 = h5open("dataSpec.hdf5","r")
+#hd5 = h5open("dataSpec.hdf5","r")
+hd5 = h5open("../dataSpec.hdf5","r")
 dset=hd5["3.Eigen/Wavefunctions"]
 evec=read(dset)
 close(hd5)

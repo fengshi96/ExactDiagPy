@@ -28,9 +28,9 @@ def observe(total, cmdargs):
     para = Parameter(inputname)
     Lat = Lattice(para)
     ob = Observ(Lat, para)
-    print(para.Model)
+    print(para.parameters["Model"])
     dof = Dofs("SpinHalf")  # default spin-1/2
-    if para.Model == "AKLT":
+    if para.parameters["Model"] == "AKLT":
         dof = Dofs("SpinOne")
 
     # ------- Read dataSpec file -------
@@ -40,8 +40,8 @@ def observe(total, cmdargs):
 
     # extract eigen value and eigen vector from HDF5 rfile
     print(dof.hilbsize ** Lat.Nsite)
-    evals = np.zeros(para.Nstates, dtype=float)
-    evecs = np.zeros((dof.hilbsize ** Lat.Nsite, para.Nstates), dtype=complex)
+    evals = np.zeros(para.parameters["Nstates"], dtype=float)
+    evecs = np.zeros((dof.hilbsize ** Lat.Nsite, para.parameters["Nstates"]), dtype=complex)
     evalset.read_direct(evals)
     evecset.read_direct(evecs)
 
@@ -117,12 +117,16 @@ def observe(total, cmdargs):
         print("Magnitization=", St)
 
     # ------- Calculate magnetization (Total Sz) & write to ascii---------
-    elif observname == "totalSz":
-        print("Calculating totalSz...")
+    elif observname == "totalSi":
+        print("Calculating totalSi...")
         tic = time.perf_counter()
+        Magx = ob.TotalSx(evecs[:, 0])
+        Magy = ob.TotalSy(evecs[:, 0])
         Magz = ob.TotalSz(evecs[:, 0])
         toc = time.perf_counter()
         print(f"time = {toc-tic:0.4f} sec\n")
+        print(f"totalSx = {Magx.real:.6f}")
+        print(f"totalSy = {Magy.real:.6f}")
         print(f"totalSz = {Magz.real:.6f}")
 
     # ------- Calculate Single-Magnon DOS & write to HDF5---------
@@ -175,7 +179,7 @@ def observe(total, cmdargs):
         # ------- Calculate energy current of TFIM & write to HDF5---------
     elif observname == "ecurrent1":
         site = 2
-        if para.Model != "TFIM":
+        if para.parameters["Model"] != "TFIM":
             raise ValueError("ecurrent1 is designed for TFIM exclusively")
         print("Calculating energy current of TFIM...")
         tic = time.perf_counter()

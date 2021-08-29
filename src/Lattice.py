@@ -8,18 +8,17 @@ class Lattice:
     def __init__(self, para):
 
         # Shared attributes
-        self.LLX = para.LLX  # Number of unit cells in x
-        self.LLY = para.LLY  # Number of unit cells in y
-        self.IsPeriodicX = para.IsPeriodicX  # PBC (1) or OBC (0)
-        self.IsPeriodicY = para.IsPeriodicY
-        # self.Model = para.Model  # Name of the model.
-        self.Geometry = para.Geometry
-        if para.Option is not None:
-            if "EE" in para.Option:
-                self.SysIndx = para.SysIndx
+        self.LLX = para.parameters["LLX"]  # Number of unit cells in x
+        self.LLY = para.parameters["LLY"]  # Number of unit cells in y
+        self.IsPeriodicX = para.parameters["IsPeriodicX"]  # PBC (1) or OBC (0)
+        self.IsPeriodicY = para.parameters["IsPeriodicY"]
+        self.Geometry = para.parameters["Geometry"]
+        # if para.Option is not None:
+        #     if "EE" in para.Option:
+        #         self.SysIndx = para.SysIndx
 
         # Geometry-dependent attributes
-        if para.Geometry == "Honeycomb":
+        if self.Geometry == "Honeycomb":
             self.Nsite = self.LLX * self.LLY * 2
             self.indx_ = np.zeros(self.Nsite, dtype=int)  # x coordinate in mesh
             self.indy_ = np.zeros(self.Nsite, dtype=int)
@@ -28,7 +27,7 @@ class Lattice:
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
 
-        elif para.Geometry == "Square":
+        elif self.Geometry == "Square":
             self.Nsite = self.LLX * self.LLY
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.indy_ = np.zeros(self.Nsite, dtype=int)
@@ -39,7 +38,7 @@ class Lattice:
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
             self.BuildSquare()  # build attributes in square lattice
 
-        elif para.Geometry == "Chain":
+        elif self.Geometry == "Chain":
             self.Nsite = self.LLX
             self.indx_ = np.zeros(self.Nsite, dtype=int)
             self.Number1neigh = 2
@@ -305,6 +304,7 @@ class Lattice:
                     self.nn_[i, 3] = j
         matprint(self.nn_)
 
+# from src.Parameter import Parameter
 # param = Parameter("../input.inp")
 # lat = Lattice(param)
 

@@ -158,7 +158,7 @@ class HeisenbergObserve(Observ):
                 idm = sp.eye(hilbsize ** (indxL - indxS - 1))
                 idb = sp.eye(hilbsize ** (Lat.Nsite - indxL - 1))
                 kinetic += 1 / (2 * Lat.Nsite) * \
-                           self.Para.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
+                           self.Para.parameters["Kxx"] * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
                 kinetic += kinetic.conjugate()
                 string = "1/(2*N)*Kx*(sp[" + str(site) + "]*" + "sm[" + str(nn_[0]) + "]" \
                          + "+sm[" + str(site) + "]*sp[" + str(nn_[0]) + "])"  # "js_x["+str(site)+"] = "+
@@ -174,7 +174,7 @@ class HeisenbergObserve(Observ):
                 idm = sp.eye(hilbsize ** (indxL - indxS - 1))
                 idb = sp.eye(hilbsize ** (Lat.Nsite - indxL - 1))
                 kinetic += 1 / (2 * Lat.Nsite) * \
-                           self.Para.Kyy * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
+                           self.Para.parameters["Kyy"] * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
                 kinetic += kinetic.conjugate()
                 string = "1/(2*N)*Ky*(sp[" + str(site) + "]*" + "sm[" + str(nn_[0]) + "]" \
                          + "+sm[" + str(site) + "]*sp[" + str(nn_[0]) + "])"  # "js_x["+str(site)+"] = "+
@@ -190,7 +190,7 @@ class HeisenbergObserve(Observ):
                 idm = sp.eye(hilbsize ** (indxL - indxS - 1))
                 idb = sp.eye(hilbsize ** (Lat.Nsite - indxL - 1))
                 kinetic += 1 / (2 * Lat.Nsite) * \
-                           self.Para.Kzz * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
+                           self.Para.parameters["Kzz"] * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
                 kinetic += kinetic.conjugate()
                 string = "1/(2*N)*Kz*(sp[" + str(site) + "]*" + "sm[" + str(nn_[0]) + "]" \
                          + "+sm[" + str(site) + "]*sp[" + str(nn_[0]) + "])"  # "js_x["+str(site)+"] = "+
@@ -261,7 +261,7 @@ class HeisenbergObserve(Observ):
         for oi in range(0, omegasteps):
             omega = domega * oi
 
-            for m in range(0, self.Para.Nstates):
+            for m in range(0, self.Para.parameters["Nstates"]):
                 J0m = matele(gs, J, evecs[:, m])
                 Jm0 = np.conj(J0m)
 
@@ -310,7 +310,7 @@ def main():
     Hamil = Heisenberg(Lat, Para)
     ham = Hamil.Ham
 
-    evals, evecs = primme.eigsh(ham, Para.Nstates, tol=Para.tolerance, which='SA')
+    evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which='SA')
     evals, evecs = sort(evals, evecs)
 
     ob = HeisenbergObserve(Lat, Para)

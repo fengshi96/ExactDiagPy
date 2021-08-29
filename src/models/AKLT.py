@@ -11,17 +11,17 @@ class AKLT(Hamiltonian):
 
         self.Nsite = Lat.LLX
 
-        self.Hx = Para.Hx
-        self.Kxx1 = Para.Kxx
-        self.Kxx2 = Para.Kxx / 3.0
+        self.Hx = Para.parameters["Bxx"]
+        self.Kxx1 = Para.parameters["Kxx"]
+        self.Kxx2 = Para.parameters["Kxx"] / 3.0
 
-        self.Hy = Para.Hy
-        self.Kyy1 = Para.Kyy
-        self.Kyy2 = Para.Kyy / 3.0
+        self.Hy = Para.parameters["Byy"]
+        self.Kyy1 = Para.parameters["Kyy"]
+        self.Kyy2 = Para.parameters["Kyy"] / 3.0
 
-        self.Hz = Para.Hz
-        self.Kzz1 = Para.Kzz
-        self.Kzz2 = Para.Kzz / 3.0
+        self.Hz = Para.parameters["Bzz"]
+        self.Kzz1 = Para.parameters["Kzz"]
+        self.Kzz2 = Para.parameters["Kzz"] / 3.0
 
         self.Kxx1Pair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.Kyy1Pair_ = np.zeros(())  # 1st and 2nd cols are site indices

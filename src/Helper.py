@@ -7,35 +7,35 @@ import time
 def hd5Storage(Para, Lat, Hamil, Eigen):
     tic = time.perf_counter()
     file = h5py.File('dataSpec.hdf5', 'w')
-    file.attrs["LLX"] = Para.LLX
-    file.attrs["LLY"] = Para.LLY
+    file.attrs["LLX"] = Para.parameters["LLX"]
+    file.attrs["LLY"] = Para.parameters["LLY"]
 
-    file.attrs["IsPeriodicX"] = Para.IsPeriodicX
-    file.attrs["IsPeriodicY"] = Para.IsPeriodicY
+    file.attrs["IsPeriodicX"] = Para.parameters["IsPeriodicX"]
+    file.attrs["IsPeriodicY"] = Para.parameters["IsPeriodicY"]
 
-    file.attrs["#States2Keep"] = Para.Nstates
-    file.attrs["Dof"] = Para.Dof
-    file.attrs["Geometry"] = Para.Geometry
-    file.attrs["Model"] = Para.Model
+    file.attrs["#States2Keep"] = Para.parameters["Nstates"]
+    file.attrs["Dof"] = Para.parameters["Dof"]
+    file.attrs["Geometry"] = Para.parameters["Geometry"]
+    file.attrs["Model"] = Para.parameters["Model"]
     file.attrs["Nsites"] = Lat.Nsite
 
     ConnGrp = file.create_group("2.Connectors")
 
-    if "Spin" in Para.Dof:
-        file.attrs["Kx"] = Para.Kxx
-        file.attrs["Ky"] = Para.Kyy
-        file.attrs["Kz"] = Para.Kzz
+    if "Spin" in Para.parameters["Dof"]:
+        file.attrs["Kx"] = Para.parameters["Kxx"]
+        file.attrs["Ky"] = Para.parameters["Kyy"]
+        file.attrs["Kz"] = Para.parameters["Kzz"]
 
-        file.attrs["Hx"] = Para.Hz
-        file.attrs["Hy"] = Para.Hy
-        file.attrs["Hz"] = Para.Hz
+        file.attrs["Hx"] = Para.parameters["Bxx"]
+        file.attrs["Hy"] = Para.parameters["Byy"]
+        file.attrs["Hz"] = Para.parameters["Bzz"]
 
-        if Para.Model == "Kitaev":
+        if Para.parameters["Model"] == "Kitaev":
             ConnGrp.create_dataset("KxxGraph", data=Hamil.KxxGraph_)
             ConnGrp.create_dataset("KyyGraph", data=Hamil.KyyGraph_)
             ConnGrp.create_dataset("KzzGraph", data=Hamil.KzzGraph_)
 
-        elif Para.Model == "AKLT":
+        elif Para.parameters["Model"] == "AKLT":
             ConnGrp.create_dataset("Kxx1Graph", data=Hamil.Kxx1Graph_)
             ConnGrp.create_dataset("Kyy1Graph", data=Hamil.Kyy1Graph_)
             ConnGrp.create_dataset("Kzz1Graph", data=Hamil.Kzz1Graph_)
@@ -43,7 +43,7 @@ def hd5Storage(Para, Lat, Hamil, Eigen):
             ConnGrp.create_dataset("Kyy2Graph", data=Hamil.Kyy2Graph_)
             ConnGrp.create_dataset("Kzz2Graph", data=Hamil.Kzz2Graph_)
 
-    elif "Fermion" in Para.Dof:
+    elif "Fermion" in Para.parameters["Dof"]:
         ConnGrp.create_dataset("tGraph", data=Hamil.tGraph_)
     else:
         raise ValueError("Para.Dof not valid")

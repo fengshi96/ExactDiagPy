@@ -1,29 +1,23 @@
+import re
+
+
 class Parameter:
     def __init__(self, path):
-        # For spin lattices
-        self.LLX = 1
-        self.LLY = 1
-        self.IsPeriodicX = True
-        self.IsPeriodicY = True
-        self.Option = None
-        self.Dof = None
-        self.Geometry = None
-        self.Model = None
-        self.Kxx = 1.0
-        self.Kyy = 1.0
-        self.Kzz = 1.0
-        self.Hx = 0.0
-        self.Hy = 0.0
-        self.Hz = 0.0
-        self.Nstates = 1
-        self.tolerance = 1e-12
-        self.SysIndx = None
-        # For Bosons
-        self.t = None
-        self.U = None
-        self.mu = None
-        self.maxOccupation = None
+        self.parameters = {}
         self.GetParameter(path)
+
+    def add_parameter(self, name):
+        self.parameters[name] = None
+
+    def add_value(self, name, strVal):
+        if strVal.isnumeric():
+            val = int(strVal)
+        elif re.match(r"[-+]?\d+[.]\d*", strVal) or re.match(r"[-+]?\d*?e[-+]\d+", strVal):
+            val = float(strVal)
+        else:
+            val = strVal
+        self.parameters[name] = val
+
 
     def GetParameter(self, path):
         file = open(path, 'r')
@@ -37,70 +31,20 @@ class Parameter:
             name = line[0]
             var = line[1]
 
-            if name == "LLX":
-                self.LLX = int(var)
-            elif name == "LLY":
-                self.LLY = int(var)
-            elif name == "IsPeriodicX":
-                self.IsPeriodicX = bool(int(var))
-            elif name == "IsPeriodicY":
-                self.IsPeriodicY = bool(int(var))
-            elif name == "Dof":
-                self.Dof = var
-            elif name == "Geometry":
-                self.Geometry = var
-            elif name == "Model":
-                self.Model = var
-            elif name == "Kxx":
-                self.Kxx = float(var)
-            elif name == "Kyy":
-                self.Kyy = float(var)
-            elif name == "Kzz":
-                self.Kzz = float(var)
-            elif name == "Bxx":
-                self.Hx = float(var)
-            elif name == "Byy":
-                self.Hy = float(var)
-            elif name == "Bzz":
-                self.Hz = float(var)
-            elif name == "Nstates":
-                self.Nstates = int(var)
-            elif name == "tolerance":
-                self.tolerance = float(var)
-            elif name == "Option":
-                self.Option = var.strip(' ').split(',')
-            elif name == "SysIndx" and "EE" in self.Option:
-                self.SysIndx = eval(var)
-            elif name == "t":
-                self.t = float(var)
-            elif name == "U":
-                self.U = float(var)
-            elif name == "mu":
-                self.mu = float(var)
-            elif name == "maxOccupation":
-                self.maxOccupation = int(var)
-            else:
-                pass
+            self.add_parameter(name)
+            self.add_value(name, var)
 
         print("Parameters are ....")
-        print("LLX=", self.LLX, "\nLLY=", self.LLY)
-        print("IsPeriodicX=", self.IsPeriodicX, "\nIsPeriodicY=", self.IsPeriodicY)
-        print("Model=", self.Model)
-        if "Fermi" in self.Model or "Bose_Hubbard" in self.Model:
-            print("t=", self.t)
-            print("U=", self.U)
-            print("mu=", self.mu)
-            print("maxOccupation=", self.maxOccupation)
-        else:
-            print("Kx=", self.Kxx, "\nKy=", self.Kyy, "\nKz=", self.Kzz)
-            print("Hx=", self.Hx, "\nHy=", self.Hy, "\nHz=", self.Hz)
-        print("NStates2Keep:", self.Nstates)
-        print("option:", self.Option)
-        if self.Option is not None:
-            if "EE" in self.Option:
-                print("System index=", self.SysIndx)
+        for k, v in zip(self.parameters.keys(), self.parameters.values()):
+            print(k, "=", v)
         print("----------------- End of Parameters -----------------\n")
+
+
+
+
+
+
 
 # param = Parameter("../input.inp")
 # param.GetParameter("../input.inp")
-# print(param.Hx)
+

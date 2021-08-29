@@ -578,7 +578,7 @@ class Observ:
         st = 0.5 * (-1 + np.sqrt(1 + 4 * st2))
         return st
 
-    # ----------------------------- Magnetization measurement (Total Sz) ----------------------------------
+    # ----------------------------- Magnetization measurement (Total Si) ----------------------------------
     def TotalSz(self, evec, qm = "SpinHalf"):
         """
         Measure S_z = < \sum_i S_z^i > _
@@ -593,6 +593,33 @@ class Observ:
         sz = matele(evec, Sz, evec)
         return sz
 
+    def TotalSy(self, evec, qm = "SpinHalf"):
+        """
+        Measure S_y = < \sum_i S_z^i > _
+        """
+        Nsite = self.Lat.Nsite
+        hilbsize = Dofs(qm).hilbsize
+        Sy = sp.eye(hilbsize ** Nsite, dtype=complex) * 0
+
+        for i in range(0, Nsite):
+            Sy += self.LSyBuild(i, qm)
+
+        sy = matele(evec, Sy, evec)
+        return sy
+
+    def TotalSx(self, evec, qm = "SpinHalf"):
+        """
+        Measure S_z = < \sum_i S_z^i > _
+        """
+        Nsite = self.Lat.Nsite
+        hilbsize = Dofs(qm).hilbsize
+        Sx = sp.eye(hilbsize ** Nsite, dtype=complex) * 0
+
+        for i in range(0, Nsite):
+            Sx += self.LSxBuild(i, qm)
+
+        sx = matele(evec, Sx, evec)
+        return sx
     # ----------------------------- Transport measurement ----------------------------------
     # ----------------------------- Transport measurement ----------------------------------
     # ----------------------------- Transport measurement ----------------------------------
@@ -987,7 +1014,7 @@ class Observ:
         # for spin-1/2
         dimDof = 2
         # for Bose Hubbard
-        if self.Para.Model == "Bose_Hubbard":
+        if self.Para.parameters["Model"] == "Bose_Hubbard":
             dimDof = self.Lat.maxOccupation
 
         sysHilDim = pow(dimDof, sysindx.size)

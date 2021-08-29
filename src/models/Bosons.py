@@ -9,14 +9,14 @@ class Bosons(Hamiltonian):
     def __init__(self, Lat, Para):
         super().__init__(Lat, Para)
 
-        self.t = Para.t
-        self.U = Para.U
-        self.mu = Para.mu
-        self.maxOccupation = Para.maxOccupation
+        self.t = Para.parameters["t"]
+        self.U = Para.parameters["U"]
+        self.mu = Para.parameters["mu"]
+        self.maxOccupation = Para.parameters["maxOccupation"]
         self.tGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
         self.tPair_ = np.zeros(())
         self.tcoef_ = np.zeros(())
-        if Para.Model == "Bose_Hubbard":
+        if Para.parameters["Model"] == "Bose_Hubbard":
             self.Ham = self.BuildBoseHubbard()
         else:
             raise ValueError("Model not yet supported")

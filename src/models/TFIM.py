@@ -9,14 +9,14 @@ class TFIM(Hamiltonian):
     def __init__(self, Lat, Para):
         super().__init__(Lat, Para)
 
-        self.Hx = Para.Hx
+        self.Hx = Para.parameters["Bxx"]
         self.Kxx = 0
 
         self.Hy = 0
         self.Kyy = 0
 
         self.Hz = 0
-        self.Kzz = Para.Kzz
+        self.Kzz = Para.parameters["Kzz"]
 
         self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices

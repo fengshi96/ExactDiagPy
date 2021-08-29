@@ -9,12 +9,12 @@ class Fermions(Hamiltonian):
     def __init__(self, Lat, Para):
         super().__init__(Lat, Para)
 
-        self.t = Para.t
-        self.U = Para.U
-        self.mu = Para.mu
+        self.t = Para.parameters["t"]
+        self.U = Para.parameters["U"]
+        self.mu = Para.parameters["mu"]
 
 
-        if Para.Model == "Fermi_Hubbard":
+        if Para.parameters["Model"] == "Fermi_Hubbard":
             self.Ham = self.BuildFermiHubbard()
         else:
             raise ValueError("Model not yet supported")

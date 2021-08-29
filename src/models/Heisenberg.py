@@ -9,9 +9,9 @@ class Heisenberg(Hamiltonian):
     def __init__(self, Lat, Para):
         super().__init__(Lat, Para)
 
-        self.Hx = Para.Hx
-        self.Hy = Para.Hy
-        self.Hz = Para.Hz
+        self.Hx = Para.parameters["Bxx"]
+        self.Hy = Para.parameters["Byy"]
+        self.Hz = Para.parameters["Bzz"]
 
         self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
@@ -21,9 +21,9 @@ class Heisenberg(Hamiltonian):
         self.Kyycoef_ = np.zeros(())
         self.Kzzcoef_ = np.zeros(())
 
-        self.Kxx = Para.Kxx  # coupling strength of x-bond
-        self.Kyy = Para.Kyy
-        self.Kzz = Para.Kzz
+        self.Kxx = Para.parameters["Kxx"]  # coupling strength of x-bond
+        self.Kyy = Para.parameters["Kyy"]
+        self.Kzz = Para.parameters["Kzz"]
 
         self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
         self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
