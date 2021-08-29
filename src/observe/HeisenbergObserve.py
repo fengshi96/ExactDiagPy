@@ -42,7 +42,7 @@ class HeisenbergObserve(Observ):
                 ida = sp.eye(hilbsize ** indxS)
                 idm = sp.eye(hilbsize ** (indxL - indxS - 1))
                 idb = sp.eye(hilbsize ** (Lat.Nsite - indxL - 1))
-                Oscurr += 0.5 * complex(0, 1) * self.Para.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm),
+                Oscurr += 0.5 * complex(0, 1) * self.Para.parameters["Kxx"] * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm),
                                                                         idb)
                 Oscurr -= Oscurr.conjugate()
                 string = "0.5i*Kx*(sp[" + str(site) + "]*" + "sm[" + str(nn_[0]) + "]" \
@@ -58,7 +58,7 @@ class HeisenbergObserve(Observ):
                 ida = sp.eye(hilbsize ** indxS)
                 idm = sp.eye(hilbsize ** (indxL - indxS - 1))
                 idb = sp.eye(hilbsize ** (Lat.Nsite - indxL - 1))
-                Oscurr += 0.5 * complex(0, 1) * self.Para.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm),
+                Oscurr += 0.5 * complex(0, 1) * self.Para.parameters["Kyy"] * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm),
                                                                         idb)
                 Oscurr -= Oscurr.conjugate()
                 string = "0.5i*Ky*(sp[" + str(site) + "]*" + "sm[" + str(nn_[1]) + "]" \
@@ -74,7 +74,7 @@ class HeisenbergObserve(Observ):
                 ida = sp.eye(hilbsize ** indxS)
                 idm = sp.eye(hilbsize ** (indxL - indxS - 1))
                 idb = sp.eye(hilbsize ** (Lat.Nsite - indxL - 1))
-                Oscurr += 0.5 * complex(0, 1) * self.Para.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm),
+                Oscurr += 0.5 * complex(0, 1) * self.Para.parameters["Kzz"] * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm),
                                                                         idb)
                 Oscurr -= Oscurr.conjugate()
                 string = "0.5i*Kz*(sp[" + str(site) + "]*" + "sm[" + str(nn_[2]) + "]" \
@@ -129,9 +129,6 @@ class HeisenbergObserve(Observ):
             # print(stringtot)
             return scurrTotal, stringtot
 
-    # kinetic += 1 / (2 * self.Para.Nsites) * \
-    #            self.Para.Kxx * sp.kron(sp.kron(sp.kron(sp.kron(ida, Sp), idm), Sm), idb)
-    # kinetic += kinetic
 
     def kinetic(self, direction, site, qm="SpinHalf"):
         if qm not in ["SpinHalf", "SpinOne"]:
