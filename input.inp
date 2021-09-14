@@ -1,4 +1,4 @@
-LLX=2
+LLX=3
 LLY=3
 IsPeriodicX=1
 IsPeriodicY=1
@@ -21,9 +21,9 @@ Kxx=1.0
 Kyy=1.0
 Kzz=1.0
 
-Bxx=-0.0
-Byy=-0.0
-Bzz=-0.0
+Bxx=0.1
+Byy=0.1
+Bzz=0.1
 
 ### For Bose Hubbard and Fermions
 #t=1.0

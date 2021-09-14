@@ -25,6 +25,7 @@ class Lattice:
             self.Number1neigh = 3  # number of nearest neighbors
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
+            self.rMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
 
         elif self.Geometry == "Square":
@@ -36,6 +37,7 @@ class Lattice:
                 self.Number1neigh = 2
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
+            self.rMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
             self.BuildSquare()  # build attributes in square lattice
 
         elif self.Geometry == "Chain":
@@ -107,7 +109,6 @@ class Lattice:
         """
         Construct Honeycomb Lattice mesh and nearest neighbor matrix
         """
-
         print("[Lattice.py] building Honeycomb lattice...")
         scalex = 2
         scaley = 4.0 / m.sqrt(3)
@@ -206,6 +207,21 @@ class Lattice:
 
         matprint(self.nn_)
 
+        # ----------------------------rMap HoneyComb-----------------------------------
+        # ----------------------------rMap HoneyComb-----------------------------------
+        for i in range(self.Nsite):
+            yR, xR = divmod(i, 2 * self.LLX)
+
+            if i%2 == 0:
+                self.rMap[i, 0] = xR / 2
+                self.rMap[i, 1] = yR
+            else:
+                self.rMap[i, 0] = (1/3) + int(xR/2)
+                self.rMap[i, 1] = (1/3) + yR
+
+        print("\nMap: # -> (r1,r2)")
+        matprint(self.rMap)
+
     def BuildSquare(self):
         """
         Construct Square Lattice mesh and nearest neighbor matrix
@@ -303,6 +319,13 @@ class Lattice:
                     j = self.mesh_[jx, jy]
                     self.nn_[i, 3] = j
         matprint(self.nn_)
+
+        # ----------------------------rMap Square-----------------------------------
+        # ----------------------------rMap Square-----------------------------------
+        self.rMap[:, 0] = self.indx_.copy()
+        self.rMap[:, 1] = self.indy_.copy()
+        print("\nMap: # -> (r1,r2)")
+        matprint(self.rMap)
 
 # from src.Parameter import Parameter
 # param = Parameter("../input.inp")

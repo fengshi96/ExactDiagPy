@@ -64,7 +64,24 @@ def hd5Storage(Para, Lat, Hamil, Eigen):
     print(f"\nHDF5 time = {toc - tic:0.4f} sec")
 
 
+def readfArray(str, Complex = False):
+    file = open(str, 'r')
+    lines = file.readlines()
+    file.close()
 
+    # Determine shape:
+    row = len(lines)
+    testcol = lines[0].strip("\n").rstrip().split()
+    col = len(testcol)  # rstip to rm whitespace at the end
+
+    m = np.zeros((row, col))
+    for i in range(row):
+        line = lines[i].strip("\n").rstrip().split()
+        # print(line)
+        for j in range(col):
+            val = float(line[j])
+            m[i, j] = val
+    return m
 
 
 def matprint(A):
@@ -84,15 +101,40 @@ def vecprint(A):
     print("\n")
 
 
-def matprintos(A, filename):
-    file = open(filename, "w")
-    row = A.shape[0]
-    col = A.shape[1]
-    for i in range(row):
-        for j in range(col):
-            file.write(str(A[i, j]) + "\t")
-        file.write("\n")
-    file.close()
+def matprintos(A, filename, separation=0):
+    if separation == 0:
+        file = open(filename, "w")
+        row = A.shape[0]
+        col = A.shape[1]
+        for i in range(row):
+            for j in range(col):
+                file.write(str(A[i, j]) + "\t")
+            file.write("\n")
+        file.close()
+    else:
+        file = open(filename, "w")
+        row = A.shape[0]
+        col = A.shape[1]
+
+        segments = int(row / separation)
+        if segments > 0:
+            for c in range(segments):
+                for i in range(separation):
+                    for j in range(col):
+                        file.write(str(A[i, j]) + "\t")
+                    file.write("\n")
+                file.write("\n")
+            file.close()
+        else:
+            file = open(filename, "w")
+            row = A.shape[0]
+            col = A.shape[1]
+            for i in range(row):
+                for j in range(col):
+                    file.write(str(A[i, j]) + "\t")
+                file.write("\n")
+            file.close()
+
 
 
 def sort(evals, evecs):
