@@ -121,7 +121,7 @@ def matprintos(A, filename, separation=0):
             for c in range(segments):
                 for i in range(separation):
                     for j in range(col):
-                        file.write(str(A[i, j]) + "\t")
+                        file.write(str(A[c*separation+i, j]) + "\t")
                     file.write("\n")
                 file.write("\n")
             file.close()

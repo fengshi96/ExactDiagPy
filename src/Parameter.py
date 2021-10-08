@@ -45,6 +45,4 @@ class Parameter:
 
 
 
-# param = Parameter("../input.inp")
-# param.GetParameter("../input.inp")
 
