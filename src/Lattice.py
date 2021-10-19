@@ -25,7 +25,7 @@ class Lattice:
             self.Number1neigh = 3  # number of nearest neighbors
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
             self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
-            self.rMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
+            self.cMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
             self.BuildHoneycomb()  # build attributes in honeycomb lattice
 
         elif self.Geometry == "Square":
@@ -37,7 +37,7 @@ class Lattice:
                 self.Number1neigh = 2
             self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
             self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
-            self.rMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
+            self.cMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
             self.BuildSquare()  # build attributes in square lattice
 
         elif self.Geometry == "Chain":
@@ -207,20 +207,20 @@ class Lattice:
 
         matprint(self.nn_)
 
-        # ----------------------------rMap HoneyComb-----------------------------------
-        # ----------------------------rMap HoneyComb-----------------------------------
+        # ----------------------------cMap HoneyComb-----------------------------------
+        # ----------------------------cMap HoneyComb-----------------------------------
         for i in range(self.Nsite):
             yR, xR = divmod(i, 2 * self.LLX)
 
-            if i%2 == 0:
-                self.rMap[i, 0] = xR / 2
-                self.rMap[i, 1] = yR
+            if i % 2 == 0:
+                self.cMap[i, 0] = xR / 2
+                self.cMap[i, 1] = yR
             else:
-                self.rMap[i, 0] = (1/3) + int(xR/2)
-                self.rMap[i, 1] = (1/3) + yR
+                self.cMap[i, 0] = (1 / 3) + int(xR / 2)
+                self.cMap[i, 1] = (1 / 3) + yR
 
         print("\nMap: # -> (r1,r2)")
-        matprint(self.rMap)
+        matprint(self.cMap)
 
     def BuildSquare(self):
         """
@@ -320,14 +320,13 @@ class Lattice:
                     self.nn_[i, 3] = j
         matprint(self.nn_)
 
-        # ----------------------------rMap Square-----------------------------------
-        # ----------------------------rMap Square-----------------------------------
-        self.rMap[:, 0] = self.indx_.copy()
-        self.rMap[:, 1] = self.indy_.copy()
+        # ----------------------------cMap Square-----------------------------------
+        # ----------------------------cMap Square-----------------------------------
+        self.cMap[:, 0] = self.indx_.copy()
+        self.cMap[:, 1] = self.indy_.copy()
         print("\nMap: # -> (r1,r2)")
-        matprint(self.rMap)
+        matprint(self.cMap)
 
 # from src.Parameter import Parameter
 # param = Parameter("../input.inp")
 # lat = Lattice(param)
-

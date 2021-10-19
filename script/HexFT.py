@@ -23,19 +23,19 @@ def main(total, cmdargs):
     Para = Parameter("../input.inp")
     Lat = Lattice(Para)
 
-    rMap = Lat.rMap
-    rMapNew = rMap.copy()
+    cMap = Lat.cMap
+    cMapNew = cMap.copy()
 
     centerOffset = 11  # 0 -> centerOffset
-    rc1, rc2 = rMap[centerOffset, :]
+    rc1, rc2 = cMap[centerOffset, :]
 
-    rMapNew[:, 0] -= rc1
-    rMapNew[:, 1] -= rc2
+    cMapNew[:, 0] -= rc1
+    cMapNew[:, 1] -= rc2
 
     print("\noffcentered rMap:")
-    matprint(rMapNew)
+    matprint(cMapNew)
 
-    print(data.shape, rMapNew.shape)
+    print(data.shape, cMapNew.shape)
 
     # Begin FT
     n = 64  # 32 * 2
@@ -47,8 +47,8 @@ def main(total, cmdargs):
     for i, k1 in enumerate(K1):
         for j, k2 in enumerate(K2):
             for si in range(Lat.Nsite):
-                r1 = rMapNew[si, 0]
-                r2 = rMapNew[si, 1]
+                r1 = cMapNew[si, 0]
+                r2 = cMapNew[si, 1]
                 S[i, j] += math.e ** (2 * math.pi * complex(0, 1) * (r1 * k1 + r2 * k2)) * data[si]
             outputdata.append([k1, k2, S[i, j]])
     # matprint(S)
