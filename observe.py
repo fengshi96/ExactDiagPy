@@ -17,7 +17,7 @@ def observe(total, cmdargs):
         raise ValueError('Missing arguments')
     inputname = cmdargs[1]
     observname = cmdargs[2]
-    # Needed for loacl measurement
+    # Needed for loacl information input
     if total > 3:
         localSite = int(cmdargs[3])
     outputname = "dataObserve.hdf5"
@@ -66,7 +66,41 @@ def observe(total, cmdargs):
         print("Local_Sy = ", local_Sy)
         print("Local_Sz = ", local_Sz)
 
-    #====================================================================
+    # ------- Calculate static correlations (for gs) & write to ASCII---------
+    elif observname == "Cz":
+        """
+        3 input in termial: input name, observe name, and site of reference 
+        """
+        print("Calculating Static Sz-Sz...")
+        tic = time.perf_counter()
+        Czc = ob.Czc(localSite, evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+        file = open("Czc.dat", 'w')
+        for c in Czc:
+            file.write(str(c) + "\n")
+        file.close()
+    elif observname == "Cx":
+        print("Calculating Static Sx-Sx...")
+        tic = time.perf_counter()
+        Cxc = ob.Cxc(localSite, evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+        file = open("Cxc.dat", 'w')
+        for c in Cxc:
+            file.write(str(c) + "\n")
+        file.close()
+    elif observname == "Cy":
+        print("Calculating Static Sy-Sy...")
+        tic = time.perf_counter()
+        Cyc = ob.Cyc(localSite, evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+        file = open("Cyc.dat", 'w')
+        for c in Cyc:
+            file.write(str(c) + "\n")
+        file.close()
+
     # ------- Calculate spin response S(\omega) & write to HDF5---------
     elif observname == "spin_response":
         print("Calculating S(omega)...")

@@ -1027,6 +1027,39 @@ class Observ:
         evals_sorted, evecs_sorted = sort(evals, evecs)
         return evals_sorted, evecs_sorted
 
+    def Czc(self, siteOfReference, gs):
+        """
+        :param siteOfReference: site of reference in <S_ref S_c>
+        :param gs: 1D array, ground state
+        :return: Real space static structure factor as 1D array, C(r) = <S_ref S_c>
+        """
+        Cc = np.zeros(self.Lat.Nsite, dtype=float)  # correlation wrt lattice coordinate
+        S_ref = self.LSzBuild(siteOfReference)
+        for c in range(self.Lat.Nsite):
+            S_c = self.LSzBuild(c)
+            Cc[c] = matele(gs, S_ref * S_c, gs)
+
+        return Cc
+
+    def Cyc(self, siteOfReference, gs):
+        Cc = np.zeros(self.Lat.Nsite, dtype=float)  # correlation wrt lattice coordinate
+        S_ref = self.LSyBuild(siteOfReference)
+        for c in range(self.Lat.Nsite):
+            S_c = self.LSyBuild(c)
+            Cc[c] = matele(gs, S_ref * S_c, gs)
+
+        return Cc
+
+    def Cxc(self, siteOfReference, gs):
+        Cc = np.zeros(self.Lat.Nsite, dtype=float)  # correlation wrt lattice coordinate
+        S_ref = self.LSxBuild(siteOfReference)
+        for c in range(self.Lat.Nsite):
+            S_c = self.LSxBuild(c)
+            Cc[c] = matele(gs, S_ref * S_c, gs)
+
+        return Cc
+
+
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)
 # ob = Observ(Lat)
