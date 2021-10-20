@@ -1059,6 +1059,37 @@ class Observ:
 
         return Cc
 
+    def twoSpin(self, Sites, Components, gs):
+        """
+        Calculate expectation of two-point spin expectation
+        :param Sites: 1D list with 2 elements, site indices
+        :param Components: 1D list with 2 elements, spin components for each site
+        :param gs: ground state wavefunction
+        :return: Float: <Sia Sjb>
+        """
+        if len(Sites) > 2 or len(Components) > 2:
+            raise ValueError("Sites and Components should be 1D list with 2 elements")
+
+        hilbsize = Dofs("SpinHalf").hilbsize
+        S = sp.eye(hilbsize ** self.Lat.Nsite, dtype=complex)
+
+        for s, site in enumerate(Sites):
+            if Components[s] == "x":
+                print("site, component =", site, Components[s])
+                S *= self.LSxBuild(site)
+            elif Components[s] == "y":
+                print("site, component =", site, Components[s])
+                S *= self.LSyBuild(site)
+            elif Components[s] == "z":
+                print("site, component =", site, Components[s])
+                S *= self.LSzBuild(site)
+            else:
+                raise ValueError("invalid name for spin components:", Components[s])
+
+        SS = matele(gs, S, gs)
+        return SS
+
+
     def fourSpin(self, site, gs):
         """
         Test calculation for 4-point correlatrion
