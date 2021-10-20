@@ -1059,6 +1059,49 @@ class Observ:
 
         return Cc
 
+    def fourSpin(self, site, gs):
+        """
+        Test calculation for 4-point correlatrion
+        :param site: site of reference
+        :param gs: groud state
+        :return: expectation <S0z S1x S2y S3z>
+        """
+        nn_ = self.Lat.nn_[site, :]
+        S0 = self.LSzBuild(site)
+        S1 = self.LSxBuild(nn_[0])
+        S2 = self.LSyBuild(nn_[1])
+        S3 = self.LSzBuild(nn_[2])
+
+        S = S0 * S1 * S2 * S3
+        C4 = matele(gs, S, gs)
+        return C4
+
+    def flux(self, Sites, Components, gs):
+        """
+        Calculate expectation of a single flux in Kitaev model
+        :param sites: 1D list, indices of spins on the plaquette
+        :param gs: groud state
+        :param Components: 1D list specifying the spin component for each index
+        :return: expectation <Wp>
+        Example: Sites = [1,2,3,4,5,6]; Components = ["z","y","x","z","y","x"]
+        """
+        hilbsize = Dofs("SpinHalf").hilbsize
+        S = sp.eye(hilbsize ** self.Lat.Nsite, dtype=complex)
+
+        for s, site in enumerate(Sites):
+            print("site, component =", site, Components[s])
+            if Components[s] == "x":
+                S *= self.LSxBuild(site)
+            elif Components[s] == "y":
+                S *= self.LSyBuild(site)
+            elif Components[s] == "z":
+                S *= self.LSzBuild(site)
+            else:
+                raise ValueError("invalid name for spin components:", Components[s])
+
+        Wp = matele(gs, S, gs)
+        return Wp
+
 
 # para = Parameter("../input.inp")
 # Lat = Lattice(para)

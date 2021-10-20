@@ -101,6 +101,21 @@ def observe(total, cmdargs):
             file.write(str(c) + "\n")
         file.close()
 
+    # ------- Calculate 4-spin correlations (for gs) & write to ASCII---------
+    elif observname == "fourSpin":
+        """
+        3 input in termial: input name, observe name, and site of reference 
+        """
+        print("Calculating test 4-spin correlator...")
+        tic = time.perf_counter()
+        C4 = ob.fourSpin(localSite, evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+        file = open("C4.dat", 'w')
+        file.write(str(np.real(C4)))
+        file.close()
+        print("C4 =", np.real(C4))
+
     # ------- Calculate spin response S(\omega) & write to HDF5---------
     elif observname == "spin_response":
         print("Calculating S(omega)...")
