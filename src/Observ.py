@@ -1089,13 +1089,15 @@ class Observ:
         S = sp.eye(hilbsize ** self.Lat.Nsite, dtype=complex)
 
         for s, site in enumerate(Sites):
-            print("site, component =", site, Components[s])
             if Components[s] == "x":
-                S *= self.LSxBuild(site)
+                print("site, component =", site, Components[s])
+                S *= self.LSxBuild(site) * 2  # *2 to recover pauli matrix from spin-1/2
             elif Components[s] == "y":
-                S *= self.LSyBuild(site)
+                print("site, component =", site, Components[s])
+                S *= self.LSyBuild(site) * 2
             elif Components[s] == "z":
-                S *= self.LSzBuild(site)
+                print("site, component =", site, Components[s])
+                S *= self.LSzBuild(site) * 2
             else:
                 raise ValueError("invalid name for spin components:", Components[s])
 
