@@ -157,7 +157,7 @@ def observe(total, cmdargs):
         # wfile.close()
 
     # ------- Calculate TotalS & write to ascii---------
-    elif observname == "TotalS":
+    elif observname == "totalS":
         print("Calculating magnitization...")
         tic = time.perf_counter()
         St = ob.TotalS(evecs[:, 0])
