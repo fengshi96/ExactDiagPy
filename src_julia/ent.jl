@@ -75,7 +75,7 @@ function basisPartition(wf, sysIndx, nSites)
 end
 
 # Parameters
-sysIndx = Int8[0,1,2,3,4,5,6,7,8] .+1
+sysIndx = Int8[0] .+1
 Nsite = 18
 
 # read data

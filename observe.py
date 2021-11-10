@@ -166,8 +166,8 @@ def observe(total, cmdargs):
         print("Magnitization=", St)
 
     # ------- Calculate magnetization (Total Sz) & write to ascii---------
-    elif observname == "totalSi":
-        print("Calculating totalSi...")
+    elif observname == "totalSz":
+        print("Calculating totalSz...")
         tic = time.perf_counter()
         Magx = ob.TotalSx(evecs[:, 0])
         Magy = ob.TotalSy(evecs[:, 0])

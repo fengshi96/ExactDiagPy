@@ -2,6 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from src.Dofs import Dofs
 from src.Hamiltonian import Hamiltonian, PairConstructor, TwoSpinOps
+from src.Observ import Observ
 from src.Helper import matprint
 
 
@@ -12,6 +13,10 @@ class Kitaev(Hamiltonian):
         self.Hx = Para.parameters["Bxx"]
         self.Hy = Para.parameters["Byy"]
         self.Hz = Para.parameters["Bzz"]
+        try:
+            self.muFlux = Para.parameters["muFlux"]
+        except KeyError:
+            self.muFlux = None
 
         self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
@@ -26,10 +31,43 @@ class Kitaev(Hamiltonian):
         self.Kzz = Para.parameters["Kzz"]
 
         self.Nsite = Lat.LLX * Lat.LLY * 2
+        self.Ob = Observ(Lat, Para)
         self.Ham = self.BuildKitaev()
 
-    def BuildKitaev(self):
+    def BuildFlux(self, IndexArray, SigmaArray):
+        """
+        Construct Flux operators in the full Hilbert space
+        :param IndexArray: 2D Array, each row is a 6-element 1D array that represents 6 vertices in a plaquette
+               SigmaArray: 2D Array, each row is a 6-element 1D array that represent 6 pauli matrices
+        :return: 1D list that contains Flux operators as sparse matrix
+        """
+        numFlux = len(IndexArray)
+        hilbsize = Dofs("SpinHalf").hilbsize
 
+        FluxOperators = []
+        for i in range(numFlux):
+            S = sp.eye(hilbsize ** self.Nsite, dtype=complex)
+            for s, site in enumerate(IndexArray[i, :]):
+                if SigmaArray[i, s] == "x":
+                    # print("site, component =", site, SigmaArray[i, s])
+                    S *= self.Ob.LSxBuild(site, "SpinHalf") * 2  # *2 to recover pauli matrix from spin-1/2
+                elif SigmaArray[i, s] == "y":
+                    # print("site, component =", site, SigmaArray[i, s])
+                    S *= self.Ob.LSyBuild(site, "SpinHalf") * 2
+                elif SigmaArray[i, s] == "z":
+                    # print("site, component =", site, SigmaArray[i, s])
+                    S *= self.Ob.LSzBuild(site, "SpinHalf") * 2
+                else:
+                    raise ValueError("invalid name for spin components:", SigmaArray[i, s])
+            FluxOperators.append(S)
+        return FluxOperators
+
+
+    def BuildKitaev(self):
+        """
+        Build Kitaev Hamiltonian
+        :return: Kitaev Hamiltonian as sparse matrix
+        """
         for i in range(0, self.Nsite):
             # Kxx_Conn
             j = self.Lat.nn_[i, 0]
@@ -78,5 +116,36 @@ class Kitaev(Hamiltonian):
             Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
             Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
             Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+
+        # --------------------------- Add Flux bias (for 18 with PBC only at this stage) -------------------------
+
+        if self.muFlux is not None and self.Nsite == 18:
+            print("Adding Flux bias")
+            IndexArray = np.array(([
+                [1, 2, 3, 8, 7, 6],
+                [3, 4, 5, 10, 9, 8],
+                [7, 8, 9, 14, 13, 12],
+                [9, 10, 11, 16, 15, 14],
+                [13, 14, 15, 2, 1, 0],
+                [15, 16, 17, 4, 3, 2],
+                [17, 12, 13, 0, 5, 4],
+                [5, 0, 1, 6, 11, 10],
+                [11, 6, 7, 12, 17, 16]
+            ]), dtype=int)
+            SigmaArray = np.array(([
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"]
+            ]))
+
+            fluxOperators = self.BuildFlux(IndexArray, SigmaArray)
+            for i in range(len(IndexArray)):
+                Ham += self.muFlux * fluxOperators[i]
 
         return Ham
