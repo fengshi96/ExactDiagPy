@@ -18,6 +18,11 @@ class Kitaev(Hamiltonian):
         except KeyError:
             self.muFlux = None
 
+        try:
+            self.pinning = Para.parameters["Pinning"]
+        except KeyError:
+            self.pinning = None
+
         self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
         self.KzzPair_ = np.zeros(())
@@ -116,6 +121,14 @@ class Kitaev(Hamiltonian):
             Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
             Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
             Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+
+        # --------------------------- Add pinning field (to site 0) -------------------------
+        if self.pinning is not None:
+            site = 0
+            ida = sp.eye(2 ** site)
+            idb = sp.eye(2 ** (self.Nsite - site - 1))
+            Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.pinning
+
 
         # --------------------------- Add Flux bias (for 18 with PBC only at this stage) -------------------------
 
