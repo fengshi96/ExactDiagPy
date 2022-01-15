@@ -7,7 +7,7 @@ class Parameter:
         if path is not None:
             self.GetParameter(path)
 
-    def add_parameter(self, name, value):
+    def add_parameter(self, name, value=None):
         self.parameters[name] = value
 
     def add_value(self, name, strVal):
