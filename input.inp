@@ -1,5 +1,5 @@
-LLX=3
-LLY=3
+LLX=40
+LLY=40
 IsPeriodicX=1
 IsPeriodicY=1
 #Option=EE
@@ -19,13 +19,13 @@ Model=Kitaev
 # For spin models
 Kxx=1.0
 Kyy=1.0
-Kzz=4.0
+Kzz=8.0
 
-Bxx=0.2
-Byy=0.2
-Bzz=0.2
+Bxx=0.0
+Byy=0.0
+Bzz=0.0
 
-Pinning=0.0001
+#Pinning=0.0001
 
 #muFlux=-10.0
 

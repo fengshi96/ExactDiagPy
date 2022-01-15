@@ -59,6 +59,9 @@ class Hamiltonian:
                 self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
                 self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 
+        elif Para.parameters["Dof"] == "Noninteracting":
+            pass
+
         else:
             raise ValueError("Dof type not supported")
 
