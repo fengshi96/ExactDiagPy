@@ -2,7 +2,7 @@ import re
 
 
 class Parameter:
-    def __init__(self, path):
+    def __init__(self, path=None):
         self.parameters = {}
         if path is not None:
             self.GetParameter(path)
