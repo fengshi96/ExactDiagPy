@@ -61,4 +61,4 @@ if __name__ == '__main__':
     Lat = Lattice(Para)  # Build lattice
     Hamil = KitaevQuadratic(Lat, Para).HamMatrix
     evals, evecs = eigh(Hamil)
-    print(evals[int(len(evals)/2)-5:int(len(evals)/2)+5])
+    print(evals[int(len(evals)/2)-1:int(len(evals)/2)+1])

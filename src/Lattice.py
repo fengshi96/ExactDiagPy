@@ -219,8 +219,8 @@ class Lattice:
                 self.cMap[i, 0] = (1 / 3) + int(xR / 2)
                 self.cMap[i, 1] = (1 / 3) + yR
 
-        # print("\nMap: # -> (r1,r2)")
-        # matprint(self.cMap)
+        print("\nMap: # -> (r1,r2)")
+        matprint(self.cMap)
 
     def BuildSquare(self):
         """
