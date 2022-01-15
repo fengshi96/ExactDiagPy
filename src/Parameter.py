@@ -4,7 +4,8 @@ import re
 class Parameter:
     def __init__(self, path):
         self.parameters = {}
-        self.GetParameter(path)
+        if path is not None:
+            self.GetParameter(path)
 
     def add_parameter(self, name):
         self.parameters[name] = None
@@ -17,7 +18,6 @@ class Parameter:
         else:
             val = strVal
         self.parameters[name] = val
-
 
     def GetParameter(self, path):
         file = open(path, 'r')
@@ -38,11 +38,3 @@ class Parameter:
         for k, v in zip(self.parameters.keys(), self.parameters.values()):
             print(k, "=", v)
         print("----------------- End of Parameters -----------------\n")
-
-
-
-
-
-
-
-
