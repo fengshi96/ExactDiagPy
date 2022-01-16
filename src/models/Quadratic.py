@@ -4,9 +4,11 @@ from src.Helper import matprint
 
 
 class KitaevQuadratic(Hamiltonian):
-    def __init__(self, Lat, Para):
+    def __init__(self, Lat, Para, FlipZ=None):
         super().__init__(Lat, Para)
 
+        if FlipZ is None:
+            FlipZ = []
         self.Kxx = Para.parameters["Kxx"]  # coupling strength of x-bond
         self.Kyy = Para.parameters["Kyy"]
         self.Kzz = Para.parameters["Kzz"]
@@ -16,6 +18,7 @@ class KitaevQuadratic(Hamiltonian):
         self.KzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 
         self.Nsite = Lat.LLX * Lat.LLY * 2
+        self.FlipZ = FlipZ
         self.HamMatrix = self.Build()
 
     def Build(self):
@@ -42,15 +45,19 @@ class KitaevQuadratic(Hamiltonian):
             if i < j and j >= 0:
                 self.KzzGraph_[i, j] = self.Kzz
                 self.KzzGraph_[j, i] = self.Kzz
+                if i in self.FlipZ:
+                    self.KzzGraph_[i, j] *= -1
+                    self.KzzGraph_[j, i] *= -1
 
+        matprint(self.KzzGraph_)
         Ham_TB = self.KzzGraph_ + self.KxxGraph_ + self.KyyGraph_
 
         # Next-nearest neighbor
 
-
         # print("\nHam_TB:")
         # matprint(Ham_TB)
         return Ham_TB
+
 
 if __name__ == '__main__':
     from src.Parameter import Parameter
@@ -59,6 +66,8 @@ if __name__ == '__main__':
 
     Para = Parameter("../../input.inp")  # import parameters from input.inp
     Lat = Lattice(Para)  # Build lattice
-    Hamil = KitaevQuadratic(Lat, Para).HamMatrix
+
+    FlipZ = [1]
+    Hamil = KitaevQuadratic(Lat, Para, FlipZ).HamMatrix
     evals, evecs = eigh(Hamil)
-    print(evals[int(len(evals)/2)-1:int(len(evals)/2)+1])
+    print(evals[int(len(evals) / 2) - 1:int(len(evals) / 2) + 1])
