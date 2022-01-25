@@ -23,6 +23,11 @@ class Kitaev(Hamiltonian):
         except KeyError:
             self.pinning = None
 
+        try:
+            self.option = Para.parameters["Option"]
+        except KeyError:
+            self.option = None
+
         self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
         self.KzzPair_ = np.zeros(())
@@ -116,11 +121,23 @@ class Kitaev(Hamiltonian):
         # --------------------------- Add external field -------------------------
 
         for i in range(0, self.Nsite):
-            ida = sp.eye(2 ** i)
-            idb = sp.eye(2 ** (self.Nsite - i - 1))
-            Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
-            Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
-            Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+            if self.option is None:
+                ida = sp.eye(2 ** i)
+                idb = sp.eye(2 ** (self.Nsite - i - 1))
+                Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
+                Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
+                Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+            elif self.option == "zigzagField":
+                ida = sp.eye(2 ** i)
+                idb = sp.eye(2 ** (self.Nsite - i - 1))
+                if i%2 == 0:
+                    Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
+                    Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
+                    Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+                elif i%2 != 0:
+                    Ham -= sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
+                    Ham -= sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
+                    Ham -= sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
 
         # --------------------------- Add pinning field (to site 0) -------------------------
         if self.pinning is not None:
