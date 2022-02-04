@@ -158,7 +158,7 @@ def observe(total, cmdargs):
 
     # ------- Calculate TotalS & write to ascii---------
     elif observname == "totalS":
-        print("Calculating magnitization...")
+        print("Calculating totalS...")
         tic = time.perf_counter()
         St = ob.TotalS(evecs[:, 0])
         toc = time.perf_counter()
@@ -166,8 +166,8 @@ def observe(total, cmdargs):
         print("Magnitization=", St)
 
     # ------- Calculate magnetization (Total Sz) & write to ascii---------
-    elif observname == "totalSz":
-        print("Calculating totalSz...")
+    elif observname == "magnetization":
+        print("Calculating magnetization...")
         tic = time.perf_counter()
         Magx = ob.TotalSx(evecs[:, 0])
         Magy = ob.TotalSy(evecs[:, 0])
@@ -177,6 +177,7 @@ def observe(total, cmdargs):
         print(f"totalSx = {Magx.real:.6f}")
         print(f"totalSy = {Magy.real:.6f}")
         print(f"totalSz = {Magz.real:.6f}")
+        print(f"totalSe3 = {Magx.real + Magy.real + Magz.real:.6f}")
 
     # ------- Calculate Single-Magnon DOS & write to HDF5---------
     elif observname == "singlemagnon":
