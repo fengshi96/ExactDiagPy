@@ -84,6 +84,32 @@ def readfArray(str, Complex = False):
     return m
 
 
+def printfArray(A, filename, transpose=False):
+    file = open(filename, "w")
+    try:
+        col = A.shape[1]
+    except IndexError:
+        A = A.reshape(-1, 1)
+
+    row = A.shape[0]
+    col = A.shape[1]
+
+    if transpose == False:
+        for i in range(row):
+            for j in range(col - 1):
+                file.write(str(A[i, j]) + " ")
+            file.write(str(A[i, col - 1]))  # to avoid whitespace at the end of line
+            file.write("\n")
+    elif transpose == True:
+        for i in range(col):
+            for j in range(row - 1):
+                file.write(str(A[j, i]) + " ")
+            file.write(str(A[row - 1, i]))
+            file.write("\n")
+    else:
+        raise ValueError("3rd input must be Bool")
+    file.close()
+
 def matprint(A):
     row = A.shape[0]
     col = A.shape[1]

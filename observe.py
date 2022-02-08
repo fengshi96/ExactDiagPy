@@ -6,6 +6,7 @@ from src.Dofs import Dofs
 from src.Parameter import Parameter
 from src.Observ import Observ
 from src.Lattice import Lattice
+from src.Helper import printfArray
 
 pi = np.pi
 
@@ -48,23 +49,21 @@ def observe(total, cmdargs):
     rfile.close()
 
     # ------- Calculate local Sx Sy Sz (for gs) & write to ASCII---------
-    if observname == "local_spin":
-        if localSite is None:
-            raise ValueError("localSite = None!")
-        if localSite >= Lat.Nsite:
-            raise ValueError("site index exceeds lattice boundary")
-
-        print("Calculating local_Sx...")
+    if observname == "local_spins":
+        localSpins = np.zeros((Lat.Nsite, 4))
+        print("Calculating local_Spins...")
         tic = time.perf_counter()
-        local_Sx = round(ob.mLocalSx(evecs[:, 0], localSite), 9)
-        local_Sy = round(ob.mLocalSy(evecs[:, 0], localSite), 9)
-        local_Sz = round(ob.mLocalSz(evecs[:, 0], localSite), 9)
+        for localSite in range(Lat.Nsite):
+            local_Sx = round(ob.mLocalSx(evecs[:, 0], localSite), 9)
+            local_Sy = round(ob.mLocalSy(evecs[:, 0], localSite), 9)
+            local_Sz = round(ob.mLocalSz(evecs[:, 0], localSite), 9)
+            localSpins[localSite, 0] = int(localSite)
+            localSpins[localSite, 1] = local_Sx
+            localSpins[localSite, 2] = local_Sy
+            localSpins[localSite, 3] = local_Sz
         toc = time.perf_counter()
+        printfArray(localSpins, "localSpins.dat")
         print(f"time = {toc-tic:0.4f} sec")
-
-        print("Local_Sx = ", local_Sx)
-        print("Local_Sy = ", local_Sy)
-        print("Local_Sz = ", local_Sz)
 
     # ------- Calculate static correlations (for gs) & write to ASCII---------
     elif observname == "Cz":
