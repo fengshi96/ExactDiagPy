@@ -1107,7 +1107,7 @@ class Observ:
         C4 = matele(gs, S, gs)
         return C4
 
-    def flux(self, Sites, Components, gs):
+    def multiSpin(self, Sites, Components, gs):
         """
         Calculate expectation of a single flux in Kitaev model
         :param sites: 1D list, indices of spins on the plaquette
