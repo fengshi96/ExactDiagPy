@@ -1131,7 +1131,7 @@ class Observ:
                 S *= self.LSzBuild(site) * 2
             else:
                 raise ValueError("invalid name for spin components:", Components[s])
-
+        print()
         Wp = matele(gs, S, gs)
         return Wp
 
