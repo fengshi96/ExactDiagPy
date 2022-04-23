@@ -25,7 +25,7 @@ Kzz=1.0
 Bxx=0.0
 Byy=0.0
 Bzz=0.0
-threeSpin=0
+threeSpin=0.0
 
 #Pinning=0.0001
 

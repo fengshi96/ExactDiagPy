@@ -15,7 +15,7 @@ Kzz = 1.0
 Bxx = 0.0
 Byy = 0.0
 Bzz = 0.0
-threeSpin = 0
+threeSpin = 0.0
 ----------------- End of Parameters -----------------
 
 [Lattice.py] building Honeycomb lattice...
@@ -240,15 +240,15 @@ KzzGraph_:
 0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
 
 [Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
-Hamiltonian construction time = 4.5302 sec
+Hamiltonian construction time = 4.7034 sec
 
 -----------Beg of Eigen Values-----------
 
 -3.5728756555
 
 -----------End of Eigen Values-----------
-Diagonalization time = 5.3826 sec 
+Diagonalization time = 6.0676 sec 
 
 
 
-HDF5 time = 0.0069 sec
+HDF5 time = 0.0130 sec
