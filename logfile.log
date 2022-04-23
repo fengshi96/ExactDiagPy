@@ -3,8 +3,8 @@ LLX = 3
 LLY = 3
 IsPeriodicX = 1
 IsPeriodicY = 1
-Option = zigzagField
-Nstates = 2
+Option = threeSpin
+Nstates = 1
 tolerance = 1e-08
 Dof = SpinHalf
 Geometry = Honeycomb
@@ -12,9 +12,10 @@ Model = Kitaev
 Kxx = 1.0
 Kyy = 1.0
 Kzz = 1.0
-Bxx = 0.1
-Byy = 0.1
-Bzz = 0.1
+Bxx = 0.0
+Byy = 0.0
+Bzz = 0.0
+threeSpin = 0
 ----------------- End of Parameters -----------------
 
 [Lattice.py] building Honeycomb lattice...
@@ -239,34 +240,15 @@ KzzGraph_:
 0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
 
 [Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-even !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-odd !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-Hamiltonian construction time = 3.8474 sec
+Hamiltonian construction time = 4.5302 sec
 
 -----------Beg of Eigen Values-----------
 
--4.5500497099
--4.4310712048
+-3.5728756555
 
 -----------End of Eigen Values-----------
-Diagonalization time = 7.8880 sec 
+Diagonalization time = 5.3826 sec 
 
 
 
-HDF5 time = 0.0198 sec
+HDF5 time = 0.0069 sec

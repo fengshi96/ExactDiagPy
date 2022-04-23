@@ -28,6 +28,9 @@ class Kitaev(Hamiltonian):
         except KeyError:
             self.option = None
 
+        if "threeSpin" in self.option:
+            self.threeSpin = Para.parameters["threeSpin"]
+
         self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
         self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
         self.KzzPair_ = np.zeros(())
@@ -139,16 +142,27 @@ class Kitaev(Hamiltonian):
                     Ham -= sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
                     Ham -= sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
 
+        # --------------------------- Add the threeSpin term -------------------------
+
+        if "threeSpin" in self.option:
+            for i in range(0, self.Nsite):
+                sxi = self.Ob.LSxBuild(i)
+                syi = self.Ob.LSyBuild(i)
+                szi = self.Ob.LSzBuild(i)
+
+                Ham += sxi * self.Ob.LSyBuild(self.Lat.nn_[i, 0]) * self.Ob.LSzBuild(self.Lat.nn_[i, 1]) * self.threeSpin
+                Ham += syi * self.Ob.LSzBuild(self.Lat.nn_[i, 1]) * self.Ob.LSxBuild(self.Lat.nn_[i, 2]) * self.threeSpin
+                Ham += szi * self.Ob.LSxBuild(self.Lat.nn_[i, 2]) * self.Ob.LSyBuild(self.Lat.nn_[i, 0]) * self.threeSpin
+
         # --------------------------- Add pinning field (to site 0) -------------------------
+
         if self.pinning is not None:
             site = 0
             ida = sp.eye(2 ** site)
             idb = sp.eye(2 ** (self.Nsite - site - 1))
             Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.pinning
 
-
-        # --------------------------- Add Flux bias (for 18 with PBC only at this stage) -------------------------
-
+        # ------------------ Add Flux bias (for 18 with PBC only at this stage) -------------
         if self.muFlux is not None and self.Nsite == 18:
             print("Adding Flux bias")
             IndexArray = np.array(([
