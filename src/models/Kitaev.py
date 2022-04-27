@@ -26,7 +26,7 @@ class Kitaev(Hamiltonian):
         try:
             self.option = Para.parameters["Option"]
         except KeyError:
-            self.option = None
+            self.option = [None]
 
         if "threeSpin" in self.option:
             self.threeSpin = Para.parameters["threeSpin"]
@@ -143,23 +143,22 @@ class Kitaev(Hamiltonian):
                     Ham -= sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
 
         # --------------------------- Add the threeSpin term -------------------------
-        if self.option is not None:
-            if "threeSpin" in self.option:
-                for i in range(0, self.Nsite):
-                    sxi = self.Ob.LSxBuild(i)
-                    syi = self.Ob.LSyBuild(i)
-                    szi = self.Ob.LSzBuild(i)
+        if "threeSpin" in self.option:
+            for i in range(0, self.Nsite):
+                sxi = self.Ob.LSxBuild(i)
+                syi = self.Ob.LSyBuild(i)
+                szi = self.Ob.LSzBuild(i)
 
-                    Ham += sxi * self.Ob.LSyBuild(self.Lat.nn_[i, 1]) * self.Ob.LSzBuild(
-                        self.Lat.nn_[i, 2]) * self.threeSpin
-                    Ham += syi * self.Ob.LSxBuild(self.Lat.nn_[i, 0]) * self.Ob.LSzBuild(
-                        self.Lat.nn_[i, 2]) * self.threeSpin
-                    Ham += szi * self.Ob.LSxBuild(self.Lat.nn_[i, 0]) * self.Ob.LSyBuild(
-                        self.Lat.nn_[i, 1]) * self.threeSpin
+                Ham += sxi * self.Ob.LSyBuild(self.Lat.nn_[i, 1]) * self.Ob.LSzBuild(
+                    self.Lat.nn_[i, 2]) * self.threeSpin
+                Ham += syi * self.Ob.LSxBuild(self.Lat.nn_[i, 0]) * self.Ob.LSzBuild(
+                    self.Lat.nn_[i, 2]) * self.threeSpin
+                Ham += szi * self.Ob.LSxBuild(self.Lat.nn_[i, 0]) * self.Ob.LSyBuild(
+                    self.Lat.nn_[i, 1]) * self.threeSpin
 
-                    # 4-majorana term
-                    # Ham += self.Ob.LSxBuild(self.Lat.nn_[i, 0]) * self.Ob.LSyBuild(self.Lat.nn_[i, 1]) \
-                    #        * self.Ob.LSzBuild(self.Lat.nn_[i, 2]) * self.threeSpin
+                # 4-majorana term
+                # Ham += self.Ob.LSxBuild(self.Lat.nn_[i, 0]) * self.Ob.LSyBuild(self.Lat.nn_[i, 1]) \
+                #        * self.Ob.LSzBuild(self.Lat.nn_[i, 2]) * self.threeSpin
 
         # --------------------------- Add pinning field (to site 0) -------------------------
 
