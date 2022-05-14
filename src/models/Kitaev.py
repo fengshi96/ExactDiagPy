@@ -124,13 +124,15 @@ class Kitaev(Hamiltonian):
         # --------------------------- Add external field -------------------------
 
         for i in range(0, self.Nsite):
-            if self.option is None:
+            if self.option[0] is None:
+                print("Adding Magnetic Field at site " + str(i))
                 ida = sp.eye(2 ** i)
                 idb = sp.eye(2 ** (self.Nsite - i - 1))
                 Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
                 Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
                 Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
-            elif self.option == "zigzagField":
+            elif "zigzagField" in self.option:
+                print("Adding Zigzag Field at site " + str(i))
                 ida = sp.eye(2 ** i)
                 idb = sp.eye(2 ** (self.Nsite - i - 1))
                 if i%2 == 0:
@@ -145,6 +147,7 @@ class Kitaev(Hamiltonian):
         # --------------------------- Add the threeSpin term -------------------------
         if "threeSpin" in self.option:
             for i in range(0, self.Nsite):
+                print("Adding the three-spin term at site " + str(i))
                 sxi = self.Ob.LSxBuild(i)
                 syi = self.Ob.LSyBuild(i)
                 szi = self.Ob.LSzBuild(i)

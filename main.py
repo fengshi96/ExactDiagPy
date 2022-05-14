@@ -8,6 +8,7 @@ from src.models.Heisenberg import Heisenberg
 from src.Observ import Observ
 from src.Lattice import Lattice
 from src.Helper import Logger, sort, hd5Storage
+import scipy.sparse.linalg
 
 pi = np.pi
 
@@ -36,6 +37,7 @@ def main(total, cmdargs):
 
     tic = time.perf_counter()
     evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which='SA')
+    # evals, evecs = scipy.sparse.linalg.eigsh(ham, Para.parameters["Nstates"], which='SA', tol=Para.parameters["tolerance"], ncv=2*Para.parameters["Nstates"])
     evals, evecs = sort(evals, evecs)
     toc = time.perf_counter()
 
