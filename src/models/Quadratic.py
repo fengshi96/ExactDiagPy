@@ -4,15 +4,15 @@ from src.Helper import matprint
 
 
 class KitaevQuadratic(Hamiltonian):
-    def __init__(self, Lat, Para, FlipZ=None):
+    def __init__(self, Lat, Para, FlipX=[], FlipY=[], FlipZ=[]):
         super().__init__(Lat, Para)
 
-        if FlipZ is None:
-            FlipZ = []
         self.Kxx = Para.parameters["Kxx"]  # coupling strength of x-bond
         self.Kyy = Para.parameters["Kyy"]
         self.Kzz = Para.parameters["Kzz"]
-        self.h = 2.0
+        self.h = Para.parameters["h"]
+        self.LLX = Para.parameters["LLX"]
+        self.LLY = Para.parameters["LLY"]
 
         self.KxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
         self.KyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
@@ -20,8 +20,10 @@ class KitaevQuadratic(Hamiltonian):
 
         self.nnnGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 
-        self.Nsite = Lat.LLX * Lat.LLY * 2
+        self.FlipX = FlipX
+        self.FlipY = FlipY
         self.FlipZ = FlipZ
+        self.Nsite = Lat.LLX * Lat.LLY * 2
         self.HamMatrix = self.Build()
 
     def Build(self):
@@ -34,25 +36,55 @@ class KitaevQuadratic(Hamiltonian):
             # Kxx_Conn
             j = self.Lat.nn_[i, 0]
             if i < j and j >= 0:
+                self.KxxGraph_[i, j] = -self.Kxx
+            elif i > j and j >= 0:
                 self.KxxGraph_[i, j] = self.Kxx
-                self.KxxGraph_[j, i] = self.Kxx
 
             # Kyy_Conn
             j = self.Lat.nn_[i, 1]
-            if i < j and j >= 0:
-                self.KyyGraph_[i, j] = self.Kyy
-                self.KyyGraph_[j, i] = self.Kyy
+            if (i % 2 != 0 or int(i / (self.LLY * 2)) != 0) and (i % 2 != 1 or int(i / (self.LLY * 2)) != self.LLY - 1):
+                if i < j and j >= 0:
+                    self.KyyGraph_[i, j] = self.Kyy
+                elif i > j and j >= 0:
+                    self.KyyGraph_[i, j] = -self.Kyy
+            else:
+                if i < j and j >= 0:
+                    self.KyyGraph_[i, j] = -self.Kyy
+                elif i > j and j >= 0:
+                    self.KyyGraph_[i, j] = self.Kyy
 
             # Kzz_Conn
             j = self.Lat.nn_[i, 2]
-            if i < j and j >= 0:
-                self.KzzGraph_[i, j] = self.Kzz
-                self.KzzGraph_[j, i] = self.Kzz
-                if i in self.FlipZ:
-                    self.KzzGraph_[i, j] *= -1
-                    self.KzzGraph_[j, i] *= -1
+            if i % (self.LLY * 2) != self.LLY * 2 - 1 and i % (
+                    self.LLY * 2) != 0:  # if not on y-boundary (not top nor bottom)
+                if i < j and j >= 0:
+                    self.KzzGraph_[i, j] = self.Kzz
+                elif i > j and j >= 0:
+                    self.KzzGraph_[i, j] = -self.Kzz
+            else:  # if on the boundary
+                if i < j and j >= 0:
+                    self.KzzGraph_[i, j] = -self.Kzz
+                elif i > j and j >= 0:
+                    self.KzzGraph_[i, j] = self.Kzz
 
-        matprint(self.KzzGraph_)
+        # Flip X link
+        for i in self.FlipX:
+            j = self.Lat.nn_[i, 0]
+            self.KxxGraph_[i, j] *= -1
+            self.KxxGraph_[j, i] *= -1
+
+        # Flip Y link
+        for i in self.FlipY:
+            j = self.Lat.nn_[i, 1]
+            self.KyyGraph_[i, j] *= -1
+            self.KyyGraph_[j, i] *= -1
+
+        # Flip Z link
+        for i in self.FlipZ:
+            j = self.Lat.nn_[i, 2]
+            self.KzzGraph_[i, j] *= -1
+            self.KzzGraph_[j, i] *= -1
+
         Ham_TB = self.KzzGraph_ + self.KxxGraph_ + self.KyyGraph_
 
         # Next-nearest neighbor
@@ -60,20 +92,36 @@ class KitaevQuadratic(Hamiltonian):
             jx = self.Lat.nn_[i, 0]
             jy = self.Lat.nn_[i, 1]
             jz = self.Lat.nn_[i, 2]
-            self.nnnGraph_[jx, jy] = self.h
-            self.nnnGraph_[jy, jx] = self.h
 
-            self.nnnGraph_[jy, jz] = self.h
-            self.nnnGraph_[jz, jy] = self.h
+            # x-z
+            if i % 2 == 1:
+                self.nnnGraph_[jx, jz] = self.h
+                self.nnnGraph_[jz, jx] = -self.h
+            elif i % 2 == 0:
+                self.nnnGraph_[jx, jz] = self.h
+                self.nnnGraph_[jz, jx] = -self.h
 
-            self.nnnGraph_[jz, jx] = self.h
-            self.nnnGraph_[jx, jz] = self.h
+            # z-y
+            if i % 2 == 1:
+                self.nnnGraph_[jz, jy] = self.h
+                self.nnnGraph_[jy, jz] = -self.h
+            elif i % 2 == 0:
+                self.nnnGraph_[jz, jy] = self.h
+                self.nnnGraph_[jy, jz] = -self.h
+
+            # y-x
+            if i % 2 == 1:
+                self.nnnGraph_[jy, jx] = self.h
+                self.nnnGraph_[jx, jy] = -self.h
+            elif i % 2 == 0:
+                self.nnnGraph_[jy, jx] = self.h
+                self.nnnGraph_[jx, jy] = -self.h
 
         Ham_TB += self.nnnGraph_
 
         # print("\nHam_TB:")
-        matprint(Ham_TB)
-        return Ham_TB
+        #         matprint(Ham_TB)
+        return Ham_TB * complex(0, 1)
 
 
 if __name__ == '__main__':

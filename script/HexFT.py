@@ -3,7 +3,7 @@ sys.path.append('/Barn/Lab/ED_Python')
 import numpy as np
 from src.Parameter import Parameter
 from src.Lattice import Lattice
-from src.Helper import readfArray, matprint
+from src.Helper import matprint
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -20,7 +20,7 @@ def main(total, cmdargs):
     rawData = readfArray(inputname)
     data = rawData[0, 1:]
 
-    Para = Parameter("../input.inp")
+    Para = Parameter("input.inp")
     Lat = Lattice(Para)
 
     cMap = Lat.cMap
@@ -31,8 +31,19 @@ def main(total, cmdargs):
 
     cMapNew[:, 0] -= rc1
     cMapNew[:, 1] -= rc2
-
     print("\noffcentered rMap:")
+    matprint(cMapNew)
+    
+    # to Euclidean basis
+    # a = (1/2, sqrt{3}/2); b = (1, 0)
+    # ria*a + rib*b = rix * x + riy * y
+    for i in range(Lat.Nsite):
+        rix = 0.5 * cMapNew[i, 0] + cMapNew[i, 1]
+        riy = 0.5 * math.sqrt(3) * cMapNew[i, 0]
+        cMapNew[i, 0] = rix
+        cMapNew[i, 1] = riy
+
+    print("\nEuclidean rMap:")
     matprint(cMapNew)
 
     print(data.shape, cMapNew.shape)
@@ -68,8 +79,9 @@ def main(total, cmdargs):
     plt.xlabel('$k1$', size=18)
     plt.ylabel('$k2$', size=18, labelpad=0)
     plt.subplots_adjust(left=0.18, bottom=0.23, right=0.95, top=0.96, wspace=None, hspace=None)
-    levels = np.linspace(0,1,100)
+    levels = np.linspace(0,0.5,100)
 
+    plt.contourf(xi, yi, zi, levels=levels, cmap=plt.cm.get_cmap('seismic'), extend="both")
     plt.contourf(xi, yi, zi, levels=levels, cmap=plt.cm.get_cmap('seismic'), extend="both")
     cbar = plt.colorbar()
     plt.savefig("testFigure.pdf", dpi=600, bbox_inches='tight')
@@ -82,7 +94,44 @@ def main(total, cmdargs):
 
 
 
+def readfArray(str, Complex = False):
+    def toCplx(s):
+        if "j" in s:
+            return complex(s)
+        else:
+            repart = float(s.split(",")[0].split("(")[1])
+            impart = float(s.split(",")[1].strip("j").split(")")[0])
+            return complex(repart,impart)
+    
+    file = open(str,'r')
+    lines = file.readlines()
+    file.close()
 
+    # Determine shape:
+    row = len(lines)
+    testcol = lines[0].strip("\n").rstrip().split()
+    col = len(testcol)  # rstip to rm whitespace at the end 
+
+    if Complex:
+        m = np.zeros((row, col), dtype=complex)
+        for i in range(row):
+            if lines[i] != "\n":
+                line = lines[i].strip("\n").rstrip().split()
+                # print(line)
+                for j in range(col):
+                    val = toCplx(line[j])
+                    m[i, j] = val
+        
+    else:
+        m = np.zeros((row, col), dtype=float)
+        for i in range(row):
+            if lines[i] != "\n":
+                line = lines[i].strip("\n").rstrip().split()
+                print(line)
+                for j in range(col):
+                    val = float(line[j])
+                    m[i, j] = val
+    return m
 
 
 
