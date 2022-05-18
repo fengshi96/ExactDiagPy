@@ -37,7 +37,7 @@ class KitaevQuadratic(Hamiltonian):
             j = self.Lat.nn_[i, 0]
             if i < j and j >= 0:
                 self.KxxGraph_[i, j] = -self.Kxx
-            elif i > j and j >= 0:
+            elif i > j >= 0:
                 self.KxxGraph_[i, j] = self.Kxx
 
             # Kyy_Conn
