@@ -210,7 +210,7 @@ class Lattice:
         # ----------------------------cMap HoneyComb-----------------------------------
         # ----------------------------cMap HoneyComb-----------------------------------
         for i in range(self.Nsite):
-            yR, xR = divmod(i, 2 * self.LLX)
+            yR, xR = divmod(i, 2 * self.LLY)
 
             if i % 2 == 0:
                 self.cMap[i, 0] = xR / 2
@@ -322,11 +322,14 @@ class Lattice:
 
         # ----------------------------cMap Square-----------------------------------
         # ----------------------------cMap Square-----------------------------------
-        self.cMap[:, 1] = self.indx_.copy()
-        self.cMap[:, 0] = self.indy_.copy()
+        self.cMap[:, 0] = self.indx_.copy()
+        self.cMap[:, 1] = self.indy_.copy()
         print("\nMap: # -> (r1,r2)")
         matprint(self.cMap)
 
-# from src.Parameter import Parameter
-# param = Parameter("../input.inp")
-# lat = Lattice(param)
+
+if __name__ == '__main__':
+    from src.Parameter import Parameter
+
+    param = Parameter("../input.inp")
+    lat = Lattice(param)
