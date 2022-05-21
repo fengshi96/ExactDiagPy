@@ -322,8 +322,8 @@ class Lattice:
 
         # ----------------------------cMap Square-----------------------------------
         # ----------------------------cMap Square-----------------------------------
-        self.cMap[:, 0] = self.indx_.copy()
-        self.cMap[:, 1] = self.indy_.copy()
+        self.cMap[:, 1] = self.indx_.copy()
+        self.cMap[:, 0] = self.indy_.copy()
         print("\nMap: # -> (r1,r2)")
         matprint(self.cMap)
 
