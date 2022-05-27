@@ -220,6 +220,80 @@ class KitaevObserv(Observ):
 
         return CSx, CSy, CSz
 
+    def DynDoubleCorrelation(self, siteRef, bond, evals, evecs, omegasteps, domega, eta, qm="SpinHalf"):
+        """
+        For dynamical correlation i.e. S(c,j, omega) = sum_m sum_j <0|O_R O_{R+b}|m><m|O_j O_{j+b}|0> delta(omega - (Em - E0))
+        :param siteRef: the site of reference: R of A_R
+        :param evals: 1D array of eigen values
+        :param bond: integer that indicate bond direction; 0 = x, 1 = y, 2 = z
+        :param evecs: 2D array of eigen vectors; m-th column corresponds to m-th eigenvalue
+        :param omegasteps: number of omegas to scan
+        :param domega: step of omega scan
+        :param eta: broadening factor
+        :param qm: type of dof
+        :return: 2D array: len(omega) x #unit_cells =  len(omega) x Nsites/2
+        """
+        print("Calculating DynCorrelator for the dimer: " + str(siteRef) + " and " + str(Lat.nn_[siteRef, bond]))
+        CSxx = np.zeros((omegasteps, int(Lat.Nsite/2)+1), dtype=float)
+        CSyy = np.zeros((omegasteps, int(Lat.Nsite/2)+1), dtype=float)
+        CSzz = np.zeros((omegasteps, int(Lat.Nsite/2)+1), dtype=float)
+
+        Nstates = len(evals)
+        gs = evecs[:, 0]  # ground state
+        Eg = evals[0]  # ground state energy
+
+        # gs contribution
+
+        SxxRExp = matele(gs, self.LSxBuild(siteRef) * self.LSxBuild(Lat.nn_[siteRef, bond]), gs) * sp.eye(2 ** Lat.Nsite)
+        SyyRExp = matele(gs, self.LSyBuild(siteRef) * self.LSyBuild(Lat.nn_[siteRef, bond]), gs) * sp.eye(2 ** Lat.Nsite)
+        SzzRExp = matele(gs, self.LSzBuild(siteRef) * self.LSzBuild(Lat.nn_[siteRef, bond]), gs) * sp.eye(2 ** Lat.Nsite)
+
+        SxxR = self.LSxBuild(siteRef) * self.LSxBuild(Lat.nn_[siteRef, bond]) - SxxRExp  # dofs on the site of reference
+        SyyR = self.LSyBuild(siteRef) * self.LSyBuild(Lat.nn_[siteRef, bond]) - SyyRExp
+        SzzR = self.LSzBuild(siteRef) * self.LSzBuild(Lat.nn_[siteRef, bond]) - SzzRExp
+
+        omegacounter = 0
+        for oi in range(0, omegasteps):
+            omega = domega * oi
+            CSxx[omegacounter, 0] = omega
+            CSyy[omegacounter, 0] = omega
+            CSzz[omegacounter, 0] = omega
+            for si in range(0, Lat.Nsite, 2):
+                # gs contribution
+                SxxiExp = matele(gs, self.LSxBuild(si) * self.LSxBuild(Lat.nn_[si, bond]), gs) * sp.eye(2 ** Lat.Nsite)
+                SyyiExp = matele(gs, self.LSyBuild(si) * self.LSyBuild(Lat.nn_[si, bond]), gs) * sp.eye(2 ** Lat.Nsite)
+                SzziExp = matele(gs, self.LSzBuild(si) * self.LSzBuild(Lat.nn_[si, bond]), gs) * sp.eye(2 ** Lat.Nsite)
+
+                Sxxi = self.LSxBuild(si) * self.LSxBuild(Lat.nn_[si, bond]) - SxxiExp  # dofs on the site i
+                Syyi = self.LSyBuild(si) * self.LSyBuild(Lat.nn_[si, bond]) - SyyiExp
+                Szzi = self.LSzBuild(si) * self.LSzBuild(Lat.nn_[si, bond]) - SzziExp
+
+                for mi in range(0, Nstates):
+                    Em = evals[mi]
+                    if Em != Eg:  # rule out gs
+                        MelRx = matele(evecs[:, mi], SxxR, gs)
+                        MelRy = matele(evecs[:, mi], SyyR, gs)
+                        MelRz = matele(evecs[:, mi], SzzR, gs)
+                        Melix = matele(evecs[:, mi], Sxxi, gs)
+                        Meliy = matele(evecs[:, mi], Syyi, gs)
+                        Meliz = matele(evecs[:, mi], Szzi, gs)
+
+                        denom = 1 / (omega - (Em - Eg) - complex(0, 1) * eta)
+
+                        # <gs|O_R|m><m|O_i|gs>
+                        tmp11 = MelRx.conjugate() * Melix * denom  # D1 D1
+                        tmp22 = MelRy.conjugate() * Meliy * denom  # D2 D2
+                        tmp33 = MelRz.conjugate() * Meliz * denom  # D3 D3
+
+                        # update polarization matrix
+                        CSxx[omegacounter, int(si/2)+1] += tmp11.imag
+                        CSyy[omegacounter, int(si/2)+1] += tmp22.imag
+                        CSzz[omegacounter, int(si/2)+1] += tmp33.imag
+
+            omegacounter += 1
+
+        return CSxx, CSyy, CSzz
+
 
 if __name__ == '__main__':
     inputname = "../../input.inp"
@@ -248,5 +322,5 @@ if __name__ == '__main__':
     B = np.abs(np.ones(omegasteps) * para.parameters["Bxx"])
     Omega = np.round(np.linspace(0, (omegasteps - 1) * domega, omegasteps), 5)
 
-    CSx, CSy, CSz = ob.DynCorrelation(2, evals, evecs, omegasteps, domega, eta)
+    CSx, CSy, CSz = ob.DynDoubleCorrelation(2, 0, evals, evecs, omegasteps, domega, eta)
     printfArray(CSx, "Csx.dat")
