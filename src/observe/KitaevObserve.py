@@ -161,6 +161,7 @@ class KitaevObserv(Observ):
         :param qm: type of dof
         :return: 2D array: len(omega) x Nsites
         """
+        print("Calculating DynCorrelator for site: " + str(siteRef))
         CSx = np.zeros((omegasteps, Lat.Nsite+1), dtype=float)
         CSy = np.zeros((omegasteps, Lat.Nsite+1), dtype=float)
         CSz = np.zeros((omegasteps, Lat.Nsite+1), dtype=float)
@@ -233,7 +234,7 @@ class KitaevObserv(Observ):
         :param qm: type of dof
         :return: 2D array: len(omega) x #unit_cells =  len(omega) x Nsites/2
         """
-        print("Calculating DynCorrelator for the dimer: " + str(siteRef) + " and " + str(Lat.nn_[siteRef, bond]))
+        print("Calculating DynDoubleCorrelation for the dimer: " + str(siteRef) + " and " + str(Lat.nn_[siteRef, bond]))
         CSxx = np.zeros((omegasteps, int(Lat.Nsite/2)+1), dtype=float)
         CSyy = np.zeros((omegasteps, int(Lat.Nsite/2)+1), dtype=float)
         CSzz = np.zeros((omegasteps, int(Lat.Nsite/2)+1), dtype=float)
@@ -296,7 +297,7 @@ class KitaevObserv(Observ):
 
 
 if __name__ == '__main__':
-    inputname = "../../input.inp"
+    inputname = "input.inp"
     para = Parameter(inputname)
     Lat = Lattice(para)
     ob = KitaevObserv(Lat, para)
@@ -304,7 +305,7 @@ if __name__ == '__main__':
     dof = Dofs("SpinHalf")  # default spin-1/2
 
     # ------- Read dataSpec file -------
-    rfile = h5py.File('../../dataSpec.hdf5', 'r')
+    rfile = h5py.File('dataSpec.hdf5', 'r')
     evalset = rfile["3.Eigen"]["Eigen Values"]
     evecset = rfile["3.Eigen"]["Wavefunctions"]
 
@@ -317,10 +318,22 @@ if __name__ == '__main__':
     rfile.close()
 
     omegasteps = 500
-    domega = 0.00002
-    eta = 0.00005
+    domega = 0.00004
+    eta = 0.00010
     B = np.abs(np.ones(omegasteps) * para.parameters["Bxx"])
     Omega = np.round(np.linspace(0, (omegasteps - 1) * domega, omegasteps), 5)
 
-    CSx, CSy, CSz = ob.DynDoubleCorrelation(2, 0, evals, evecs, omegasteps, domega, eta)
+    CSx, CSy, CSz = ob.DynCorrelation(11, evals, evecs, omegasteps, domega, eta)
     printfArray(CSx, "Csx.dat")
+    printfArray(CSy, "Csy.dat")
+    printfArray(CSz, "Csz.dat")
+
+    CSxx, CSyy, CSzz = ob.DynDoubleCorrelation(11, 12, evals, evecs, omegasteps, domega, eta)
+    printfArray(CSxx, "Csxx-zbond.dat")
+    printfArray(CSyy, "Csyy-zbond.dat")
+    printfArray(CSzz, "Cszz-zbond.dat")
+
+    CSxx, CSyy, Czz = ob.DynDoubleCorrelation(11, 10, evals, evecs, omegasteps, domega, eta)
+    printfArray(CSxx, "Csxx-xbond.dat")
+    printfArray(CSyy, "Csyy-xbond.dat")
+    printfArray(CSzz, "Cszz-xbond.dat")
