@@ -86,14 +86,15 @@ function Svn(sysIndx::Vector{Int}, Nsite::Int, wf::Vector{ComplexF64})
 end
 
 # Parameters
-sysIndxA = Int8[8,9] .+ 1 # cut a z-bond + 2 y-bond
-sysIndxB = Int8[8,9,10] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxC = Int8[8,9,10,11] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxD = Int8[8,9,10,11,12] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxE = Int8[0,1,2,3,4,5,6,7,8,9,10,11] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxF = Int8[0,1,2,3,4,5,6,7] .+ 1
+sysIndxA = Int8[1] .+ 1 # cut a z-bond + 2 y-bond
+sysIndxB = Int8[2,3,7,8] .+ 1 # cut a x-bond + 2 y-bond
+sysIndxC = Int8[6] .+ 1 # cut a x-bond + 2 y-bond
+sysIndxD = Int8[0,4,5,9,10,11,12,13,14] .+ 1 # cut a x-bond + 2 y-bond
+sysIndxAB = Int8[1,2,3,7,8] .+ 1 # cut a x-bond + 2 y-bond
+sysIndxBC = Int8[2,3,6,7,8] .+ 1
+sysIndxAC = Int8[1,6] .+ 1
 
-Nsite = 24
+Nsite = 15
 dirList =  glob("Kzz_*") # ["B_0.20"]
 
 Bs = zeros(Float64, (size(dirList)[1], 1))
@@ -101,106 +102,54 @@ ESpecA = Vector{Vector{Float64}}()
 ESpecB = similar(ESpecA)
 ESpecC = similar(ESpecA)
 ESpecD = similar(ESpecA)
-ESpecE = similar(ESpecA)
-ESpecF = similar(ESpecA)
+ESpecAB = similar(ESpecA)
+ESpecBC = similar(ESpecA)
+ESpecAC = similar(ESpecA)
 
-counter = 1
-for bdir in dirList
-	R = r"Kzz_(\d+\.\d+)"
-	Breg = match(R, bdir)
-	B = parse(Float64, Breg.captures[1])
-	
-	# read data
-	hd5 = h5open(bdir * "/dataSpec.hdf5","r")
-	dset=hd5["3.Eigen/Wavefunctions"]
-	evec=read(dset)
-	close(hd5)
 
-    Bs[counter, 1] = B
+# read data
+hd5 = h5open("../dataSpec.hdf5","r")
+dset=hd5["3.Eigen/Wavefunctions"]
+evec=read(dset)
+close(hd5)
 
-    eeA, PentS_A = Svn(sysIndxA, Nsite, evec[1,:])
-    push!(ESpecA, PentS_A)
-    println(eeA)
 
-    eeB, PentS_B = Svn(sysIndxB, Nsite, evec[1,:])
-    push!(ESpecB, PentS_B)
-    println(eeB)
-	
-    eeC, PentS_C = Svn(sysIndxC, Nsite, evec[1,:])
-    push!(ESpecC, PentS_C)
-    println(eeC)
-    
-    eeD, PentS_D = Svn(sysIndxD, Nsite, evec[1,:])
-    push!(ESpecD, PentS_D)
-    println(eeD)
+eeA, PentS_A = Svn(sysIndxA, Nsite, evec[1,:])
+push!(ESpecA, PentS_A)
+println(eeA)
 
-    eeE, PentS_E = Svn(sysIndxE, Nsite, evec[1,:])
-    push!(ESpecE, PentS_E)
-    println(eeE)
+eeB, PentS_B = Svn(sysIndxB, Nsite, evec[1,:])
+push!(ESpecB, PentS_B)
+println(eeB)
 
-    eeF, PentS_F = Svn(sysIndxF, Nsite, evec[1,:])
-    push!(ESpecF, PentS_F)
-    println(eeF)
-    
-    global counter = counter + 1
-end
+eeC, PentS_C = Svn(sysIndxC, Nsite, evec[1,:])
+push!(ESpecC, PentS_C)
+println(eeC)
 
-io = open("ESpectrum_2.dat", "w")
-for i in 1 : size(dirList)[1]	
-	write(io, string(Bs[i,1]) * " ")
-    for j in 1 : size(ESpecA[i])[1]
-        write(io, string(ESpecA[i][j]) * " ")
-	end
-	write(io, "\n")
-end
-close(io)
+eeD, PentS_D = Svn(sysIndxD, Nsite, evec[1,:])
+push!(ESpecD, PentS_D)
+println(eeD)
 
-io = open("ESpectrum_3.dat", "w")
-for i in 1 : size(dirList)[1]	
-	write(io, string(Bs[i,1]) * " ")
-    for j in 1 : size(ESpecB[i])[1]
-        write(io, string(ESpecB[i][j]) * " ")
-	end
-	write(io, "\n")
-end
-close(io)
+eeAB, PentS_AB = Svn(sysIndxAB, Nsite, evec[1,:])
+push!(ESpecAB, PentS_AB)
+println(eeAB)
 
-io = open("ESpectrum_4.dat", "w")
-for i in 1 : size(dirList)[1]	
-	write(io, string(Bs[i,1]) * " ")
-    for j in 1 : size(ESpecC[i])[1]
-        write(io, string(ESpecC[i][j]) * " ")
-	end
-	write(io, "\n")
-end
-close(io)
+eeBC, PentS_BC = Svn(sysIndxBC, Nsite, evec[1,:])
+push!(ESpecBC, PentS_BC)
+println(eeBC)
 
-io = open("ESpectrum_5.dat", "w")
-for i in 1 : size(dirList)[1]	
-	write(io, string(Bs[i,1]) * " ")
-    for j in 1 : size(ESpecD[i])[1]
-        write(io, string(ESpecD[i][j]) * " ")
-	end
-	write(io, "\n")
-end
-close(io)
+eeAC, PentS_AC = Svn(sysIndxAC, Nsite, evec[1,:])
+push!(ESpecAC, PentS_AC)
+println(eeAC)
 
-io = open("ESpectrum_12.dat", "w")
-for i in 1 : size(dirList)[1]	
-	write(io, string(Bs[i,1]) * " ")
-    for j in 1 : size(ESpecE[i])[1]
-        write(io, string(ESpecE[i][j]) * " ")
-	end
-	write(io, "\n")
-end
-close(io)
+println(eeA + eeB + eeB - eeAB - eeAC - eeBC + eeD)
 
-io = open("ESpectrum_8.dat", "w")
-for i in 1 : size(dirList)[1]	
-	write(io, string(Bs[i,1]) * " ")
-    for j in 1 : size(ESpecF[i])[1]
-        write(io, string(ESpecF[i][j]) * " ")
-	end
-	write(io, "\n")
-end
-close(io)
+#io = open("ESpectrum_8.dat", "w")
+#for i in 1 : size(dirList)[1]	
+#	write(io, string(Bs[i,1]) * " ")
+#    for j in 1 : size(ESpecF[i])[1]
+#        write(io, string(ESpecF[i][j]) * " ")
+#	end
+#	write(io, "\n")
+#end
+#close(io)

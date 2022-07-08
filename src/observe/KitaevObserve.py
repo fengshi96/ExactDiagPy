@@ -170,14 +170,9 @@ class KitaevObserv(Observ):
         gs = evecs[:, 0]  # ground state
         Eg = evals[0]  # ground state energy
 
-        # gs contribution
-        SxRExp = matele(gs, self.LSxBuild(siteRef), gs) * sp.eye(2 ** Lat.Nsite)
-        SyRExp = matele(gs, self.LSyBuild(siteRef), gs) * sp.eye(2 ** Lat.Nsite)
-        SzRExp = matele(gs, self.LSzBuild(siteRef), gs) * sp.eye(2 ** Lat.Nsite)
-
-        SxR = self.LSxBuild(siteRef) - SxRExp  # dofs on the site of reference
-        SyR = self.LSyBuild(siteRef) - SyRExp
-        SzR = self.LSzBuild(siteRef) - SzRExp
+        SxR = self.LSxBuild(siteRef) # dofs on the site of reference
+        SyR = self.LSyBuild(siteRef)
+        SzR = self.LSzBuild(siteRef)
 
         omegacounter = 0
         for oi in range(0, omegasteps):
@@ -186,14 +181,9 @@ class KitaevObserv(Observ):
             CSy[omegacounter, 0] = omega
             CSz[omegacounter, 0] = omega
             for si in range(Lat.Nsite):
-                # gs contribution
-                SxiExp = matele(gs, self.LSxBuild(si), gs) * sp.eye(2 ** Lat.Nsite)
-                SyiExp = matele(gs, self.LSyBuild(si), gs) * sp.eye(2 ** Lat.Nsite)
-                SziExp = matele(gs, self.LSzBuild(si), gs) * sp.eye(2 ** Lat.Nsite)
-
-                Sxi = self.LSxBuild(si) - SxiExp  # dofs on the site i
-                Syi = self.LSyBuild(si) - SyiExp
-                Szi = self.LSzBuild(si) - SziExp
+                Sxi = self.LSxBuild(si)  # dofs on the site i
+                Syi = self.LSyBuild(si)
+                Szi = self.LSzBuild(si)
 
                 for mi in range(0, Nstates):
                     Em = evals[mi]
@@ -243,15 +233,9 @@ class KitaevObserv(Observ):
         gs = evecs[:, 0]  # ground state
         Eg = evals[0]  # ground state energy
 
-        # gs contribution
-
-        SxxRExp = matele(gs, self.LSxBuild(siteRef) * self.LSxBuild(Lat.nn_[siteRef, bond]), gs) * sp.eye(2 ** Lat.Nsite)
-        SyyRExp = matele(gs, self.LSyBuild(siteRef) * self.LSyBuild(Lat.nn_[siteRef, bond]), gs) * sp.eye(2 ** Lat.Nsite)
-        SzzRExp = matele(gs, self.LSzBuild(siteRef) * self.LSzBuild(Lat.nn_[siteRef, bond]), gs) * sp.eye(2 ** Lat.Nsite)
-
-        SxxR = self.LSxBuild(siteRef) * self.LSxBuild(Lat.nn_[siteRef, bond]) - SxxRExp  # dofs on the site of reference
-        SyyR = self.LSyBuild(siteRef) * self.LSyBuild(Lat.nn_[siteRef, bond]) - SyyRExp
-        SzzR = self.LSzBuild(siteRef) * self.LSzBuild(Lat.nn_[siteRef, bond]) - SzzRExp
+        SxxR = self.LSxBuild(siteRef) * self.LSxBuild(Lat.nn_[siteRef, bond]) # dofs on the site of reference
+        SyyR = self.LSyBuild(siteRef) * self.LSyBuild(Lat.nn_[siteRef, bond])
+        SzzR = self.LSzBuild(siteRef) * self.LSzBuild(Lat.nn_[siteRef, bond])
 
         omegacounter = 0
         for oi in range(0, omegasteps):
@@ -260,14 +244,9 @@ class KitaevObserv(Observ):
             CSyy[omegacounter, 0] = omega
             CSzz[omegacounter, 0] = omega
             for si in range(0, Lat.Nsite, 2):
-                # gs contribution
-                SxxiExp = matele(gs, self.LSxBuild(si) * self.LSxBuild(Lat.nn_[si, bond]), gs) * sp.eye(2 ** Lat.Nsite)
-                SyyiExp = matele(gs, self.LSyBuild(si) * self.LSyBuild(Lat.nn_[si, bond]), gs) * sp.eye(2 ** Lat.Nsite)
-                SzziExp = matele(gs, self.LSzBuild(si) * self.LSzBuild(Lat.nn_[si, bond]), gs) * sp.eye(2 ** Lat.Nsite)
-
-                Sxxi = self.LSxBuild(si) * self.LSxBuild(Lat.nn_[si, bond]) - SxxiExp  # dofs on the site i
-                Syyi = self.LSyBuild(si) * self.LSyBuild(Lat.nn_[si, bond]) - SyyiExp
-                Szzi = self.LSzBuild(si) * self.LSzBuild(Lat.nn_[si, bond]) - SzziExp
+                Sxxi = self.LSxBuild(si) * self.LSxBuild(Lat.nn_[si, bond])  # dofs on the site i
+                Syyi = self.LSyBuild(si) * self.LSyBuild(Lat.nn_[si, bond])
+                Szzi = self.LSzBuild(si) * self.LSzBuild(Lat.nn_[si, bond])
 
                 for mi in range(0, Nstates):
                     Em = evals[mi]
@@ -297,7 +276,7 @@ class KitaevObserv(Observ):
 
 
 if __name__ == '__main__':
-    inputname = "input.inp"
+    inputname = "../../input.inp"
     para = Parameter(inputname)
     Lat = Lattice(para)
     ob = KitaevObserv(Lat, para)
@@ -305,7 +284,7 @@ if __name__ == '__main__':
     dof = Dofs("SpinHalf")  # default spin-1/2
 
     # ------- Read dataSpec file -------
-    rfile = h5py.File('dataSpec.hdf5', 'r')
+    rfile = h5py.File('../../dataSpec.hdf5', 'r')
     evalset = rfile["3.Eigen"]["Eigen Values"]
     evecset = rfile["3.Eigen"]["Wavefunctions"]
 
@@ -328,12 +307,12 @@ if __name__ == '__main__':
     printfArray(CSy, "Csy.dat")
     printfArray(CSz, "Csz.dat")
 
-    CSxx, CSyy, CSzz = ob.DynDoubleCorrelation(11, 12, evals, evecs, omegasteps, domega, eta)
-    printfArray(CSxx, "Csxx-zbond.dat")
-    printfArray(CSyy, "Csyy-zbond.dat")
-    printfArray(CSzz, "Cszz-zbond.dat")
-
-    CSxx, CSyy, Czz = ob.DynDoubleCorrelation(11, 10, evals, evecs, omegasteps, domega, eta)
-    printfArray(CSxx, "Csxx-xbond.dat")
-    printfArray(CSyy, "Csyy-xbond.dat")
-    printfArray(CSzz, "Cszz-xbond.dat")
+    # CSxx, CSyy, CSzz = ob.DynDoubleCorrelation(11, 12, evals, evecs, omegasteps, domega, eta)
+    # printfArray(CSxx, "Csxx-zbond.dat")
+    # printfArray(CSyy, "Csyy-zbond.dat")
+    # printfArray(CSzz, "Cszz-zbond.dat")
+    #
+    # CSxx, CSyy, Czz = ob.DynDoubleCorrelation(11, 10, evals, evecs, omegasteps, domega, eta)
+    # printfArray(CSxx, "Csxx-xbond.dat")
+    # printfArray(CSyy, "Csyy-xbond.dat")
+    # printfArray(CSzz, "Cszz-xbond.dat")

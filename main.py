@@ -10,6 +10,8 @@ from src.Lattice import Lattice
 from src.Helper import Logger, sort, hd5Storage
 import scipy.sparse.linalg
 
+from src.models.ToricCode import ToricCode
+
 pi = np.pi
 
 
@@ -30,6 +32,8 @@ def main(total, cmdargs):
         Hamil = Heisenberg(Lat, Para)    # Build Hamiltonian object
     elif Para.parameters["Model"] == "Kitaev":
         Hamil = Kitaev(Lat, Para)
+    elif Para.parameters["Model"] == "ToricCode":
+        Hamil = ToricCode(Lat, Para)
     #######################################
     ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
     toc = time.perf_counter()
