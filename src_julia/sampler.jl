@@ -1,6 +1,7 @@
 using HDF5
 using LinearAlgebra
 using Glob
+using Random
 
 function basisPartition(wf, sysIndx, nSites)
     """
@@ -82,30 +83,59 @@ function Svn(sysIndx::Vector{Int}, Nsite::Int, wf::Vector{ComplexF64})
     topop =  count(i->(i<0), entS)
     PentS = entS[topop+1:end]
     ee = - transpose(PentS) * log.(PentS)
-    return ee, PentS 
+    return ee, PentS, rdm
 end
 
+function ProjectZ!(ρ::Matrix{ComplexF64}, site::Int, dir::Int)
+    Nsites = Int(log2(size(ρ)[1]))
+    sz = [1 0 ; 0 -1]
+    ida = Matrix{ComplexF64}(I, 2^(site-1), 2^(site-1))
+    idb = Matrix{ComplexF64}(I, 2^(Nsites-site), 2^(Nsites-site))
+    PauliZ = kron(ida, sz, idb)
+    Id = Matrix{ComplexF64}(I, 2^Nsites, 2^Nsites)
+    
+    if dir == 1
+        ρ = 0.25 * (Id + PauliZ) * ρ * (Id + PauliZ)
+        ρ /= tr(ρ)
+        @assert tr(ρ*PauliZ) ≈ 1
+    elseif dir == -1
+        ρ = 0.25 * (Id - PauliZ) * ρ * (Id - PauliZ)
+        ρ /= tr(ρ)
+        @assert tr(ρ*PauliZ) ≈ -1
+    end
+    return ρ
+end
+
+function OneShotZ!(ρ::Matrix{ComplexF64}, site::Int, rngIndx=1234)
+    Nsites = Int(log2(size(ρ)[1]))
+    rng = MersenneTwister(rngIndx)
+    ida = Matrix{ComplexF64}(I, 2^(site-1), 2^(site-1))
+    idb = Matrix{ComplexF64}(I, 2^(Nsites-site), 2^(Nsites-site))
+    sz = [1 0 ; 0 -1]
+    PauliZ = kron(ida, sz, idb)
+    Id = Matrix{ComplexF64}(I, 2^Nsites, 2^Nsites)
+
+    Z = tr(ρ * PauliZ)
+    prob_up = real(0.5 * (1 + Z))
+   
+#     sample::Bool = nothing
+#     @show rnd=rand(rng)
+    if prob_up > rand(rng)
+        sample = 1  # up
+        ρ = 0.25 * (Id + PauliZ) * ρ * (Id + PauliZ)
+        ρ /= tr(ρ)
+    else
+        sample = -1  # down
+        ρ = 0.25 * (Id - PauliZ) * ρ * (Id - PauliZ)
+        ρ /= tr(ρ)
+    end
+    return sample, ρ
+end
+
+let
 # Parameters
-sysIndxA = Int8[1] .+ 1 # cut a z-bond + 2 y-bond
-sysIndxB = Int8[2,3,7,8] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxC = Int8[6] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxD = Int8[0,4,5,9,10,11,12,13,14] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxAB = Int8[1,2,3,7,8] .+ 1 # cut a x-bond + 2 y-bond
-sysIndxBC = Int8[2,3,6,7,8] .+ 1
-sysIndxAC = Int8[1,6] .+ 1
-
-Nsite = 15
-dirList =  glob("Kzz_*") # ["B_0.20"]
-
-Bs = zeros(Float64, (size(dirList)[1], 1))
-ESpecA = Vector{Vector{Float64}}()
-ESpecB = similar(ESpecA)
-ESpecC = similar(ESpecA)
-ESpecD = similar(ESpecA)
-ESpecAB = similar(ESpecA)
-ESpecBC = similar(ESpecA)
-ESpecAC = similar(ESpecA)
-
+sysIndxA = Int8[1,2,6,7] .+ 1
+Nsite = 20
 
 # read data
 hd5 = h5open("../dataSpec.hdf5","r")
@@ -114,42 +144,35 @@ evec=read(dset)
 close(hd5)
 
 
-eeA, PentS_A = Svn(sysIndxA, Nsite, evec[1,:])
-push!(ESpecA, PentS_A)
-println(eeA)
+eeA, PentS_A, rdm = Svn(sysIndxA, Nsite, evec[1,:])
+# push!(ESpecA, PentS_A)
+# println(eeA)
+# show(stdout, "text/plain", rdm); println()
 
-eeB, PentS_B = Svn(sysIndxB, Nsite, evec[1,:])
-push!(ESpecB, PentS_B)
-println(eeB)
+ρ = ProjectZ!(rdm, 4, 1)  # fix site 4 to be spin-up
+numShots = 5000
+samples = Matrix{Int8}(undef, (numShots, 3))
+for i in 1:numShots
+    rdm = ρ
+    sample4, rdm = OneShotZ!(rdm, 4, rand(100:9000)); #println(sample4)
+    sample1, rdm = OneShotZ!(rdm, 1, rand(100:9000)); #println(sample1)
+    sample2, rdm = OneShotZ!(rdm, 2, rand(100:9000)); #println(sample2)
+    sample3, rdm = OneShotZ!(rdm, 3, rand(100:9000)); #println(sample3)
+    samples[i, 1] = sample1
+    samples[i, 2] = sample2
+    samples[i, 3] = sample3
+end
+# show(stdout, "text/plain", samples); println()
 
-eeC, PentS_C = Svn(sysIndxC, Nsite, evec[1,:])
-push!(ESpecC, PentS_C)
-println(eeC)
+io = open("SampleTC4.dat", "w")
+for i in 1 : numShots	
+    for j in 1 : 3
+        write(io, string(samples[i, j]) * " ")
+	end
+	write(io, "\n")
+end
+close(io)
 
-eeD, PentS_D = Svn(sysIndxD, Nsite, evec[1,:])
-push!(ESpecD, PentS_D)
-println(eeD)
 
-eeAB, PentS_AB = Svn(sysIndxAB, Nsite, evec[1,:])
-push!(ESpecAB, PentS_AB)
-println(eeAB)
+end
 
-eeBC, PentS_BC = Svn(sysIndxBC, Nsite, evec[1,:])
-push!(ESpecBC, PentS_BC)
-println(eeBC)
-
-eeAC, PentS_AC = Svn(sysIndxAC, Nsite, evec[1,:])
-push!(ESpecAC, PentS_AC)
-println(eeAC)
-
-println(eeA + eeB + eeB - eeAB - eeAC - eeBC + eeD)
-
-#io = open("ESpectrum_8.dat", "w")
-#for i in 1 : size(dirList)[1]	
-#	write(io, string(Bs[i,1]) * " ")
-#    for j in 1 : size(ESpecF[i])[1]
-#        write(io, string(ESpecF[i][j]) * " ")
-#	end
-#	write(io, "\n")
-#end
-#close(io)
