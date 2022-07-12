@@ -136,15 +136,15 @@ even for star: 16 17 2 1
 odd for plaquette: 17 18 3 2
 even for star: 18 19 4 3
 odd for plaquette: 19 15 0 4
-Hamiltonian construction time = 5.4514 sec
+Hamiltonian construction time = 5.3973 sec
 
 -----------Beg of Eigen Values-----------
 
 -17.6568542495
 
 -----------End of Eigen Values-----------
-Diagonalization time = 6.1265 sec 
+Diagonalization time = 5.8258 sec 
 
 
 
-HDF5 time = 0.0282 sec
+HDF5 time = 0.0294 sec
