@@ -1,13 +1,13 @@
 Parameters are ....
 LLX = 4
-LLY = 5
+LLY = 1
 IsPeriodicX = 1
-IsPeriodicY = 1
+IsPeriodicY = 0sss
 Nstates = 1
 tolerance = 1e-07
 Dof = SpinHalf
-Geometry = Square
-Model = ToricCode
+Geometry = Honeycomb
+Model = Kitaev
 Kxx = 1.0
 Kyy = 1.0
 Kzz = 1.0
@@ -17,60 +17,46 @@ Bzz = 0.0
 threeSpin = 0.0
 ----------------- End of Parameters -----------------
 
-[Lattice.py] building Square lattice...
+[Lattice.py] building Honeycomb lattice...
 
 
-0	1	2	3	4	
+0	-1	
 
-5	6	7	8	9	
+-1	1	
 
-10	11	12	13	14	
+2	-1	
 
-15	16	17	18	19	
+-1	3	
+
+4	-1	
+
+-1	5	
+
+6	-1	
+
+-1	7	
+
+-1	-1	
 
 
 [Lattice.py] Looking for nearest neighbors...
 
 
-5	15	1	4	
+1	7	1	
 
-6	16	2	0	
+0	2	0	
 
-7	17	3	1	
+3	1	3	
 
-8	18	4	2	
+2	4	2	
 
-9	19	0	3	
+5	3	5	
 
-10	0	6	9	
+4	6	4	
 
-11	1	7	5	
+7	5	7	
 
-12	2	8	6	
-
-13	3	9	7	
-
-14	4	5	8	
-
-15	5	11	14	
-
-16	6	12	10	
-
-17	7	13	11	
-
-18	8	14	12	
-
-19	9	10	13	
-
-0	10	16	19	
-
-1	11	17	15	
-
-2	12	18	16	
-
-3	13	19	17	
-
-4	14	15	18	
+6	0	6	
 
 
 Map: # -> (r1,r2)
@@ -78,73 +64,98 @@ Map: # -> (r1,r2)
 
 0.0	0.0	
 
+0.3333333333333333	0.3333333333333333	
+
 0.0	1.0	
+
+0.3333333333333333	1.3333333333333333	
 
 0.0	2.0	
 
+0.3333333333333333	2.3333333333333335	
+
 0.0	3.0	
 
-0.0	4.0	
+0.3333333333333333	3.3333333333333335	
 
-1.0	0.0	
 
-1.0	1.0	
+KxxGraph_:
 
-1.0	2.0	
 
-1.0	3.0	
+0.0	1.0	0.0	0.0	0.0	0.0	0.0	0.0	
 
-1.0	4.0	
+1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
 
-2.0	0.0	
+0.0	0.0	0.0	1.0	0.0	0.0	0.0	0.0	
 
-2.0	1.0	
+0.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
 
-2.0	2.0	
+0.0	0.0	0.0	0.0	0.0	1.0	0.0	0.0	
 
-2.0	3.0	
+0.0	0.0	0.0	0.0	1.0	0.0	0.0	0.0	
 
-2.0	4.0	
+0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.0	
 
-3.0	0.0	
+0.0	0.0	0.0	0.0	0.0	0.0	1.0	0.0	
 
-3.0	1.0	
 
-3.0	2.0	
+KyyGraph_:
 
-3.0	3.0	
 
-3.0	4.0	
+0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.0	
 
-even for star: 0 1 6 5
-odd for plaquette: 1 2 7 6
-even for star: 2 3 8 7
-odd for plaquette: 3 4 9 8
-even for star: 4 0 5 9
-odd for plaquette: 5 6 11 10
-even for star: 6 7 12 11
-odd for plaquette: 7 8 13 12
-even for star: 8 9 14 13
-odd for plaquette: 9 5 10 14
-even for star: 10 11 16 15
-odd for plaquette: 11 12 17 16
-even for star: 12 13 18 17
-odd for plaquette: 13 14 19 18
-even for star: 14 10 15 19
-odd for plaquette: 15 16 1 0
-even for star: 16 17 2 1
-odd for plaquette: 17 18 3 2
-even for star: 18 19 4 3
-odd for plaquette: 19 15 0 4
-Hamiltonian construction time = 5.3973 sec
+0.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+
+0.0	1.0	0.0	0.0	0.0	0.0	0.0	0.0	
+
+0.0	0.0	0.0	0.0	1.0	0.0	0.0	0.0	
+
+0.0	0.0	0.0	1.0	0.0	0.0	0.0	0.0	
+
+0.0	0.0	0.0	0.0	0.0	0.0	1.0	0.0	
+
+0.0	0.0	0.0	0.0	0.0	1.0	0.0	0.0	
+
+1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+
+
+KzzGraph_:
+
+
+0.0	1.0	0.0	0.0	0.0	0.0	0.0	0.0	
+
+1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	
+
+0.0	0.0	0.0	1.0	0.0	0.0	0.0	0.0	
+
+0.0	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+
+0.0	0.0	0.0	0.0	0.0	1.0	0.0	0.0	
+
+0.0	0.0	0.0	0.0	1.0	0.0	0.0	0.0	
+
+0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.0	
+
+0.0	0.0	0.0	0.0	0.0	0.0	1.0	0.0	
+
+[Hamiltonian.py] Building Hamiltonian as Sparse Matrix...
+Adding Magnetic Field at site 0
+Adding Magnetic Field at site 1
+Adding Magnetic Field at site 2
+Adding Magnetic Field at site 3
+Adding Magnetic Field at site 4
+Adding Magnetic Field at site 5
+Adding Magnetic Field at site 6
+Adding Magnetic Field at site 7
+Hamiltonian construction time = 0.0347 sec
 
 -----------Beg of Eigen Values-----------
 
--17.6568542495
+-2.1357792051
 
 -----------End of Eigen Values-----------
-Diagonalization time = 5.8258 sec 
+Diagonalization time = 0.0423 sec 
 
 
 
-HDF5 time = 0.0294 sec
+HDF5 time = 0.0125 sec

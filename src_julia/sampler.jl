@@ -149,9 +149,10 @@ eeA, PentS_A, rdm = Svn(sysIndxA, Nsite, evec[1,:])
 # println(eeA)
 # show(stdout, "text/plain", rdm); println()
 
-ρ = ProjectZ!(rdm, 4, 1)  # fix site 4 to be spin-up
+#ρ = ProjectZ!(rdm, 4, 1)
+ρ = rdm  # fix site 4 to be spin-up
 numShots = 5000
-samples = Matrix{Int8}(undef, (numShots, 3))
+samples = Matrix{Int8}(undef, (numShots, 4))
 for i in 1:numShots
     rdm = ρ
     sample4, rdm = OneShotZ!(rdm, 4, rand(100:9000)); #println(sample4)
@@ -161,12 +162,13 @@ for i in 1:numShots
     samples[i, 1] = sample1
     samples[i, 2] = sample2
     samples[i, 3] = sample3
+    samples[i, 4] = sample4
 end
 # show(stdout, "text/plain", samples); println()
 
 io = open("SampleTC4.dat", "w")
 for i in 1 : numShots	
-    for j in 1 : 3
+    for j in 1 : 4
         write(io, string(samples[i, j]) * " ")
 	end
 	write(io, "\n")

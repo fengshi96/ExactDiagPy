@@ -36,6 +36,7 @@ python main.py input.inp
 The file input.inp includes all parameters that are needed to construct the Lattice and Hamiltonain:
 ```
 LLX, LLY       # Number of unit cells in X and Y direction
+Geometry       # Lattice Geometry, e.g. HoneyComb
 Model          # Name of the model: Kitaev, Heisenberg or Hubbard
 IsPeriodicX    # PBC (1) or OBC (0) in X direction
 IsPeriodicY    # PBC (1) or OBC (0) in Y direction
