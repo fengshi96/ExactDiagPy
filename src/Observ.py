@@ -1059,6 +1059,42 @@ class Observ:
 
         return Cc
 
+    def CC_all(self, siteOfReference, gs):
+        Ccxx = np.zeros(self.Lat.Nsite, dtype=float)  # correlation wrt lattice coordinate
+        Ccxy = np.zeros(self.Lat.Nsite, dtype=float)
+        Ccxz = np.zeros(self.Lat.Nsite, dtype=float)
+
+        Ccyx = np.zeros(self.Lat.Nsite, dtype=float)
+        Ccyy = np.zeros(self.Lat.Nsite, dtype=float)
+        Ccyz = np.zeros(self.Lat.Nsite, dtype=float)
+
+        Cczx = np.zeros(self.Lat.Nsite, dtype=float)
+        Cczy = np.zeros(self.Lat.Nsite, dtype=float)
+        Cczz = np.zeros(self.Lat.Nsite, dtype=float)
+
+        Sx_ref = self.LSxBuild(siteOfReference)
+        Sy_ref = self.LSyBuild(siteOfReference)
+        Sz_ref = self.LSzBuild(siteOfReference)
+
+        for c in range(self.Lat.Nsite):
+            Sx_c = self.LSxBuild(c)
+            Sy_c = self.LSyBuild(c)
+            Sz_c = self.LSzBuild(c)
+
+            Ccxx[c] = matele(gs, Sx_ref * Sx_c, gs)
+            Ccxy[c] = matele(gs, Sx_ref * Sy_c, gs)
+            Ccxz[c] = matele(gs, Sx_ref * Sz_c, gs)
+
+            Ccyx[c] = matele(gs, Sy_ref * Sx_c, gs)
+            Ccyy[c] = matele(gs, Sy_ref * Sy_c, gs)
+            Ccyz[c] = matele(gs, Sy_ref * Sz_c, gs)
+
+            Cczx[c] = matele(gs, Sz_ref * Sx_c, gs)
+            Cczy[c] = matele(gs, Sz_ref * Sy_c, gs)
+            Cczz[c] = matele(gs, Sz_ref * Sz_c, gs)
+
+        return Ccxx, Ccxy, Ccxz, Ccyx, Ccyy, Ccyz, Cczx, Cczy, Cczz
+
     def twoSpin(self, Sites, Components, gs):
         """
         Calculate expectation of two-point spin expectation

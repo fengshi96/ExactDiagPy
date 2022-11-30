@@ -100,6 +100,15 @@ def observe(total, cmdargs):
             file.write(str(c) + "\n")
         file.close()
 
+    elif observname == "CC_all":
+        print("Calculating Static correlation for all pairs...")
+        tic = time.perf_counter()
+        Ccxx, Ccxy, Ccxz, Ccyx, Ccyy, Ccyz, Cczx, Cczy, Cczz = ob.CC_all(localSite, evecs[:, 0])
+        toc = time.perf_counter()
+        print(f"time = {toc-tic:0.4f} sec")
+        Ccs = np.vstack([Ccxx, Ccxy, Ccxz, Ccyx, Ccyy, Ccyz, Cczx, Cczy, Cczz])
+        printfArray(Ccs, "CCs.dat")
+
     # ------- Calculate 4-spin correlations (for gs) & write to ASCII---------
     elif observname == "fourSpin":
         """
