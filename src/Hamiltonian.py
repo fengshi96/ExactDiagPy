@@ -40,7 +40,8 @@ class Hamiltonian:
             self.tPair_ = np.zeros(())
             self.tcoef_ = np.zeros(())
 
-        elif Para.parameters["Dof"] == "SpinHalf" or Para.parameters["Dof"] == "SpinOne":
+        elif Para.parameters["Dof"] == "SpinHalf" or Para.parameters["Dof"] == "SpinOne" or \
+                Para.parameters["Dof"] == "SpinThreeHalf":
             Spins = Dofs(Para.parameters["Dof"])
             self.sx = Spins.Sx
             self.sy = Spins.Sy

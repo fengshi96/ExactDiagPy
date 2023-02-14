@@ -69,13 +69,45 @@ class Dofs:
 
             self.I = sp.eye(3)
 
+        elif dof == "SpinThreeHalf":
+
+            self.hilbsize = 4
+            self.type = "SpinThreeHalf"
+
+            I = np.array([0, 1, 1, 2, 2, 3], dtype=int)
+            J = np.array([1, 0, 2, 1, 3, 2], dtype=int)
+            V = np.array([np.sqrt(3), np.sqrt(3), 2, 2, np.sqrt(3), np.sqrt(3)], dtype=complex) * 0.5
+            self.Sx = sp.coo_matrix((V, (I, J)), shape=(4, 4))
+
+            I = np.array([0, 1, 1, 2, 2, 3], dtype=int)
+            J = np.array([1, 0, 2, 1, 3, 2], dtype=int)
+            V = np.array([np.sqrt(3), -np.sqrt(3), 2, -2, np.sqrt(3), -np.sqrt(3)], dtype=complex) * -0.5j
+            self.Sy = sp.coo_matrix((V, (I, J)), shape=(4, 4))
+
+            I = np.array([0, 1, 2, 3], dtype=int)
+            J = np.array([0, 1, 2, 3], dtype=int)
+            V = np.array([1.5, 0.5, -0.5, -1.5], dtype=complex)
+            self.Sz = sp.coo_matrix((V, (I, J)), shape=(4, 4))
+
+            I = np.array([0, 1, 2], dtype=int)
+            J = np.array([1, 2, 3], dtype=int)
+            V = np.array([np.sqrt(3), 2, np.sqrt(3)], dtype=complex)
+            self.Sp = sp.coo_matrix((V, (I, J)), shape=(4, 4))
+
+            I = np.array([1, 2, 3], dtype=int)
+            J = np.array([0, 1, 2], dtype=int)
+            V = np.array([np.sqrt(3), 2, np.sqrt(3)], dtype=complex)
+            self.Sm = sp.coo_matrix((V, (I, J)), shape=(4, 4))
+
+            self.I = sp.eye(4)
+
         elif dof == "Boson":
 
             self.hilbsize = boson_dim
-            self.type = str(boson_dim)+"_Boson"
+            self.type = str(boson_dim) + "_Boson"
 
             # define a and a^\dagger
-            I = np.array(range(0, boson_dim-1), dtype=int)
+            I = np.array(range(0, boson_dim - 1), dtype=int)
             J = np.array(range(1, boson_dim), dtype=int)
             V = np.sqrt(np.array(range(1, boson_dim)), dtype=complex)
             self.annih = sp.coo_matrix((V, (I, J)), shape=(boson_dim, boson_dim))
