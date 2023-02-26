@@ -13,6 +13,7 @@ class CrI3(Hamiltonian):
         self.Hx = Para.parameters["Bxx"]
         self.Hy = Para.parameters["Byy"]
         self.Hz = Para.parameters["Bzz"]
+        self.hilbsize = Dofs(Para.parameters["Dof"]).hilbsize
 
         # ----------------------------- Kitaev
 
@@ -79,7 +80,7 @@ class CrI3(Hamiltonian):
         :return: 1D list that contains Flux operators as sparse matrix
         """
         numFlux = len(IndexArray)
-        hilbsize = Dofs("SpinHalf").hilbsize
+        hilbsize = self.hilbsize
 
         FluxOperators = []
         for i in range(numFlux):
@@ -99,12 +100,12 @@ class CrI3(Hamiltonian):
             FluxOperators.append(S)
         return FluxOperators
 
-
     def BuildCrI3(self):
         """
         Build CrI3 Hamiltonian
         :return: CrI3 Hamiltonian as sparse matrix
         """
+        hilbsize = self.hilbsize
         # --------------------------- Start with Kitaev term --------------------
         for i in range(0, self.Nsite):
             # Kxx_Conn
@@ -196,32 +197,30 @@ class CrI3(Hamiltonian):
             if self.option[0] is None:
                 print("Adding Magnetic Field at site " + str(i) + "(Hx, Hy, Hz) = "
                       + str(self.Hx) + ", " + str(self.Hx) + ", " + str(self.Hx))
-                ida = sp.eye(4 ** i)
-                idb = sp.eye(4 ** (self.Nsite - i - 1))
+                ida = sp.eye(hilbsize ** i)
+                idb = sp.eye(hilbsize ** (self.Nsite - i - 1))
                 Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
                 Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
                 Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
             elif "zigzagField" in self.option:
                 print("Adding Zigzag Field at site " + str(i))
-                ida = sp.eye(4 ** i)
-                idb = sp.eye(4 ** (self.Nsite - i - 1))
-                if i%2 == 0:
+                ida = sp.eye(hilbsize ** i)
+                idb = sp.eye(hilbsize ** (self.Nsite - i - 1))
+                if i % 2 == 0:
                     Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
                     Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
                     Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
-                elif i%2 != 0:
+                elif i % 2 != 0:
                     Ham -= sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
                     Ham -= sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
                     Ham -= sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
-
 
         # --------------------------- Add pinning field (to site 0) -------------------------
 
         if self.pinning is not None:
             site = 0
-            ida = sp.eye(2 ** site)
-            idb = sp.eye(2 ** (self.Nsite - site - 1))
+            ida = sp.eye(hilbsize ** site)
+            idb = sp.eye(hilbsize ** (self.Nsite - site - 1))
             Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.pinning
-
 
         return Ham

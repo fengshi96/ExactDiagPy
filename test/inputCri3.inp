@@ -1,5 +1,5 @@
-LLX=2
-LLY=2
+LLX=3
+LLY=3
 IsPeriodicX=1
 IsPeriodicY=1
 #Option=threeSpin
@@ -7,25 +7,25 @@ IsPeriodicY=1
 #SysIndx=[0,1,2,3,4,5,6]
 
 ### Number of states to probe
-Nstates=10
+Nstates=1
 tolerance=1e-7
 
-Dof=SpinThreeHalf
+Dof=SpinHalf
 Geometry=Honeycomb
 Model=CrI3
 
 # For spin models
-Kxx=-1.0
-Kyy=-1.0
-Kzz=-1.0
+Kxx=1.0
+Kyy=1.0
+Kzz=1.0
 
-Jxx=-1.0
-Jyy=-1.0
-Jzz=-1.0
+Jxx=-0.0
+Jyy=-0.0
+Jzz=-0.0
 
-Bxx=0.5
-Byy=0.5
-Bzz=0.5
+Bxx=0
+Byy=0
+Bzz=0
 threeSpin=0.0
 
 #Pinning=0.0001
