@@ -9,7 +9,7 @@ from src.Helper import matprint
 class CrI3(Hamiltonian):
     def __init__(self, Lat, Para):
         super().__init__(Lat, Para)
-
+        self.Geometry = Para.parameters["Geometry"]
         self.Hx = Para.parameters["Bxx"]
         self.Hy = Para.parameters["Byy"]
         self.Hz = Para.parameters["Bzz"]
@@ -32,45 +32,53 @@ class CrI3(Hamiltonian):
         except KeyError:
             self.option = [None]
 
-        if "threeSpin" in self.option:
-            self.threeSpin = Para.parameters["threeSpin"]
+        if self.Geometry == "Custom":
+            self.Kxx = Para.parameters["Kxx"]
+            self.Kyy = Para.parameters["Kyy"]
+            self.Kzz = Para.parameters["Kzz"]
+            self.J = Para.parameters["J"]
+            self.Ham = self.BuildCustomCrI3()
 
-        self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
-        self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
-        self.KzzPair_ = np.zeros(())
+        else:
+            if "threeSpin" in self.option:
+                self.threeSpin = Para.parameters["threeSpin"]
 
-        self.Kxxcoef_ = np.zeros(())  # pairwise non-zero coupling strength
-        self.Kyycoef_ = np.zeros(())
-        self.Kzzcoef_ = np.zeros(())
+            self.KxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
+            self.KyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
+            self.KzzPair_ = np.zeros(())
 
-        self.Kxx = Para.parameters["Kxx"]  # coupling strength of x-bond
-        self.Kyy = Para.parameters["Kyy"]
-        self.Kzz = Para.parameters["Kzz"]
+            self.Kxxcoef_ = np.zeros(())  # pairwise non-zero coupling strength
+            self.Kyycoef_ = np.zeros(())
+            self.Kzzcoef_ = np.zeros(())
 
-        self.Nsite = Lat.LLX * Lat.LLY * 2
+            self.Kxx = Para.parameters["Kxx"]  # coupling strength of x-bond
+            self.Kyy = Para.parameters["Kyy"]
+            self.Kzz = Para.parameters["Kzz"]
 
-        # ----------------------------- Heisenberg
+            self.Nsite = Lat.LLX * Lat.LLY * 2
 
-        self.JxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
-        self.JyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
-        self.JzzPair_ = np.zeros(())
+            # ----------------------------- Heisenberg
 
-        self.Jxxcoef_ = np.zeros(())  # pairwise non-zero coupling strength
-        self.Jyycoef_ = np.zeros(())
-        self.Jzzcoef_ = np.zeros(())
+            self.JxxPair_ = np.zeros(())  # pairwise non-zero coupling \\
+            self.JyyPair_ = np.zeros(())  # 1st and 2nd cols are site indices
+            self.JzzPair_ = np.zeros(())
 
-        self.Jxx = Para.parameters["Jxx"]  # coupling strength of x-bond
-        self.Jyy = Para.parameters["Jyy"]
-        self.Jzz = Para.parameters["Jzz"]
+            self.Jxxcoef_ = np.zeros(())  # pairwise non-zero coupling strength
+            self.Jyycoef_ = np.zeros(())
+            self.Jzzcoef_ = np.zeros(())
 
-        self.JxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
-        self.JyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
-        self.JzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+            self.Jxx = Para.parameters["Jxx"]  # coupling strength of x-bond
+            self.Jyy = Para.parameters["Jyy"]
+            self.Jzz = Para.parameters["Jzz"]
 
-        # ----------------------------
+            self.JxxGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+            self.JyyGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
+            self.JzzGraph_ = np.zeros((self.Nsite, self.Nsite), dtype=float)
 
-        self.Ob = Observ(Lat, Para)
-        self.Ham = self.BuildCrI3()
+            # ----------------------------
+
+            self.Ob = Observ(Lat, Para)
+            self.Ham = self.BuildCrI3()
 
     def BuildFlux(self, IndexArray, SigmaArray):
         """
@@ -196,7 +204,7 @@ class CrI3(Hamiltonian):
         for i in range(0, self.Nsite):
             if self.option[0] is None:
                 print("Adding Magnetic Field at site " + str(i) + "(Hx, Hy, Hz) = "
-                      + str(self.Hx) + ", " + str(self.Hx) + ", " + str(self.Hx))
+                      + str(self.Hx) + ", " + str(self.Hy) + ", " + str(self.Hz))
                 ida = sp.eye(hilbsize ** i)
                 idb = sp.eye(hilbsize ** (self.Nsite - i - 1))
                 Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
@@ -224,3 +232,51 @@ class CrI3(Hamiltonian):
             Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.pinning
 
         return Ham
+
+    def BuildCustomCrI3(self):
+        hilbsize = self.hilbsize
+        # ---------------------Build Hamiltonian as Sparse Matrix-------------------
+        print("[Hamiltonian.py] Building Kitaev part of the Hamiltonian as Sparse Matrix...")
+        self.KxxPair_ = np.array(self.Lat.xConnectors)
+        self.KyyPair_ = np.array(self.Lat.yConnectors)
+        self.KzzPair_ = np.array(self.Lat.zConnectors)
+        self.Kxxcoef_ = np.ones(len(self.KxxPair_)) * self.Kxx
+        self.Kyycoef_ = np.ones(len(self.KyyPair_)) * self.Kyy
+        self.Kzzcoef_ = np.ones(len(self.KzzPair_)) * self.Kzz
+
+        HamKx = TwoSpinOps(self.KxxPair_, self.Kxxcoef_, self.sx, self.sx, self.Nsite)
+        HamKy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, self.sy, self.sy, self.Nsite)
+        HamKz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, self.sz, self.sz, self.Nsite)
+
+        print("[Hamiltonian.py] Building Heisenberg part of the Hamiltonian as Sparse Matrix...")
+        allConnectors = self.Lat.xConnectors + self.Lat.yConnectors + self.Lat.zConnectors
+        self.JPair_ = np.array(allConnectors)
+        self.Jcoef_ = np.ones(len(self.JPair_)) * self.J
+
+        HamJx = TwoSpinOps(self.JPair_, self.Jcoef_, self.sx, self.sx, self.Nsite)
+        HamJy = TwoSpinOps(self.JPair_, self.Jcoef_, self.sy, self.sy, self.Nsite)
+        HamJz = TwoSpinOps(self.JPair_, self.Jcoef_, self.sz, self.sz, self.Nsite)
+
+        Ham = HamKx + HamKy + HamKz + HamJx + HamJy + HamJz
+
+        # --------------------------- Add external field -------------------------
+        for i in range(0, self.Nsite):
+            if self.option[0] is None:
+                print("Adding Magnetic Field at site " + str(i) + "(Hx, Hy, Hz) = "
+                      + str(self.Hx) + ", " + str(self.Hy) + ", " + str(self.Hz))
+                ida = sp.eye(hilbsize ** i)
+                idb = sp.eye(hilbsize ** (self.Nsite - i - 1))
+                Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
+                Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
+                Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+
+        return Ham
+
+
+if __name__ == '__main__':
+    from src.Parameter import Parameter
+    from src.Lattice import Lattice
+
+    param = Parameter("../../test/inputCri3.inp")
+    lat = Lattice(param)
+    cri3 = CrI3(lat, param)

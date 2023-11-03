@@ -1,55 +1,64 @@
 import numpy as np
 import math as m
 from src.Helper import matprint, vecprint
-
+import ast
 
 class Lattice:
 
     def __init__(self, para):
 
         # Shared attributes
-        self.LLX = para.parameters["LLX"]  # Number of unit cells in x
-        self.LLY = para.parameters["LLY"]  # Number of unit cells in y
-        self.IsPeriodicX = para.parameters["IsPeriodicX"]  # PBC (1) or OBC (0)
-        self.IsPeriodicY = para.parameters["IsPeriodicY"]
         self.Geometry = para.parameters["Geometry"]
-        # if para.Option is not None:
-        #     if "EE" in para.Option:
-        #         self.SysIndx = para.SysIndx
 
-        # Geometry-dependent attributes
-        if self.Geometry == "Honeycomb":
-            self.Nsite = self.LLX * self.LLY * 2
-            self.indx_ = np.zeros(self.Nsite, dtype=int)  # x coordinate in mesh
-            self.indy_ = np.zeros(self.Nsite, dtype=int)
-            self.Number1neigh = 3  # number of nearest neighbors
-            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
-            self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
-            self.cMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
-            self.BuildHoneycomb()  # build attributes in honeycomb lattice
+        if self.Geometry != "Custom":
+            self.LLX = para.parameters["LLX"]  # Number of unit cells in x
+            self.LLY = para.parameters["LLY"]  # Number of unit cells in y
+            self.IsPeriodicX = para.parameters["IsPeriodicX"]  # PBC (1) or OBC (0)
+            self.IsPeriodicY = para.parameters["IsPeriodicY"]
+            # if para.Option is not None:
+            #     if "EE" in para.Option:
+            #         self.SysIndx = para.SysIndx
+            # Geometry-dependent attributes
+            if self.Geometry == "Honeycomb":
+                self.Nsite = self.LLX * self.LLY * 2
+                self.indx_ = np.zeros(self.Nsite, dtype=int)  # x coordinate in mesh
+                self.indy_ = np.zeros(self.Nsite, dtype=int)
+                self.Number1neigh = 3  # number of nearest neighbors
+                self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)  # nearest neighbor matrix
+                self.mesh_ = -np.ones((self.LLX * 2 + self.LLY, self.LLY * 2), dtype=int)  # declare mesh of the lattice
+                self.cMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
+                self.BuildHoneycomb()  # build attributes in honeycomb lattice
 
-        elif self.Geometry == "Square":
-            self.Nsite = self.LLX * self.LLY
-            self.indx_ = np.zeros(self.Nsite, dtype=int)
-            self.indy_ = np.zeros(self.Nsite, dtype=int)
-            self.Number1neigh = 4
-            if self.LLX == 1 or self.LLY == 1:
+            elif self.Geometry == "Square":
+                self.Nsite = self.LLX * self.LLY
+                self.indx_ = np.zeros(self.Nsite, dtype=int)
+                self.indy_ = np.zeros(self.Nsite, dtype=int)
+                self.Number1neigh = 4
+                if self.LLX == 1 or self.LLY == 1:
+                    self.Number1neigh = 2
+                self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+                self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
+                self.cMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
+                self.BuildSquare()  # build attributes in square lattice
+
+            elif self.Geometry == "Chain":
+                self.Nsite = self.LLX
+                self.indx_ = np.zeros(self.Nsite, dtype=int)
                 self.Number1neigh = 2
-            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
-            self.mesh_ = -np.ones((self.LLX, self.LLY), dtype=int)
-            self.cMap = np.zeros((self.Nsite, 2), dtype=float)  # map site indices i to coordinate (r1,r2)
-            self.BuildSquare()  # build attributes in square lattice
+                self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+                self.mesh_ = -np.ones(self.LLX, dtype=int)
+                self.BuildChain()  # build attributes in square lattice
 
-        elif self.Geometry == "Chain":
-            self.Nsite = self.LLX
-            self.indx_ = np.zeros(self.Nsite, dtype=int)
-            self.Number1neigh = 2
-            self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
-            self.mesh_ = -np.ones(self.LLX, dtype=int)
-            self.BuildChain()  # build attributes in square lattice
+            else:
+                raise ValueError("Geometry not supported yet")
 
         else:
-            raise ValueError("Geometry not supported yet")
+            self.CustomNsites = para.parameters["CustomNsites"]
+            self.Number1neigh = 2
+            self.XConnectors = para.parameters["XConnectors"]
+            self.YConnectors = para.parameters["YConnectors"]
+            self.ZConnectors = para.parameters["ZConnectors"]
+            self.BuildCustom()
 
     def BuildChain(self):
         """
@@ -327,9 +336,30 @@ class Lattice:
         print("\nMap: # -> (r1,r2)")
         matprint(self.cMap)
 
+    def BuildCustom(self):
+        """
+        Customize Lattice based on neighbor matrix
+        """
+        print("[Lattice] CustomNsites = ", self.CustomNsites)
+        self.xConnectors = ast.literal_eval(self.XConnectors)
+        self.yConnectors = ast.literal_eval(self.YConnectors)
+        self.zConnectors = ast.literal_eval(self.ZConnectors)
+
+        if len(self.xConnectors) == len(self.yConnectors) and len(self.yConnectors) == len(self.zConnectors):
+            print("[Lattice] x Connectors are: ")
+            for i in range(len(self.xConnectors)):
+                print(self.xConnectors[i])
+            print("\n[Lattice] y Connectors are: ")
+            for i in range(len(self.yConnectors)):
+                print(self.yConnectors[i])
+            print("\n[Lattice] z Connectors are: ")
+            for i in range(len(self.zConnectors)):
+                print(self.zConnectors[i])
+
 
 if __name__ == '__main__':
     from src.Parameter import Parameter
 
-    param = Parameter("../input.inp")
+    param = Parameter("../test/inputCri3.inp")
+    #param = Parameter("../input.inp")
     lat = Lattice(param)

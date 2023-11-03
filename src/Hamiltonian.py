@@ -15,6 +15,8 @@ class Hamiltonian:
             self.Nsite = Lat.LLX * Lat.LLY * 2
         elif Lat.Geometry == "Chain":
             self.Nsite = Lat.LLX
+        elif Lat.Geometry == "Custom":
+            self.Nsite = Lat.CustomNsites
         else:
             raise ValueError("Geometry not yet supported")
 

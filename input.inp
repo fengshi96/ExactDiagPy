@@ -1,7 +1,7 @@
-LLX=4
+LLX=6
 LLY=1
-IsPeriodicX=1
-IsPeriodicY=1
+IsPeriodicX=0
+IsPeriodicY=0
 #Option=threeSpin
 #Option=zigzagField
 #SysIndx=[0,1,2,3,4,5,6]
