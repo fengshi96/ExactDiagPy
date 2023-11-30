@@ -171,7 +171,7 @@ class Kitaev(Hamiltonian):
             idb = sp.eye(2 ** (self.Nsite - site - 1))
             Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.pinning
 
-        # ------------------ Add Flux bias (for 18 with PBC only at this stage) -------------
+        # ------------------ Add Flux bias (for 18 with PBC) -------------
         if self.muFlux is not None and self.Nsite == 18:
             print("Adding Flux bias")
             IndexArray = np.array(([
@@ -186,6 +186,42 @@ class Kitaev(Hamiltonian):
                 [11, 6, 7, 12, 17, 16]
             ]), dtype=int)
             SigmaArray = np.array(([
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"]
+            ]))
+
+            fluxOperators = self.BuildFlux(IndexArray, SigmaArray)
+            for i in range(len(IndexArray)):
+                Ham += self.muFlux * fluxOperators[i]
+                
+        # ------------------ Add Flux bias (for 24=3x4 with PBC) -------------
+        if self.muFlux is not None and self.Nsite == 24:
+            print("Adding Flux bias")
+            IndexArray = np.array(([
+                [1, 2, 3, 10, 9, 8],
+                [3, 4, 5, 12, 11, 10],
+                [5, 6, 7, 14, 13, 12],
+                [9, 10, 11, 18, 17, 16],
+                [11, 12, 13, 20, 19, 18],
+                [13, 14, 15, 22, 21, 20],
+                [7, 0, 1, 8, 15, 14],
+                [15, 8, 9, 16, 23, 22],
+                [23, 16, 17, 0, 7, 6],
+                [17, 18, 19, 2, 1, 0],
+                [19, 20, 21, 4, 3, 2],
+                [21, 22, 23, 6, 5, 4]
+            ]), dtype=int)
+            SigmaArray = np.array(([
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
+                ["x", "y", "z", "x", "y", "z"],
                 ["x", "y", "z", "x", "y", "z"],
                 ["x", "y", "z", "x", "y", "z"],
                 ["x", "y", "z", "x", "y", "z"],
