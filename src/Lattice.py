@@ -1,6 +1,7 @@
 import numpy as np
 import math as m
 from src.Helper import matprint, vecprint
+# from Helper import matprint, vecprint
 import ast
 
 class Lattice:
@@ -48,13 +49,24 @@ class Lattice:
                 self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
                 self.mesh_ = -np.ones(self.LLX, dtype=int)
                 self.BuildChain()  # build attributes in square lattice
+            
+            elif self.Geometry == "Ladder":
+                if self.LLY != 2:
+                    raise ValueError("Ladder geometry requires LLY = 2")
+                self.Nsite = self.LLX * 2
+                self.indx_ = np.zeros(self.Nsite, dtype=int)
+                self.indy_ = np.zeros(self.Nsite, dtype=int)
+                self.Number1neigh = 3
+                self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+                self.mesh_ = -np.ones((2, self.LLX), dtype=int)
+                self.BuildLadder()  # build attributes in square lattice
 
             else:
                 raise ValueError("Geometry not supported yet")
 
         else:
             self.CustomNsites = para.parameters["CustomNsites"]
-            self.Number1neigh = 2
+            # self.Number1neigh = 2
             self.XConnectors = para.parameters["XConnectors"]
             self.YConnectors = para.parameters["YConnectors"]
             self.ZConnectors = para.parameters["ZConnectors"]
@@ -336,6 +348,77 @@ class Lattice:
         print("\nMap: # -> (r1,r2)")
         matprint(self.cMap)
 
+
+
+    def BuildLadder(self):
+        """
+        Construct Ladder Lattice mesh and nearest neighbor matrix
+        The lattice is labeled as follows (e.g. for a Lx = 8 ladder under OBC):
+        1 - x - 3 - y - 5 - x - 7 - y - 9 - x - 11 -
+        |       |       |       |       |       |            
+        z       z       z       z       z       z              
+        |       |       |       |       |       |          
+        0 - y - 2 - x - 4 - y - 6 - x - 8 - y - 10 -
+        """
+        print("[Lattice.py] building Ladder lattice...")
+        counter = 0
+        for ix in range(0, self.LLX):
+            for iy in [0, 1]:
+                self.mesh_[iy, ix] = counter
+                self.indx_[counter] = ix
+                self.indy_[counter] = iy
+                counter += 1
+        matprint(self.mesh_)
+        print("indx_ = ", self.indx_)
+        print("indy_ = ", self.indy_)
+
+        print("\n[Lattice.py] Looking for nearest neighbors...")
+        for i in range(0, self.Nsite):
+            ix = self.indx_[i]
+            iy = self.indy_[i]
+
+            # horizontal bonds +x
+            if ix  < self.LLX - 1:
+                jy = iy
+                jx = ix + 1
+                j = self.mesh_[jy, jx]  # (+x)-neighbor index
+                self.nn_[i, 0] = j
+            
+            # horizontal bonds in PBC +x
+            if self.IsPeriodicX and ix == self.LLX - 1:
+                jy = iy
+                jx = 0
+                j = self.mesh_[jy, jx]
+                self.nn_[i, 0] = j
+
+
+            # horizontal bonds -x
+            if ix - 1 >= 0:
+                jy = iy
+                jx = ix - 1
+                j = self.mesh_[jy, jx]  # (+x)-neighbor index
+                self.nn_[i, 1] = j
+
+            # horizontal bonds in PBC -x
+            if self.IsPeriodicX and ix == 0:
+                jy = iy
+                jx = self.indx_[self.Nsite - 1]
+                j = self.mesh_[jy, jx]
+                self.nn_[i, 1] = j
+
+            # veritcal bonds
+            if ix < self.LLX and iy + 1 < 2: 
+                jy = iy + 1
+                jx = ix
+                j = self.mesh_[jy, jx]  # (+y)-neighbor index
+                self.nn_[i, 2] = j
+                self.nn_[j, 2] = i # odd sites
+
+        matprint(self.nn_)
+    
+
+
+
     def BuildCustom(self):
         """
         Customize Lattice based on neighbor matrix
@@ -358,8 +441,9 @@ class Lattice:
 
 
 if __name__ == '__main__':
-    from src.Parameter import Parameter
+    from Parameter import Parameter
+    from Helper import matprint, vecprint
 
-    param = Parameter("../test/inputCri3.inp")
+    param = Parameter("/Users/shifeng/Projects/ExactDiagPy/input.inp")
     #param = Parameter("../input.inp")
     lat = Lattice(param)

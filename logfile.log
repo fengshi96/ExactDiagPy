@@ -199,15 +199,15 @@ Adding Magnetic Field at site 8
 Adding Magnetic Field at site 9
 Adding Magnetic Field at site 10
 Adding Magnetic Field at site 11
-Hamiltonian construction time = 0.1386 sec
+Hamiltonian construction time = 0.0466 sec
 
 -----------Beg of Eigen Values-----------
 
 -1.8240574526
 
 -----------End of Eigen Values-----------
-Diagonalization time = 0.1241 sec 
+Diagonalization time = 0.0135 sec 
 
 
 
-HDF5 time = 0.0065 sec
+HDF5 time = 0.0035 sec

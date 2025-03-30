@@ -15,6 +15,8 @@ class Hamiltonian:
             self.Nsite = Lat.LLX * Lat.LLY * 2
         elif Lat.Geometry == "Chain":
             self.Nsite = Lat.LLX
+        elif Lat.Geometry == "Ladder":
+            self.Nsite = Lat.LLX * 2
         elif Lat.Geometry == "Custom":
             self.Nsite = Lat.CustomNsites
         else:
@@ -82,7 +84,10 @@ def PairConstructor(Graph_, Nsite):
                 PairInd_[counter, 1] = j
                 PairCoef_[counter] = Graph_[i, j]
                 counter += 1
-
+    print("PairInd_ = ")
+    print(PairInd_)
+    print("PairCoef_ = ")
+    print(PairCoef_)
     return PairInd_, PairCoef_
 
 # Two point operator by tensor product
