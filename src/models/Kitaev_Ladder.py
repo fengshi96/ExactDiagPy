@@ -165,6 +165,7 @@ class Kitaev_Ladder(Hamiltonian):
                     Ham -= sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
                     Ham -= sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
                     Ham -= sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+        return Ham
 
        
 

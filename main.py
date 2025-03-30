@@ -4,6 +4,7 @@ import time
 import primme
 from src.Parameter import Parameter
 from src.models.Kitaev import Kitaev
+from src.models.Kitaev_Ladder import Kitaev_Ladder
 from src.models.Heisenberg import Heisenberg
 from src.Observ import Observ
 from src.Lattice import Lattice
@@ -34,6 +35,8 @@ def main(total, cmdargs):
         Hamil = Kitaev(Lat, Para)
     elif Para.parameters["Model"] == "ToricCode":
         Hamil = ToricCode(Lat, Para)
+    elif Para.parameters["Model"] == "Kitaev_Ladder":
+        Hamil = Kitaev_Ladder(Lat, Para)
     #######################################
     ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
     toc = time.perf_counter()
