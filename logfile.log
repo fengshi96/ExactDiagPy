@@ -3,7 +3,7 @@ LLX = 6
 LLY = 2
 IsPeriodicX = 1
 IsPeriodicY = 1
-Nstates = 8
+Nstates = 1
 tolerance = 1e-07
 Dof = SpinHalf
 Geometry = Ladder
@@ -178,22 +178,15 @@ Adding Magnetic Field at site 8
 Adding Magnetic Field at site 9
 Adding Magnetic Field at site 10
 Adding Magnetic Field at site 11
-Hamiltonian construction time = 0.0551 sec
+Hamiltonian construction time = 0.0509 sec
 
 -----------Beg of Eigen Values-----------
 
--2.5322475511
--2.5
--2.3824716031
--2.3824716031
--2.3824716031
--2.3136065026
--2.3045175136
--2.2807764064
+-10.1289902045
 
 -----------End of Eigen Values-----------
-Diagonalization time = 0.1365 sec 
+Diagonalization time = 0.0326 sec 
 
 
 
-HDF5 time = 0.0017 sec
+HDF5 time = 0.0015 sec

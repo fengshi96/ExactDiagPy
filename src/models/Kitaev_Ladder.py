@@ -141,7 +141,7 @@ class Kitaev_Ladder(Hamiltonian):
         Hamy = TwoSpinOps(self.KyyPair_, self.Kyycoef_, self.sy, self.sy, self.Nsite)
         Hamz = TwoSpinOps(self.KzzPair_, self.Kzzcoef_, self.sz, self.sz, self.Nsite)
 
-        Ham = Hamx + Hamy + Hamz
+        Ham = (Hamx + Hamy + Hamz) * 4
 
         # --------------------------- Add external field -------------------------
 
@@ -150,9 +150,9 @@ class Kitaev_Ladder(Hamiltonian):
                 print("Adding Magnetic Field at site " + str(i))
                 ida = sp.eye(2 ** i)
                 idb = sp.eye(2 ** (self.Nsite - i - 1))
-                Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx
-                Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy
-                Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz
+                Ham += sp.kron(ida, sp.kron(self.sx, idb)) * self.Hx * 2
+                Ham += sp.kron(ida, sp.kron(self.sy, idb)) * self.Hy * 2
+                Ham += sp.kron(ida, sp.kron(self.sz, idb)) * self.Hz * 2
             elif "zigzagField" in self.option:
                 print("Adding Zigzag Field at site " + str(i))
                 ida = sp.eye(2 ** i)

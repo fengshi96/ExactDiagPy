@@ -43,7 +43,7 @@ def main(total, cmdargs):
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which='SA')
+    evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which=-11.4296333222) #-10
     # evals, evecs = scipy.sparse.linalg.eigsh(ham, Para.parameters["Nstates"], which='SA', tol=Para.parameters["tolerance"], ncv=2*Para.parameters["Nstates"])
     evals, evecs = sort(evals, evecs)
     toc = time.perf_counter()
