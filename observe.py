@@ -2,6 +2,7 @@ import sys
 import time
 import numpy as np
 import h5py
+import math
 from src.Dofs import Dofs
 from src.Parameter import Parameter
 from src.Observ import Observ
@@ -50,20 +51,31 @@ def observe(total, cmdargs):
 
     # ------- Calculate local Sx Sy Sz (for gs) & write to ASCII---------
     if observname == "local_spins":
-        localSpins = np.zeros((Lat.Nsite, 4))
+        localSpins = np.zeros((Lat.Nsite, 7))
         print("Calculating local_Spins...")
         tic = time.perf_counter()
         for localSite in range(Lat.Nsite):
-            local_Sx = round(ob.mLocalSx(evecs[:, 0], localSite), 9)
-            local_Sy = round(ob.mLocalSy(evecs[:, 0], localSite), 9)
-            local_Sz = round(ob.mLocalSz(evecs[:, 0], localSite), 9)
+            local_Sx = round(ob.mLocalSx(evecs[:, 0], localSite).real, 9)
+            local_Sy = round(ob.mLocalSy(evecs[:, 0], localSite).real, 9)
+            local_Sz = round(ob.mLocalSz(evecs[:, 0], localSite).real, 9)
             localSpins[localSite, 0] = int(localSite)
             localSpins[localSite, 1] = local_Sx
             localSpins[localSite, 2] = local_Sy
             localSpins[localSite, 3] = local_Sz
+            localSpins[localSite, 4] = (local_Sx + local_Sy + local_Sz) / math.sqrt(3)  # S_e3
+            localSpins[localSite, 5] = (local_Sx - local_Sy) / math.sqrt(2)  # S_e2
+            localSpins[localSite, 6] = (-local_Sx - local_Sy + 2 * local_Sz) / math.sqrt(6)  # S_e1
         toc = time.perf_counter()
         printfArray(localSpins, "localSpins.dat")
         print(f"time = {toc-tic:0.4f} sec")
+        print("total Sx = ", np.sum(localSpins[:, 1]))
+        print("total Sy = ", np.sum(localSpins[:, 2]))
+        print("total Sz = ", np.sum(localSpins[:, 3]))
+        print("total Se3 = ", np.sum(localSpins[:, 4]))
+        print("total Se2 = ", np.sum(localSpins[:, 5]))
+        print("total Se1 = ", np.sum(localSpins[:, 6]))
+
+
 
     # ------- Calculate static correlations (for gs) & write to ASCII---------
     elif observname == "Cz":

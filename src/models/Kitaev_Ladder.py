@@ -222,6 +222,8 @@ class Kitaev_Ladder(Hamiltonian):
                     Ws2_Ops.append(["y", "x", "y", "x"]) 
 
         return np.array(Ws1_Indx), np.array(Ws1_Ops), np.array(Ws2_Indx), np.array(Ws2_Ops), np.array(Wp_Indx), np.array(Wp_Ops)
+    
+
 
                 
         
@@ -284,6 +286,7 @@ if __name__ == '__main__':
     for op in ops:
         result = matele(gs, op, gs).real
         print(result)
+
 
 
 
