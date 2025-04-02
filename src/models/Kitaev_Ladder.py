@@ -234,14 +234,14 @@ if __name__ == '__main__':
     import h5py
     from src.Observ import matele
 
-    param = Parameter("/Users/shifeng/Projects/ExactDiagPy/input.inp")
+    param = Parameter("input.inp")
     lat = Lattice(param)
     test = Kitaev_Ladder(lat, param)
 
 
     # test measuring fluxes 
-    outputname = "/Users/shifeng/Projects/ExactDiagPy/dataSpec.hdf5"
-    inputname = "/Users/shifeng/Projects/ExactDiagPy/input.inp"
+    outputname = "dataSpec.hdf5"
+    inputname = "input.inp"
 
     para = Parameter(inputname)
     Lat = Lattice(para)
