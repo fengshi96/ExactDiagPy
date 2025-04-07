@@ -46,6 +46,7 @@ t, U, mu       # Standard Constants in Hubbard Model
 maxOccupation  # The upper bound of boson occupation number
 Nstates        # Number of eigen states to keep
 Option         # Axiliary options. "option=EE" calculates entanglement spectrum and entropy 
+muFlux         # energy bias of fluxes in Kitaev model
 ```
 
 

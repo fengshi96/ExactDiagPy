@@ -110,13 +110,14 @@ def printfArray(A, filename, transpose=False):
         raise ValueError("3rd input must be Bool")
     file.close()
 
-def matprint(A):
+def matprint(A, delimiter='\t', nospacing=False):
     row = A.shape[0]
     col = A.shape[1]
     for i in range(row):
-        print("\n")
+        if not nospacing:
+            print("\n")
         for j in range(col):
-            print(A[i, j], end='\t')
+            print(A[i, j], end=delimiter)
     print("\n")
 
 
