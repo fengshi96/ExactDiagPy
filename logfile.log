@@ -11,9 +11,9 @@ Model = Kitaev_Ladder
 Kxx = 1
 Kyy = 1
 Kzz = 1
-Bxx = -0.0
-Byy = -0.0
-Bzz = -0.0
+Bxx = -0.1
+Byy = -0.1
+Bzz = -0.1
 threeSpin = 0.0
 ----------------- End of Parameters -----------------
 
@@ -106,15 +106,15 @@ Adding Magnetic Field at site 8
 Adding Magnetic Field at site 9
 Adding Magnetic Field at site 10
 Adding Magnetic Field at site 11
-Hamiltonian construction time = 0.0608 sec
+Hamiltonian construction time = 0.0438 sec
 
 -----------Beg of Eigen Values-----------
 
--10.1289902045
+-10.1604065084
 
 -----------End of Eigen Values-----------
-Diagonalization time = 0.0220 sec 
+Diagonalization time = 0.0355 sec 
 
 
 
-HDF5 time = 0.0071 sec
+HDF5 time = 0.0040 sec

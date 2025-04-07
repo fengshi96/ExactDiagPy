@@ -38,7 +38,7 @@ class KitaevLadderObserv(Observ):
             site7 = self.Lat.nn_[site6, 2]
             print(site2, site3, site4, site5, site6, site7)
 
-            # 5 three-spin terms
+            # 6 three-spin terms
             for j in range(0, 6):
                 self.ecurr_str.append([(2, site2, 'sx'), (2, site4, 'sz'), (2, site6, 'sy')])
                 self.ecurr_str.append([(-2, site3, 'sy'), (-2, site5, 'sz'), (-2, site7, 'sx')])
@@ -85,7 +85,7 @@ class KitaevLadderObserv(Observ):
 
         for sublist in self.ecurr_str:
             sorted_row = sorted(sublist, key=lambda x: x[1])
-            print(sorted_row)
+            # print(sorted_row)
             
             # for three spin terms
             if len(sorted_row) == 3:
