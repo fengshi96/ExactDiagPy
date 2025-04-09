@@ -124,11 +124,11 @@ class Kitaev_Ladder(Hamiltonian):
         # self.KzzGraph_ = np.triu(self.KzzGraph_)
 
         print("\nKxxGraph_:")
-        matprint(self.KxxGraph_, delimiter=' ', nospacing=True)
+        matprint(self.KxxGraph_, delimiter=' ', nospacing=False)
         print("\nKyyGraph_:")
-        matprint(self.KyyGraph_, delimiter=' ', nospacing=True)
+        matprint(self.KyyGraph_, delimiter=' ', nospacing=False)
         print("\nKzzGraph_:")
-        matprint(self.KzzGraph_, delimiter=' ', nospacing=True)
+        matprint(self.KzzGraph_, delimiter=' ', nospacing=False)
 
         printfArray(
             np.round(self.KxxGraph_).astype(int),

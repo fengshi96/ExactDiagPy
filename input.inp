@@ -1,4 +1,4 @@
-LLX=8
+LLX=6
 LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
@@ -7,7 +7,7 @@ IsPeriodicY=1
 #SysIndx=[0,1,2,3,4,5,6]
 
 ### Number of states to probe
-Nstates=50
+Nstates=1
 tolerance=1e-7
 
 ### model options: Kitaev, Heisenberg_Honeycomb, Bose_Hubbard, AKLT, Fermions
@@ -22,9 +22,9 @@ Kxx=1
 Kyy=1
 Kzz=1
 
-Bxx=-0.8
-Byy=-0.8
-Bzz=-0.8
+Bxx=-0.76
+Byy=-0.76
+Bzz=-0.76
 threeSpin=0.0
 
 #Pinning=0.0001

@@ -274,17 +274,17 @@ class KitaevLadderObserv(Observ):
                 for mi in range(Nstates):
                     Em = evals[mi]
                     # print("prob = ", prob)
-                    if True: #Em != Eg and En != Eg:  # rule out gs
-                        denom = eta / ((omega - (Em - En)) ** 2 + eta ** 2)
+                    if Em != Eg or En != Eg:  # rule out gs
+                        denom = eta / ((omega - (En - Em)) ** 2 + eta ** 2)
                         Melmn = matele(evecs[:, mi], ECurr, evecs[:, ni])
                         Melnm = matele(evecs[:, ni], ECurr, evecs[:, mi])
-                        # print(Melmn,Melmn.conjugate(), Melnm, Melnm.conjugate())
+                        print(Melmn, Melmn.conjugate(), Melnm, Melnm.conjugate())
                         weight = Melmn * Melnm * prob * denom  
                         weight = weight.real
                         ECC[omegacounter, 1] += weight 
 
             omegacounter += 1
-            print("ECC = ", ECC[omegacounter, 1])
+            print("ECCT = ", ECC[omegacounter, 1])
         ECC[:, 1] /= T
         
 
@@ -293,38 +293,38 @@ class KitaevLadderObserv(Observ):
 
 
     def SpinSpectral(self, evals, evecs, omegaList, eta, qm="SpinHalf"):
-            """
-            Measure together spin response S(omega)
-            Parameter: evals, 1d array of eigen energies
-                    evecs, 2d array, with cols being eigen vectors corresponding to evals
-            """
-            Nstates = len(evals)
+        """
+        Measure together spin response S(omega)
+        Parameter: evals, 1d array of eigen energies
+                evecs, 2d array, with cols being eigen vectors corresponding to evals
+        """
+        Nstates = len(evals)
 
-            gs = evecs[:, 0]  # ground state
-            Eg = evals[0]  # ground state energy
+        gs = evecs[:, 0]  # ground state
+        Eg = evals[0]  # ground state energy
 
-            hilbsize = Dofs(qm).hilbsize
-            # STotal = sp.eye(hilbsize ** self.Lat.Nsite, dtype=complex) * 0
-            # for i in range(0, self.Lat.Nsite):
-            #     STotal += (-1) ** (i//2) * self.LSyBuild(i, qm)
-            #     STotal += (-1) ** (i//2) * self.LSzBuild(i, qm)
-            #     STotal += (-1) ** (i//2) * self.LSxBuild(i, qm)
-            # STotal = self.LSxBuild(self.Lat.Nsite//2, qm) + self.LSyBuild(self.Lat.Nsite//2, qm) + self.LSzBuild(self.Lat.Nsite//2, qm)
-            STotal = self.LSxBuild(self.Lat.Nsite//2, qm) + 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
-            Sr = np.zeros((len(omegaList), 2), dtype=float)  # spin response
-            omegacounter = 0
-            for oi in range(0, len(omegaList)):
-                omega = omegaList[oi]
-                Sr[oi, 0] = omega
-                for mi in range(0, Nstates):
-                    Em = evals[mi]
-                    if Em != Eg:
-                        broaden = (1 / complex(omega - (Em - Eg), -eta)).imag
-                        mel = matele(evecs[:, mi], STotal, gs)
-                        MelS = mel.conjugate() * mel * broaden / np.pi
-                        Sr[omegacounter, 1] += MelS.real
-                omegacounter += 1
-            return Sr
+        hilbsize = Dofs(qm).hilbsize
+        Spm = self.LSxBuild(self.Lat.Nsite//2, qm) + 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
+        Smp = self.LSxBuild(self.Lat.Nsite//2, qm) - 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
+        Szz = self.LSzBuild(self.Lat.Nsite//2, qm)
+        Sr = np.zeros((len(omegaList), 2), dtype=float)  # spin response
+        omegacounter = 0
+        for oi in range(0, len(omegaList)):
+            omega = omegaList[oi]
+            Sr[oi, 0] = omega
+            for mi in range(0, Nstates):
+                Em = evals[mi]
+                if Em != Eg:
+                    broaden = (1 / complex(omega - (Em - Eg), -eta)).imag
+                    mel1 = matele(evecs[:, mi], Spm, gs)
+                    mel2 = matele(evecs[:, mi], Smp, gs)
+                    mel3 = matele(evecs[:, mi], Szz, gs)
+                    Mel1 = mel1.conjugate() * mel1 * broaden / np.pi
+                    Mel2 = mel2.conjugate() * mel2 * broaden / np.pi
+                    Mel3 = mel3.conjugate() * mel3 * broaden / np.pi
+                    Sr[omegacounter, 1] += Mel1.real + Mel2.real + Mel3.real
+            omegacounter += 1
+        return Sr
 
 def observe(total, cmdargs):
     inputname = "input.inp" 
@@ -353,27 +353,43 @@ def observe(total, cmdargs):
 
     # ------- Calculate dynamical correlation --------
     if observname == "CurrentCorrelation":   
-        eta = 0.025
+        eta = 0.1
         # omegaList = evals[:100] - evals[0]
-        omegaList = np.arange(0.00, 0.3, 0.01)
+        omegaList = np.arange(0.00, 0.6, 0.05)
         ECC = ob.CurrentCorrelation(evals, evecs, omegaList, eta)
         SCC = ob.SpinSpectral(evals, evecs, omegaList, eta)
-        # ECC = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 100)
+        ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 1)
         # print(ECC)
         matprintos(ECC, "ECC.txt")
         matprintos(ECC, "SCC.txt")
 
 
 
-        # ------- draw figure for ECC --------
+        # ------- draw figure for ECC and SCC--------
         figure = plt.figure()
         ax = figure.add_subplot(111)
         # ax.plot(SCC[:, 0], SCC[:, 1])
         ax.plot(ECC[:, 0], ECC[:, 1])
         ax.set_xlabel("$\omega$")
         ax.set_ylabel("$C(\omega)$")
+        ax.set_ylim(ymin=0)
         figure.savefig("ECC.pdf", dpi=300, bbox_inches='tight')
 
+        figure = plt.figure()
+        ax = figure.add_subplot(111)
+        ax.plot(SCC[:, 0], SCC[:, 1])
+        ax.set_xlabel("$\omega$")
+        ax.set_ylabel("$C(\omega)$")
+        ax.set_ylim(ymin=0)
+        figure.savefig("SCC.pdf", dpi=300, bbox_inches='tight')
+
+        figure = plt.figure()
+        ax = figure.add_subplot(111)
+        ax.plot(ECCT[:, 0], ECCT[:, 1])
+        ax.set_xlabel("$\omega$")
+        ax.set_ylabel("$C(\omega)$")
+        ax.set_ylim(ymin=0)
+        figure.savefig("SCC.pdf", dpi=300, bbox_inches='tight')
         
 
 
