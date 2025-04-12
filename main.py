@@ -42,9 +42,15 @@ def main(total, cmdargs):
     toc = time.perf_counter()
     print(f"Hamiltonian construction time = {toc - tic:0.4f} sec")
 
+    method = Para.parameters["Method"]
+
     tic = time.perf_counter()
-    evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which='SA') #-10
-    # evals, evecs = scipy.sparse.linalg.eigsh(ham, Para.parameters["Nstates"], which='SA', tol=Para.parameters["tolerance"], ncv=2*Para.parameters["Nstates"])
+    if method == "ED":
+        ham = ham.toarray()  # convert to dense matrix
+        evals, evecs = scipy.linalg.eigh(ham) 
+    else:
+        evals, evecs = primme.eigsh(ham, Para.parameters["Nstates"], tol=Para.parameters["tolerance"], which='SA') #-10
+        # evals, evecs = scipy.sparse.linalg.eigsh(ham, Para.parameters["Nstates"], which='SA', tol=Para.parameters["tolerance"], ncv=2*Para.parameters["Nstates"])
     evals, evecs = sort(evals, evecs)
     toc = time.perf_counter()
 

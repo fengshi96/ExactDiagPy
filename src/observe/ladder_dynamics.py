@@ -208,123 +208,167 @@ class KitaevLadderObserv(Observ):
 
         return Ecurr
 
+
     def CurrentCorrelation(self, evals, evecs, omegaList, eta, qm="SpinHalf"):
         """
-        For dynamical correlation i.e. S(c,j, omega) = sum_m sum_j <0|O_R O_{R+b}|m><m|O_j O_{j+b}|0> delta(omega - (Em - E0))
-        :param siteRef: the site of reference: R of A_R
-        :param evals: 1D array of eigen values
-        :param bond: integer that indicate bond direction; 0 = x, 1 = y, 2 = z
-        :param evecs: 2D array of eigen vectors; m-th column corresponds to m-th eigenvalue
-        :param omegasteps: number of omegas to scan
-        :param domega: step of omega scan
-        :param eta: broadening factor
-        :param qm: type of dof
-        :return: 2D array: len(omega) x #unit_cells =  len(omega) x Nsites/2
-        """
-        ECC = np.zeros((len(omegaList), 2), dtype=float)
+        Computes the zero-T current-current correlation 
+        S(omega) = sum_{m>=1} |<v_m|ECurr|gs>|^2 * [1/(omega - (E_m-E_g) - i*eta)] (imaginary part)
+        summed over all excited states (m>=1), then divided by T.
 
+        Parameters:
+            evals      : 1D array of eigenenergies (sorted, lowest first)
+            evecs      : 2D array of eigenvectors (each column is an eigenvector)
+            omegaList  : list or array of frequencies omega at which to evaluate the correlation
+            eta        : broadening parameter
+            qm         : string indicator (e.g. "SpinHalf") – not used here but kept for compatibility
+            
+        Returns:
+            ECC: 2D array of shape (len(omegaList), 2) where first column is omega and 
+                second column is the computed correlation divided by T.
+        """    
+        Eg = evals[0]      # ground state energy
+        gs = evecs[:, 0]   # ground state (first column)
 
-        Nstates = len(evals)
-        gs = evecs[:, 0]  # ground state
-        Eg = evals[0]  # ground state energy
-
+        # Build energy current operator
         ECurr = self.buildEnergyCurrent()
+        # Shift energies so that ground state energy becomes zero.
+        evals_shifted = evals - Eg
 
-        omegacounter = 0
-        for oi in range(0, len(omegaList)):
-            omega = omegaList[oi]
-            ECC[omegacounter, 0] = omega
+        # Compute all matrix elements:  M[m] = <v_m | ECurr | gs>
+        x = ECurr @ gs                      
+        Mvec = evecs.conjugate().T @ x        # shape: (Nstates,)
 
-            for mi in range(0, Nstates):
-                Em = evals[mi]
-                if Em != Eg:  # rule out gs
-                    denom = 1 / (omega - (Em - Eg) - complex(0, 1) * eta)
-                    MelE = matele(evecs[:, mi], ECurr, gs)
-                    weight = MelE.conjugate() * MelE * denom  
-                    weight = weight.imag
-                    ECC[omegacounter, 1] += weight
+        # Exclude ground state (m=0)
+        Mvec_ex = Mvec[1:]
+        dE_ex = evals_shifted[1:]           # energy differences for m>=1
 
-            omegacounter += 1
+        # Compute the Lorentzian factor for each omega and each excited state.
+        denom = 1.0 / (omegaList[:, None] - dE_ex[None, :] - 1j * eta)
+
+        # Squared matrix elements:
+        M2_ex = np.abs(Mvec_ex)**2         # shape: (Nstates-1,)
+
+        # Now, for each frequency omega, the contribution is sum_m M2_ex[m]*denom(omega, m).
+        weights = M2_ex[None, :] * denom    # shape: (n_omega, Nstates-1)
+        result = np.sum(weights.imag, axis=1)  # shape: (n_omega,)
+
+        ECC = np.zeros((len(omegaList), 2), dtype=float)
+        ECC[:, 0] = omegaList
+        ECC[:, 1] = result
 
         return ECC
 
+  
 
     def CurrentCorrelationFiniteTemp(self, evals, evecs, omegaList, eta, T):
-
-        ECC = np.zeros((len(omegaList), 2), dtype=float)
-
-        Nstates = len(evals)
-        gs = evecs[:, 0]  # ground state
-        Eg = evals[0]  # ground state energy
-
-        ECurr = self.buildEnergyCurrent()
-
-        Z = np.sum(np.exp(-evals / T))  # partition function
-        print("Z = ", Z)
-
-        omegacounter = 0
-        for oi in range(0, len(omegaList)):
-            omega = omegaList[oi]
-            ECC[omegacounter, 0] = omega
-            print("omega = ", omega)
-
-            for ni in range(0, Nstates):
-                En = evals[ni]
-                prob = np.exp(- En / T) / Z
-                for mi in range(Nstates):
-                    Em = evals[mi]
-                    # print("prob = ", prob)
-                    if Em != Eg or En != Eg:  # rule out gs
-                        denom = eta / ((omega - (En - Em)) ** 2 + eta ** 2)
-                        Melmn = matele(evecs[:, mi], ECurr, evecs[:, ni])
-                        Melnm = matele(evecs[:, ni], ECurr, evecs[:, mi])
-                        print(Melmn, Melmn.conjugate(), Melnm, Melnm.conjugate())
-                        weight = Melmn * Melnm * prob * denom  
-                        weight = weight.real
-                        ECC[omegacounter, 1] += weight 
-
-            omegacounter += 1
-            print("ECCT = ", ECC[omegacounter, 1])
-        ECC[:, 1] /= T
+        """
+        Compute the current-current correlation at finite temperature using a vectorized approach.
         
+        Parameters:
+        - evals: 1D array of eigenenergies (assumed sorted, lowest first)
+        - evecs: 2D array of eigenvectors (columns are eigenvectors)
+        - omegaList: list or array of ω frequencies
+        - eta: Lorentzian broadening parameter
+        - T: temperature
+        
+        Returns:
+        ECC: a 2D array with first column omega and second column the computed ECCT(ω)= (result)/T.
+        """
+        import numpy as np
+        
+        Nstates = len(evals)
+        Eg = evals[0]  # Ground state energy.
+        # Shift energies to avoid large exponentials.
+        evals_shifted = evals - Eg  
+        
+        # Build the energy current operator.
+        ECurr = self.buildEnergyCurrent()
+        
+        # Compute the partition function and state probabilities using the shifted energies.
+        Z = np.sum(np.exp(-evals_shifted / T))
+        Prob = np.exp(-evals_shifted / T) / Z
+        print("Z =", Z, "T =", T)
+        
+        # Compute the full matrix of energy current matrix elements. M[i, j] = <v_i| ECurr | v_j >
+        M = evecs.conjugate().T @ (ECurr @ evecs)  # shape: (Nstates, Nstates)
+        M2 = np.abs(M)**2  # squared magnitude of each element.
+        
+        # Optionally, exclude the ground-to-ground transition:
+        M2[0, 0] = 0.0
+        
+        # Sum over the second index (j) with the Boltzmann probability P_j,
+        # so that A[i] = sum_j M2[i,j] * Prob[j].
+        A = np.sum(M2 * Prob[None, :], axis=1)  # shape: (Nstates,)
+        
+        omegaList = np.array(omegaList)  # shape: (n_omega,)
+        L = eta / ((omegaList[:, None] - evals_shifted[None, :])**2 + eta**2)  # shape: (n_omega, Nstates)
+        
+        # For each ω, sum over the states:
+        R = np.sum(L * A[None, :], axis=1)  # shape: (n_omega,)
+        
+        # Divide by T (as in the Kubo formula) and return with ω in the first column.
+        ECC = np.zeros((len(omegaList), 2), dtype=float)
+        ECC[:, 0] = omegaList
+        ECC[:, 1] = R / T
+        return ECC
 
-        return ECC     
-  
 
 
     def SpinSpectral(self, evals, evecs, omegaList, eta, qm="SpinHalf"):
         """
-        Measure together spin response S(omega)
-        Parameter: evals, 1d array of eigen energies
-                evecs, 2d array, with cols being eigen vectors corresponding to evals
-        """
-        Nstates = len(evals)
+        Compute the zero-temperature spin spectral function S(ω) via:
+        
+        S(ω) = (1/π) Σ_{m>=1} [|⟨v_m|S^+|gs⟩|^2 + |⟨v_m|S^-|gs⟩|^2 + |⟨v_m|S^z|gs⟩|^2]
+                × [η/((ω - (E_m-E_g))^2 + η^2)]
+        
+        Parameters:
+        evals     : 1D numpy array of eigenenergies (sorted, with ground state first)
+        evecs     : 2D numpy array of eigenvectors (each column is an eigenvector)
+        omegaList : list or 1D array of frequency values ω
+        eta       : broadening factor for the Lorentzian
+        qm        : a string flag for the degree of freedom ("SpinHalf", etc.)
+        
+        Returns:
+        Sr        : 2D numpy array with shape (len(omegaList), 2), where the
+                    first column is ω and the second column is S(ω).
+        """        
+        gs = evecs[:, 0]
+        Eg = evals[0]
+        
+        nsite = self.Lat.Nsite // 2  # or the appropriate number of sites for your lattice/dof
+        Spm = self.LSxBuild(nsite, qm) + 1j * self.LSyBuild(nsite, qm)
+        Smp = self.LSxBuild(nsite, qm) - 1j * self.LSyBuild(nsite, qm)
+        Szz = self.LSzBuild(nsite, qm)
+        
 
-        gs = evecs[:, 0]  # ground state
-        Eg = evals[0]  # ground state energy
-
-        hilbsize = Dofs(qm).hilbsize
-        Spm = self.LSxBuild(self.Lat.Nsite//2, qm) + 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
-        Smp = self.LSxBuild(self.Lat.Nsite//2, qm) - 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
-        Szz = self.LSzBuild(self.Lat.Nsite//2, qm)
-        Sr = np.zeros((len(omegaList), 2), dtype=float)  # spin response
-        omegacounter = 0
-        for oi in range(0, len(omegaList)):
-            omega = omegaList[oi]
-            Sr[oi, 0] = omega
-            for mi in range(0, Nstates):
-                Em = evals[mi]
-                if Em != Eg:
-                    broaden = (1 / complex(omega - (Em - Eg), -eta)).imag
-                    mel1 = matele(evecs[:, mi], Spm, gs)
-                    mel2 = matele(evecs[:, mi], Smp, gs)
-                    mel3 = matele(evecs[:, mi], Szz, gs)
-                    Mel1 = mel1.conjugate() * mel1 * broaden / np.pi
-                    Mel2 = mel2.conjugate() * mel2 * broaden / np.pi
-                    Mel3 = mel3.conjugate() * mel3 * broaden / np.pi
-                    Sr[omegacounter, 1] += Mel1.real + Mel2.real + Mel3.real
-            omegacounter += 1
+        v_ex = evecs[:, 1:]
+        # M_spm[m] = <v_ex[:, m] | Spm | gs>
+        M_spm = (v_ex.conjugate().T @ (Spm @ gs))
+        M_smp = (v_ex.conjugate().T @ (Smp @ gs))
+        M_szz = (v_ex.conjugate().T @ (Szz @ gs))
+        
+        # Compute the squared magnitudes
+        M2_spm = np.abs(M_spm)**2
+        M2_smp = np.abs(M_smp)**2
+        M2_szz = np.abs(M_szz)**2
+        # Total squared matrix element for each excited state:
+        M2_total = M2_spm + M2_smp + M2_szz   # shape: (Nstates-1,)
+        
+        # Energy differences for excited states (shift energies so that ground state energy is zero)
+        dE_ex = evals[1:] - Eg  # shape: (Nstates-1,)
+        
+        # Convert omegaList to numpy array for vectorized operations.
+        L = eta / ((omegaList[:, None] - dE_ex[None, :])**2 + eta**2)  # shape: (n_omega, Nstates-1)
+        
+        # Sum contributions over excited states for each ω.
+        S_omega = np.sum(M2_total[None, :] * L, axis=1) / np.pi   # shape: (n_omega,)
+        
+        # Build the output array. First column is ω, second column is S(ω)
+        Sr = np.zeros((len(omegaList), 2), dtype=float)
+        Sr[:, 0] = omegaList
+        Sr[:, 1] = S_omega
         return Sr
+
 
 def observe(total, cmdargs):
     inputname = "input.inp" 
@@ -353,15 +397,22 @@ def observe(total, cmdargs):
 
     # ------- Calculate dynamical correlation --------
     if observname == "CurrentCorrelation":   
-        eta = 0.1
+        eta = 0.08
         # omegaList = evals[:100] - evals[0]
-        omegaList = np.arange(0.00, 0.6, 0.05)
+        omegaList = np.arange(0.00, 1.5, 0.05)
         ECC = ob.CurrentCorrelation(evals, evecs, omegaList, eta)
         SCC = ob.SpinSpectral(evals, evecs, omegaList, eta)
-        ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 1)
-        # print(ECC)
-        matprintos(ECC, "ECC.txt")
-        matprintos(ECC, "SCC.txt")
+        ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 2)
+
+        # T = np.arange(0.0001, 5, 0.2)
+        # ECCTDC = []
+        # for t in T:
+        #     ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, t)
+        #     ECCTDC.append(ECCT[0, 1])
+        # print(ECCTDC)
+
+        # matprintos(ECC, "ECC.txt")
+        # matprintos(ECC, "SCC.txt")
 
 
 
@@ -389,7 +440,7 @@ def observe(total, cmdargs):
         ax.set_xlabel("$\omega$")
         ax.set_ylabel("$C(\omega)$")
         ax.set_ylim(ymin=0)
-        figure.savefig("SCC.pdf", dpi=300, bbox_inches='tight')
+        figure.savefig("ECCT.pdf", dpi=300, bbox_inches='tight')
         
 
 
@@ -399,3 +450,86 @@ if __name__ == '__main__':
     total = len(sys.argv)
     cmdargs = sys.argv
     observe(total, cmdargs)
+
+
+### Dummy test codes:
+# def SpinSpectral(self, evals, evecs, omegaList, eta, qm="SpinHalf"):
+#     """
+#     Measure together spin response S(omega)
+#     Parameter: evals, 1d array of eigen energies
+#             evecs, 2d array, with cols being eigen vectors corresponding to evals
+#     """
+#     Nstates = len(evals)
+
+#     gs = evecs[:, 0]  # ground state
+#     Eg = evals[0]  # ground state energy
+
+#     hilbsize = Dofs(qm).hilbsize
+#     Spm = self.LSxBuild(self.Lat.Nsite//2, qm) + 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
+#     Smp = self.LSxBuild(self.Lat.Nsite//2, qm) - 1j * self.LSyBuild(self.Lat.Nsite//2, qm) 
+#     Szz = self.LSzBuild(self.Lat.Nsite//2, qm)
+#     Sr = np.zeros((len(omegaList), 2), dtype=float)  # spin response
+
+#     omegacounter = 0
+#     for oi in range(0, len(omegaList)):
+#         omega = omegaList[oi]
+#         print("omega = ", omega)
+
+#         Sr[oi, 0] = omega
+#         for mi in range(0, Nstates):
+#             Em = evals[mi]
+#             if Em != Eg:
+#                 broaden = (1 / complex(omega - (Em - Eg), -eta)).imag
+#                 mel1 = matele(evecs[:, mi], Spm, gs)
+#                 mel2 = matele(evecs[:, mi], Smp, gs)
+#                 mel3 = matele(evecs[:, mi], Szz, gs)
+#                 Mel1 = mel1.conjugate() * mel1 * broaden / np.pi
+#                 Mel2 = mel2.conjugate() * mel2 * broaden / np.pi
+#                 Mel3 = mel3.conjugate() * mel3 * broaden / np.pi
+#                 Sr[omegacounter, 1] += Mel1.real + Mel2.real + Mel3.real
+#         omegacounter += 1
+#     return Sr
+
+
+
+# def CurrentCorrelation(self, evals, evecs, omegaList, eta, qm="SpinHalf"):
+#     """
+#     For dynamical correlation i.e. S(c,j, omega) = sum_m sum_j <0|O_R O_{R+b}|m><m|O_j O_{j+b}|0> delta(omega - (Em - E0))
+#     :param siteRef: the site of reference: R of A_R
+#     :param evals: 1D array of eigen values
+#     :param bond: integer that indicate bond direction; 0 = x, 1 = y, 2 = z
+#     :param evecs: 2D array of eigen vectors; m-th column corresponds to m-th eigenvalue
+#     :param omegasteps: number of omegas to scan
+#     :param domega: step of omega scan
+#     :param eta: broadening factor
+#     :param qm: type of dof
+#     :return: 2D array: len(omega) x #unit_cells =  len(omega) x Nsites/2
+#     """
+#     ECC = np.zeros((len(omegaList), 2), dtype=float)
+
+
+#     Nstates = len(evals)
+#     gs = evecs[:, 0]  # ground state
+#     Eg = evals[0]  # ground state energy
+
+#     ECurr = self.buildEnergyCurrent()
+
+
+#     omegacounter = 0
+#     for oi in range(0, len(omegaList)):
+#         omega = omegaList[oi]
+#         ECC[omegacounter, 0] = omega
+#         print("omega = ", omega)
+
+#         for mi in range(0, Nstates):
+#             Em = evals[mi]
+#             if Em != Eg:  # rule out gs
+#                 denom = 1 / (omega - (Em - Eg) - complex(0, 1) * eta)
+#                 MelE = matele(evecs[:, mi], ECurr, gs)
+#                 weight = MelE.conjugate() * MelE * denom  
+#                 weight = weight.imag
+#                 ECC[omegacounter, 1] += weight
+
+#         omegacounter += 1
+
+#     return ECC  
