@@ -17,6 +17,8 @@ class Hamiltonian:
             self.Nsite = Lat.LLX
         elif Lat.Geometry == "Ladder":
             self.Nsite = Lat.LLX * 2
+        elif Lat.Geometry == "Diamond_Chain":
+            self.Nsite = Lat.LLX * 4
         elif Lat.Geometry == "Custom":
             self.Nsite = Lat.CustomNsites
         else:

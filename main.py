@@ -3,9 +3,6 @@ import numpy as np
 import time
 import primme
 from src.Parameter import Parameter
-from src.models.Kitaev import Kitaev
-from src.models.Kitaev_Ladder import Kitaev_Ladder
-from src.models.Heisenberg import Heisenberg
 from src.Observ import Observ
 from src.Lattice import Lattice
 from src.Helper import Logger, sort, hd5Storage
@@ -30,13 +27,19 @@ def main(total, cmdargs):
     tic = time.perf_counter()
     #######################################
     if Para.parameters["Model"] == "Heisenberg":
+        from src.models.Heisenberg import Heisenberg
         Hamil = Heisenberg(Lat, Para)    # Build Hamiltonian object
     elif Para.parameters["Model"] == "Kitaev":
+        from src.models.Kitaev import Kitaev
         Hamil = Kitaev(Lat, Para)
     elif Para.parameters["Model"] == "ToricCode":
         Hamil = ToricCode(Lat, Para)
     elif Para.parameters["Model"] == "Kitaev_Ladder":
+        from src.models.Kitaev_Ladder import Kitaev_Ladder
         Hamil = Kitaev_Ladder(Lat, Para)
+    elif Para.parameters["Model"] == "Kitaev_Diamond_Chain":
+        from src.models.Kitaev_Diamond_Chain import Kitaev_Diamond_Chain
+        Hamil = Kitaev_Diamond_Chain(Lat, Para)
     #######################################
     ham = Hamil.Ham  # mount in Hamiltonian as sparse matrix
     toc = time.perf_counter()

@@ -48,7 +48,7 @@ class Lattice:
                 self.Number1neigh = 2
                 self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
                 self.mesh_ = -np.ones(self.LLX, dtype=int)
-                self.BuildChain()  # build attributes in square lattice
+                self.BuildChain() 
             
             elif self.Geometry == "Ladder":
                 if self.LLY != 2:
@@ -59,7 +59,16 @@ class Lattice:
                 self.Number1neigh = 3
                 self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
                 self.mesh_ = -np.ones((2, self.LLX), dtype=int)
-                self.BuildLadder()  # build attributes in square lattice
+                self.BuildLadder()  
+
+            elif self.Geometry == "Diamond_Chain":
+                self.Nsite = self.LLX * 4
+                self.indx_ = np.zeros(self.Nsite, dtype=int)
+                self.indy_ = np.zeros(self.Nsite, dtype=int)
+                self.Number1neigh = 3
+                self.nn_ = -np.ones((self.Nsite, self.Number1neigh), dtype=int)
+                self.mesh_ = -np.ones((2, 2 * self.LLX), dtype=int)
+                self.BuildDiamondChain()  
 
             else:
                 raise ValueError("Geometry not supported yet")
@@ -71,6 +80,78 @@ class Lattice:
             self.YConnectors = para.parameters["YConnectors"]
             self.ZConnectors = para.parameters["ZConnectors"]
             self.BuildCustom()
+
+
+
+    def BuildDiamondChain(self):
+        """
+        1 - x - 3       5 - x - 7       9 - x - 11 
+        | \     | \     | \     | \     | \     |  
+        y   z   y   z   y   z   y   z   y   z   y      
+        |     \ |     \ |     \ |     \ |     \ |     
+        0 - x - 2       4 - x - 6       8 - x - 10 
+        Note n.n. are connected by bonds, e.g. 3-4 is n.n., but 3-5 is not. 
+        distance between 0 and 2 is 1; the unit cell length is 2 (0-4)
+        """
+        print("[Lattice.py] building Diamond chain lattice...")
+        counter = 0
+        for ix in range(0, 2 * self.LLX):
+            for iy in [0, 1]:
+                self.mesh_[iy, ix] = counter
+                self.indx_[counter] = ix
+                self.indy_[counter] = iy
+                counter += 1
+        matprint(self.mesh_)
+        print("indx_ = ", self.indx_)
+        print("indy_ = ", self.indy_)
+
+        print("\n[Lattice.py] Looking for nearest neighbors for x, y, z bonds: ")
+        for i in range(0, self.Nsite):
+            ix = self.indx_[i]
+            iy = self.indy_[i]
+
+            # horizontal x bonds
+            if ix  < self.LLX * 2:
+                if i % 4 == 0 or i % 4 == 1:
+                    jy = iy
+                    jx = ix + 1
+                    j = self.mesh_[jy, jx]  # (+x)-neighbor index
+                    self.nn_[i, 0] = j
+                elif i % 4 == 2 or i % 4 == 3:
+                    jy = iy
+                    jx = ix - 1
+                    j = self.mesh_[jy, jx]  # (-x)-neighbor index
+                    self.nn_[i, 0] = j
+        
+
+            # veritcal y bonds
+            if ix < self.LLX  * 2 and iy + 1 < 2: 
+                jy = iy + 1
+                jx = ix
+                j = self.mesh_[jy, jx]  # y-neighbor index
+                self.nn_[i, 1] = j
+                self.nn_[j, 1] = i
+
+
+            # canted z bonds
+            if ix >= 1 and i % 2 == 0:
+                jy = 1
+                jx = ix - 1
+                j = self.mesh_[jy, jx]  # z-bond-neighbor index
+                self.nn_[i, 2] = j
+                self.nn_[j, 2] = i
+
+            # canted z bonds in PBC
+            if self.IsPeriodicX and i == self.Nsite - 1:
+                j = 0
+                self.nn_[i, 2] = j
+                self.nn_[j, 2] = i
+                
+ 
+
+        matprint(self.nn_)
+
+
 
     def BuildChain(self):
         """
@@ -125,6 +206,8 @@ class Lattice:
                     self.nn_[i, 1] = j
 
         matprint(self.nn_)
+
+        
 
     def BuildHoneycomb(self):
         """

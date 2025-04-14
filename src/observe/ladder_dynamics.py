@@ -235,8 +235,8 @@ class KitaevLadderObserv(Observ):
         evals_shifted = evals - Eg
 
         # Compute all matrix elements:  M[m] = <v_m | ECurr | gs>
-        x = ECurr @ gs                      
-        Mvec = evecs.conjugate().T @ x        # shape: (Nstates,)
+        temp = gs.conjugate() @ ECurr
+        Mvec = temp @ evecs  # shape: (Nstates,)
 
         # Exclude ground state (m=0)
         Mvec_ex = Mvec[1:]
@@ -309,7 +309,8 @@ class KitaevLadderObserv(Observ):
         # Divide by T (as in the Kubo formula) and return with ω in the first column.
         ECC = np.zeros((len(omegaList), 2), dtype=float)
         ECC[:, 0] = omegaList
-        ECC[:, 1] = R / T
+        # ECC[:, 1] = R * (1 - np.exp(- omegaList / T)) / (T * omegaList)
+        ECC[:, 1] = R / T ** 2
         return ECC
 
 
@@ -332,41 +333,50 @@ class KitaevLadderObserv(Observ):
         Sr        : 2D numpy array with shape (len(omegaList), 2), where the
                     first column is ω and the second column is S(ω).
         """        
-        gs = evecs[:, 0]
-        Eg = evals[0]
+        # Number of states and ground state:
+        gs = evecs[:, 0]     # ground state vector (small)
+        Eg = evals[0]        # ground state energy
+        # Shift energies so that E_g becomes zero.
+        evals_shifted = evals - Eg
         
-        nsite = self.Lat.Nsite // 2  # or the appropriate number of sites for your lattice/dof
+        # Build the spin operators. Adjust nsite as appropriate for your system.
+        nsite = self.Lat.Nsite // 2
         Spm = self.LSxBuild(nsite, qm) + 1j * self.LSyBuild(nsite, qm)
         Smp = self.LSxBuild(nsite, qm) - 1j * self.LSyBuild(nsite, qm)
         Szz = self.LSzBuild(nsite, qm)
         
-
-        v_ex = evecs[:, 1:]
-        # M_spm[m] = <v_ex[:, m] | Spm | gs>
-        M_spm = (v_ex.conjugate().T @ (Spm @ gs))
-        M_smp = (v_ex.conjugate().T @ (Smp @ gs))
-        M_szz = (v_ex.conjugate().T @ (Szz @ gs))
+        # Use the ground state (which is small) to contract the operators:
+        # We compute temp vectors of shape (d,), then do a dot with evecs.
+        temp_spm = gs.conjugate() @ Spm   # shape: (d,)
+        M_spm_all = temp_spm @ evecs       # shape: (Nstates,)
         
-        # Compute the squared magnitudes
-        M2_spm = np.abs(M_spm)**2
-        M2_smp = np.abs(M_smp)**2
-        M2_szz = np.abs(M_szz)**2
-        # Total squared matrix element for each excited state:
-        M2_total = M2_spm + M2_smp + M2_szz   # shape: (Nstates-1,)
+        temp_smp = gs.conjugate() @ Smp
+        M_smp_all = temp_smp @ evecs
         
-        # Energy differences for excited states (shift energies so that ground state energy is zero)
-        dE_ex = evals[1:] - Eg  # shape: (Nstates-1,)
+        temp_szz = gs.conjugate() @ Szz
+        M_szz_all = temp_szz @ evecs
         
-        # Convert omegaList to numpy array for vectorized operations.
-        L = eta / ((omegaList[:, None] - dE_ex[None, :])**2 + eta**2)  # shape: (n_omega, Nstates-1)
+        # Compute the squared magnitudes for each excited state (m>=1)
+        M2_spm = np.abs(M_spm_all[1:])**2
+        M2_smp = np.abs(M_smp_all[1:])**2
+        M2_szz = np.abs(M_szz_all[1:])**2
+        M2_total = M2_spm + M2_smp + M2_szz  # shape: (Nstates-1,)
         
-        # Sum contributions over excited states for each ω.
-        S_omega = np.sum(M2_total[None, :] * L, axis=1) / np.pi   # shape: (n_omega,)
+        # Energy differences for the excited states:
+        dE_ex = evals_shifted[1:]  # shape: (Nstates-1,)
         
-        # Build the output array. First column is ω, second column is S(ω)
-        Sr = np.zeros((len(omegaList), 2), dtype=float)
-        Sr[:, 0] = omegaList
-        Sr[:, 1] = S_omega
+        # Prepare the ω values for vectorized computation:
+        omegaArray = np.array(omegaList)  # shape: (n_omega,)
+        
+        # Construct the Lorentzian broadening factors:
+        # L(ω, m) = η / [ (ω - dE_ex[m])^2 + η^2 ]
+        L = eta / ((omegaArray[:, None] - dE_ex[None, :])**2 + eta**2)  # shape: (n_omega, Nstates-1)
+        
+        # Sum contributions over m for each ω:
+        S_omega = np.sum(M2_total[None, :] * L, axis=1) / np.pi  # shape: (n_omega,)
+        
+        # Build the final output: first column = ω, second column = S(ω)
+        Sr = np.column_stack((omegaArray, S_omega))
         return Sr
 
 
@@ -399,20 +409,22 @@ def observe(total, cmdargs):
     if observname == "CurrentCorrelation":   
         eta = 0.08
         # omegaList = evals[:100] - evals[0]
-        omegaList = np.arange(0.00, 1.5, 0.05)
+        omegaList = np.arange(0.00, 6.0, 0.05)
         ECC = ob.CurrentCorrelation(evals, evecs, omegaList, eta)
         SCC = ob.SpinSpectral(evals, evecs, omegaList, eta)
-        ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 2)
+        # ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 1)
 
-        # T = np.arange(0.0001, 5, 0.2)
-        # ECCTDC = []
-        # for t in T:
+        # T = np.arange(1, 10, 1)
+        # ECCTDC = np.zeros((len(T), len(omegaList)), dtype=float)
+        # for ti, t in enumerate(T):
         #     ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, t)
-        #     ECCTDC.append(ECCT[0, 1])
-        # print(ECCTDC)
+        #     ECCTDC[ti, :] = ECCT[:, 1].T
+        #     print(ECCTDC[ti, 1])
+        # print(ECCTDC[:, 1])
 
         # matprintos(ECC, "ECC.txt")
         # matprintos(ECC, "SCC.txt")
+        # matprintos(ECCTDC, "ECCTDC.txt")
 
 
 
@@ -434,13 +446,13 @@ def observe(total, cmdargs):
         ax.set_ylim(ymin=0)
         figure.savefig("SCC.pdf", dpi=300, bbox_inches='tight')
 
-        figure = plt.figure()
-        ax = figure.add_subplot(111)
-        ax.plot(ECCT[:, 0], ECCT[:, 1])
-        ax.set_xlabel("$\omega$")
-        ax.set_ylabel("$C(\omega)$")
-        ax.set_ylim(ymin=0)
-        figure.savefig("ECCT.pdf", dpi=300, bbox_inches='tight')
+        # figure = plt.figure()
+        # ax = figure.add_subplot(111)
+        # ax.plot(ECCT[:, 0], ECCT[:, 1])
+        # ax.set_xlabel("$\omega$")
+        # ax.set_ylabel("$C(\omega)$")
+        # ax.set_ylim(ymin=0)
+        # figure.savefig("ECCT.pdf", dpi=300, bbox_inches='tight')
         
 
 
