@@ -20,6 +20,21 @@ def matele(A, Op, B):
     return bra.dot(Op.dot(ket))
 
 
+def overlap(A, B):
+    """
+    Calculate overlap: <A|B>
+    """
+    bra = A.conj().T
+    ket = B
+    if bra.shape != ket.shape:
+        print("bra, ket.shape = ", bra.shape, ket.shape)
+        raise ValueError("overlap(bra,ket): bra & ket must be vectors of the same dimension")
+    if bra.shape[0] != ket.shape[0]:
+        raise ValueError("overlap(bra,ket): Dimension mismatch")
+
+    return bra.dot(ket)
+
+
 class Observ:
     """
     This class is designed for construction of all kinds of Observable operators and their evaluation
@@ -383,7 +398,7 @@ class Observ:
     # ----------------------------- Local dofs ----------------------------------
     # ----------------------------- Local dofs----------------------------------
     # ----------------------------- Build local operators ----------------------------------
-    def LSxBuild(self, site, qm="SpinHalf"):
+    def LSxBuild(self, site, pauli=False, qm="SpinHalf"):
         """
         Build local spin x operator in full Hilbert space
         """
@@ -397,9 +412,11 @@ class Observ:
         ida = sp.eye(hilbsize ** site)
         idb = sp.eye(hilbsize ** (self.Lat.Nsite - site - 1))
         Sx = sp.kron(ida, sp.kron(sx, idb))
+        if pauli:
+            return Sx * 2
         return Sx
 
-    def LSyBuild(self, site, qm="SpinHalf"):
+    def LSyBuild(self, site, pauli=False, qm="SpinHalf"):
         """
         Build local spin y operator in full Hilbert space
         """
@@ -413,9 +430,11 @@ class Observ:
         ida = sp.eye(hilbsize ** site)
         idb = sp.eye(hilbsize ** (self.Lat.Nsite - site - 1))
         Sy = sp.kron(ida, sp.kron(sy, idb))
+        if pauli:
+            return Sy * 2
         return Sy
 
-    def LSzBuild(self, site, qm="SpinHalf"):
+    def LSzBuild(self, site, pauli=False, qm="SpinHalf"):
         """
         Build local spin z operator in full Hilbert space
         """
@@ -429,6 +448,8 @@ class Observ:
         ida = sp.eye(hilbsize ** site)
         idb = sp.eye(hilbsize ** (self.Lat.Nsite - site - 1))
         Sz = sp.kron(ida, sp.kron(sz, idb))
+        if pauli:
+            return Sz * 2
         return Sz
 
     def LSpBuild(self, site, qm="SpinHalf"):

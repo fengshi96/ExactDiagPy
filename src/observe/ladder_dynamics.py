@@ -17,6 +17,18 @@ from matplotlib import pyplot as plt
 pi = np.pi
 
 
+def reshape_outer(lst, a, b):
+    """
+    Reshape a 1‑D list `lst` of length a*b into a 2‑D list (a rows, b columns).
+    It does *not* touch the variable‑length sub‑lists stored inside.
+
+    Raises ValueError if len(lst) != a*b.
+    """
+    if len(lst) != a * b:
+        raise ValueError(f"len(lst)={len(lst)} is not a*b={a*b}")
+    return [lst[i*b : (i+1)*b] for i in range(a)]
+
+
 class KitaevLadderObserv(Observ):
     def __init__(self, Lat, Para):
         super().__init__(Lat, Para)
@@ -99,6 +111,144 @@ class KitaevLadderObserv(Observ):
         result = "+".join(terms)
         print(result)
         return result
+
+
+
+    def generate_energy_string(self):
+        """
+        generate a string representation of energy density
+        """
+        self.energy_str = []  # [[(const, site, op), (const, site, op), (const, site, op)], ...]
+        for i in np.arange(2, self.Lat.Nsite, 4):
+            # print("Building local energy density operator for site: " + str(i))
+            site2 = i
+            site3 = self.Lat.nn_[site2, 2]
+            site4 = self.Lat.nn_[site2, 0]
+            site5 = self.Lat.nn_[site4, 2]
+            site0 = self.Lat.nn_[site2, 1]
+            site1 = self.Lat.nn_[site0, 2]
+            # print(site0, site1, site2, site3, site4, site5)
+
+            # 7 two-spin terms
+            self.energy_str.append([(1, site2, 'sz'), (1, site3, 'sz')])
+            self.energy_str.append([(1, site1, 'sx'), (1, site3, 'sx')])
+            self.energy_str.append([(1, site2, 'sx'), (1, site4, 'sx')])
+            self.energy_str.append([(1, site0, 'sy'), (1, site2, 'sy')])
+            self.energy_str.append([(1, site3, 'sy'), (1, site5, 'sy')])
+            self.energy_str.append([(0.5, site0, 'sz'), (0.5, site1, 'sz')])
+            self.energy_str.append([(0.5, site4, 'sz'), (0.5, site5, 'sz')])
+
+            # Zeeman field on 6 sites (6x3 terms)
+            h = self.Hx # for [111] field
+            if h != 0:
+                for op in ['sx', 'sy', 'sz']:
+                    self.energy_str.append([(h / 2, site0, op)])
+                    self.energy_str.append([(h / 2, site1, op)])
+                    self.energy_str.append([(h, site2, op)])
+                    self.energy_str.append([(h, site3, op)])
+                    self.energy_str.append([(h / 2, site4, op)])
+                    self.energy_str.append([(h / 2, site5, op)])
+
+            if self.Hx != 0:
+                items_to_print = self.energy_str[-25:]
+            else:
+                items_to_print = self.energy_str[-7:]
+
+            for sublist in items_to_print:
+                # Create a formatted string for each tuple in the sublist
+                formatted_line = ", ".join(f"({const}, {site}, {op})" for const, site, op in sublist)
+                # print(f"[{formatted_line}]")
+
+        terms = []
+        for summand in self.energy_str:
+            # Get the constant from the first tuple in the summand.
+            constant = summand[0][0]
+            # Build operator factors: each tuple gives op[site]
+            op_factors = []
+            for tup in summand:
+                # tup is (const, site, op) ; ignore the repeated constant in subsequent tuples.
+                # Convert the operator to a string (if not already) and build e.g. "sx[14]"
+                op_str = f"{tup[2]}[{tup[1]}]"
+                op_factors.append(op_str)
+            term = f"{constant}*" + "*".join(op_factors) + "*|gs>"
+            terms.append(term)
+        # Join each term with a plus sign.
+        result = "+".join(terms)
+        # print(result)
+        return result
+    
+
+
+    def buildenergydensity(self, energy_site_ref):
+        """
+        Build the local energy density operator for the Kitaev ladder model at site=site (2, 6, ...).
+        
+        Returns:
+            E: sparse matrix representing the energy density operator.
+        """
+        if energy_site_ref % 4 != 2:
+            raise ValueError("site of reference for energy density operator must be 2 mod 4")
+        
+        self.generate_energy_string()
+
+        Spins = Dofs("SpinHalf")
+        X = Spins.Sx * 2
+        Y = Spins.Sy * 2
+        Z = Spins.Sz * 2
+        hilbsize = Spins.hilbsize
+        dict = {'sx': X, 'sy': Y, 'sz': Z}
+
+        Energy = sp.eye(hilbsize ** self.Lat.Nsite, dtype=complex) * 0
+
+        offset = int((energy_site_ref - 2) / 4)
+        # print("offset = ", offset)
+        if self.Hx != 0:
+            energy_str = reshape_outer(self.energy_str, self.Lat.Nsite // 4, 25)
+        elif self.Hx == 0:
+            energy_str = reshape_outer(self.energy_str, self.Lat.Nsite // 4, 7)
+        # print(energy_str[offset])
+        
+        for sublist in energy_str[offset]:
+            sorted_row = sorted(sublist, key=lambda x: x[1])
+            # print(sorted_row)
+            
+            # for two spin terms
+            if len(sorted_row) == 2:
+                first_site = sorted_row[0][1]
+                second_site = sorted_row[1][1]
+                if first_site > 0:
+                    ida = sp.eye(hilbsize ** first_site)
+                else:
+                    ida = sp.eye(1)
+                idm = sp.eye(hilbsize ** (second_site - first_site - 1))
+                if second_site < self.Lat.Nsite - 1:
+                    idb = sp.eye(hilbsize ** (self.Lat.Nsite - second_site - 1))
+                else:
+                    idb = sp.eye(1)
+
+                op1 = sorted_row[0][2]
+                op2 = sorted_row[1][2]
+                const = sorted_row[0][0]
+                Energy += sp.kron(sp.kron(sp.kron(sp.kron(ida, dict[op1]), idm), dict[op2]), idb) * const
+                
+            # for one spin terms
+            elif len(sorted_row) == 1:
+                first_site = sorted_row[0][1]
+                op1 = sorted_row[0][2]
+                const = sorted_row[0][0]
+                ida = sp.eye(hilbsize ** first_site)
+                idb = sp.eye(hilbsize ** (self.Lat.Nsite - first_site - 1))
+                Energy += sp.kron(ida, sp.kron(dict[op1], idb)) * const
+
+        return Energy
+
+
+
+
+
+
+
+
 
 
     def buildEnergyCurrent(self):
@@ -385,6 +535,10 @@ def observe(total, cmdargs):
     observname = "CurrentCorrelation"
     para = Parameter(inputname)
     Lat = Lattice(para)
+
+    if para.parameters['Method'] == "ED":
+        para.parameters["Nstates"] = 2 ** Lat.Nsite
+
     ob = KitaevLadderObserv(Lat, para)
     print(para.parameters["Model"])
     dof = Dofs("SpinHalf")  # default spin-1/2
@@ -404,55 +558,57 @@ def observe(total, cmdargs):
 
     # ob.buildEnergyCurrent()
     # ob.generate_ecurr_string()
+    ob.generate_energy_string()
+    ob.buildenergydensity(6)
 
-    # ------- Calculate dynamical correlation --------
-    if observname == "CurrentCorrelation":   
-        eta = 0.08
-        # omegaList = evals[:100] - evals[0]
-        omegaList = np.arange(0.00, 6.0, 0.05)
-        ECC = ob.CurrentCorrelation(evals, evecs, omegaList, eta)
-        SCC = ob.SpinSpectral(evals, evecs, omegaList, eta)
-        # ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 1)
+    # # ------- Calculate dynamical correlation --------
+    # if observname == "CurrentCorrelation":   
+    #     eta = 0.08
+    #     # omegaList = evals[:100] - evals[0]
+    #     omegaList = np.arange(0.00, 6.0, 0.05)
+    #     ECC = ob.CurrentCorrelation(evals, evecs, omegaList, eta)
+    #     SCC = ob.SpinSpectral(evals, evecs, omegaList, eta)
+    #     # ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, 1)
 
-        # T = np.arange(1, 10, 1)
-        # ECCTDC = np.zeros((len(T), len(omegaList)), dtype=float)
-        # for ti, t in enumerate(T):
-        #     ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, t)
-        #     ECCTDC[ti, :] = ECCT[:, 1].T
-        #     print(ECCTDC[ti, 1])
-        # print(ECCTDC[:, 1])
+    #     # T = np.arange(1, 10, 1)
+    #     # ECCTDC = np.zeros((len(T), len(omegaList)), dtype=float)
+    #     # for ti, t in enumerate(T):
+    #     #     ECCT = ob.CurrentCorrelationFiniteTemp(evals, evecs, omegaList, eta, t)
+    #     #     ECCTDC[ti, :] = ECCT[:, 1].T
+    #     #     print(ECCTDC[ti, 1])
+    #     # print(ECCTDC[:, 1])
 
-        # matprintos(ECC, "ECC.txt")
-        # matprintos(ECC, "SCC.txt")
-        # matprintos(ECCTDC, "ECCTDC.txt")
+    #     # matprintos(ECC, "ECC.txt")
+    #     # matprintos(ECC, "SCC.txt")
+    #     # matprintos(ECCTDC, "ECCTDC.txt")
 
 
 
-        # ------- draw figure for ECC and SCC--------
-        figure = plt.figure()
-        ax = figure.add_subplot(111)
-        # ax.plot(SCC[:, 0], SCC[:, 1])
-        ax.plot(ECC[:, 0], ECC[:, 1])
-        ax.set_xlabel("$\omega$")
-        ax.set_ylabel("$C(\omega)$")
-        ax.set_ylim(ymin=0)
-        figure.savefig("ECC.pdf", dpi=300, bbox_inches='tight')
+    #     # ------- draw figure for ECC and SCC--------
+    #     figure = plt.figure()
+    #     ax = figure.add_subplot(111)
+    #     # ax.plot(SCC[:, 0], SCC[:, 1])
+    #     ax.plot(ECC[:, 0], ECC[:, 1])
+    #     ax.set_xlabel("$\omega$")
+    #     ax.set_ylabel("$C(\omega)$")
+    #     ax.set_ylim(ymin=0)
+    #     figure.savefig("ECC.pdf", dpi=300, bbox_inches='tight')
 
-        figure = plt.figure()
-        ax = figure.add_subplot(111)
-        ax.plot(SCC[:, 0], SCC[:, 1])
-        ax.set_xlabel("$\omega$")
-        ax.set_ylabel("$C(\omega)$")
-        ax.set_ylim(ymin=0)
-        figure.savefig("SCC.pdf", dpi=300, bbox_inches='tight')
+    #     figure = plt.figure()
+    #     ax = figure.add_subplot(111)
+    #     ax.plot(SCC[:, 0], SCC[:, 1])
+    #     ax.set_xlabel("$\omega$")
+    #     ax.set_ylabel("$C(\omega)$")
+    #     ax.set_ylim(ymin=0)
+    #     figure.savefig("SCC.pdf", dpi=300, bbox_inches='tight')
 
-        # figure = plt.figure()
-        # ax = figure.add_subplot(111)
-        # ax.plot(ECCT[:, 0], ECCT[:, 1])
-        # ax.set_xlabel("$\omega$")
-        # ax.set_ylabel("$C(\omega)$")
-        # ax.set_ylim(ymin=0)
-        # figure.savefig("ECCT.pdf", dpi=300, bbox_inches='tight')
+    #     # figure = plt.figure()
+    #     # ax = figure.add_subplot(111)
+    #     # ax.plot(ECCT[:, 0], ECCT[:, 1])
+    #     # ax.set_xlabel("$\omega$")
+    #     # ax.set_ylabel("$C(\omega)$")
+    #     # ax.set_ylim(ymin=0)
+    #     # figure.savefig("ECCT.pdf", dpi=300, bbox_inches='tight')
         
 
 

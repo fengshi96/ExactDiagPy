@@ -23,9 +23,9 @@ Kxx=1
 Kyy=1
 Kzz=1
 
-Bxx=-0.0
-Byy=-0.0
-Bzz=-0.0
+Bxx=-1.0
+Byy=-1.0
+Bzz=-1.0
 threeSpin=0.0
 
 #Pinning=0.0001
