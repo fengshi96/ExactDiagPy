@@ -1,4 +1,4 @@
-LLX=4
+LLX=6
 LLY=2
 IsPeriodicX=1
 IsPeriodicY=1
@@ -7,16 +7,16 @@ IsPeriodicY=1
 #SysIndx=[0,1,2,3,4,5,6]
 
 ### Number of states to probe
-Nstates=40
+Nstates=20
 tolerance=1e-7
 
 ### model options: Kitaev, Heisenberg_Honeycomb, Bose_Hubbard, AKLT, Fermions
 ### for TFIM plz set OBC for Y and PBC for X, with its coupling constants specified
 ### Bose_Hubbard/Fermi_Hubbard Hamiltonian: H = +t \sum (a*a + aa*) + U \sum n(n-1) + \mu \sum n
-Method=Lanczos
+Method=ED
 Dof=SpinHalf
-Geometry=Diamond_Chain
-Model=Kitaev_Diamond_Chain
+Geometry=Ladder
+Model=Kitaev_Ladder
 
 # For spin models
 Kxx=1
@@ -30,7 +30,7 @@ threeSpin=0.0
 
 #Pinning=0.0001
 
-#muFlux=-10.0
+#muFlux=10.0
 
 ### For Bose Hubbard and Fermions
 #t=1.0

@@ -254,57 +254,54 @@ if __name__ == '__main__':
     param = Parameter("input.inp")
     lat = Lattice(param)
     test = Kitaev_Ladder(lat, param)
-    
-    # test.BuildKitaevLadder()  # Build the Hamiltonian to initialize the graphs
 
+    # test measuring fluxes 
+    outputname = "dataSpec.hdf5"
+    inputname = "input.inp"
 
-    # # test measuring fluxes 
-    # outputname = "dataSpec.hdf5"
-    # inputname = "input.inp"
+    para = Parameter(inputname)
+    Lat = Lattice(para)
+    ob = Observ(Lat, para)
+    print(para.parameters["Model"])
+    dof = Dofs("SpinHalf")  # default spin-1/2
 
-    # para = Parameter(inputname)
-    # Lat = Lattice(para)
-    # ob = Observ(Lat, para)
-    # print(para.parameters["Model"])
-    # dof = Dofs("SpinHalf")  # default spin-1/2
+    # ------- Read dataSpec file -------
+    rfile = h5py.File(outputname, 'r')
+    evalset = rfile["3.Eigen"]["Eigen Values"]
+    evecset = rfile["3.Eigen"]["Wavefunctions"]
 
-    # # ------- Read dataSpec file -------
-    # rfile = h5py.File(outputname, 'r')
-    # evalset = rfile["3.Eigen"]["Eigen Values"]
-    # evecset = rfile["3.Eigen"]["Wavefunctions"]
+    # extract eigen value and eigen vector from HDF5 rfile
+    evals = np.zeros(para.parameters["Nstates"], dtype=float)
+    evecs = np.zeros((dof.hilbsize ** Lat.Nsite, para.parameters["Nstates"]), dtype=complex)
+    evalset.read_direct(evals)
+    evecset.read_direct(evecs)
+    rfile.close()
+    gs = evecs[:, 0]
 
-    # # extract eigen value and eigen vector from HDF5 rfile
-    # evals = np.zeros(para.parameters["Nstates"], dtype=float)
-    # evecs = np.zeros((dof.hilbsize ** Lat.Nsite, para.parameters["Nstates"]), dtype=complex)
-    # evalset.read_direct(evals)
-    # evecset.read_direct(evecs)
-    # rfile.close()
-    # gs = evecs[:, 0]
+    # Build the flux list
+    ws1_indx, ws1_ops, ws2_indx, ws2_ops, wp_indx, wp_ops = test.buildFluxList()
+    print("ws1_indx, ws1_ops = ", ws1_indx, ws1_ops)
+    print("ws2_indx, ws2_ops = ", ws2_indx, ws2_ops)
+    print("wp_indx, wp_ops = ", wp_indx, wp_ops)
 
-    # # Build the flux list
-    # ws1_indx, ws1_ops, ws2_indx, ws2_ops, wp_indx, wp_ops = test.buildFluxList()
-    # print("ws1_indx, ws1_ops = ", ws1_indx, ws1_ops)
-    # print("ws2_indx, ws2_ops = ", ws2_indx, ws2_ops)
-    # print("wp_indx, wp_ops = ", wp_indx, wp_ops)
+    # Build the flux operators and measure
+    print("measuring ws1 fluxes:")
+    ops = test.BuildFlux(ws1_indx, ws1_ops)
+    for op in ops:
+        result = matele(gs, op, gs).real
+        print(result)
 
-    # # Build the flux operators and measure
-    # print("measuring ws1 fluxes:")
-    # ops = test.BuildFlux(ws1_indx, ws1_ops)
-    # for op in ops:
-    #     result = matele(gs, op, gs).real
-    #     print(result)
+    print("measuring ws2 fluxes:")
+    ops = test.BuildFlux(ws2_indx, ws2_ops)
+    for op in ops:
+        result = matele(gs, op, gs).real
+        print(result)
 
-    # print("measuring ws2 fluxes:")
-    # ops = test.BuildFlux(ws2_indx, ws2_ops)
-    # for op in ops:
-    #     result = matele(gs, op, gs).real
-    #     print(result)
-
-    # print("measuring wp fluxes:")
-    # ops = test.BuildFlux(wp_indx, wp_ops)
-    # for op in ops:
-    #     result = matele(gs, op, gs).real
-    #     print(result)
+    print("measuring wp fluxes:")
+    ops = test.BuildFlux(wp_indx, wp_ops)
+    for op in ops:
+        result = matele(gs, op, gs).real
+        print(result)
 
 
 
