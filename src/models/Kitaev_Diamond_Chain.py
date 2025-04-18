@@ -165,13 +165,13 @@ class Kitaev_Diamond_Chain(Hamiltonian):
             for s, site in enumerate(IndexArray[i, :]):
                 if SigmaArray[i, s] == "x":
                     # print("site, component =", site, SigmaArray[i, s])
-                    S *= self.Ob.LSxBuild(site, "SpinHalf") * 2  # *2 to recover pauli matrix from spin-1/2
+                    S *= self.Ob.LSxBuild(site, pauli=False, qm="SpinHalf") * 2  # *2 to recover pauli matrix from spin-1/2
                 elif SigmaArray[i, s] == "y":
                     # print("site, component =", site, SigmaArray[i, s])
-                    S *= self.Ob.LSyBuild(site, "SpinHalf") * 2
+                    S *= self.Ob.LSyBuild(site, pauli=False, qm="SpinHalf") * 2
                 elif SigmaArray[i, s] == "z":
                     # print("site, component =", site, SigmaArray[i, s])
-                    S *= self.Ob.LSzBuild(site, "SpinHalf") * 2
+                    S *= self.Ob.LSzBuild(site, pauli=False, qm="SpinHalf") * 2
                 else:
                     raise ValueError("invalid name for spin components:", SigmaArray[i, s])
             FluxOperators.append(S)
